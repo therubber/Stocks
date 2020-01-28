@@ -6,6 +6,6 @@ public interface Fund {
     String getName();
     String getISIN();
     int getWKN();
-    double getUnitPrice();
-    LinkedList<Double> histValue();
+    double getCurrentPrice();
+    LinkedList<Double> histPrice();
 }
