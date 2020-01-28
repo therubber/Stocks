@@ -1,9 +1,8 @@
-package funds;
+package stocks;
 
 import java.util.LinkedList;
 
-public class UniRAK implements Fund {
-
+public class UniRAK {
     private static final String NAME = "UniRAK";
     private static final String ISIN = "DE0008491044";
     private static final int WKN = 849104;
@@ -38,4 +37,8 @@ public class UniRAK implements Fund {
         this.histPrice = histPrice;
     }
 
+    @Override
+    public String toString() {
+        return NAME + "   " + ISIN + "   " + WKN + "   " + getCurrentPrice() + " EUR";
+    }
 }
