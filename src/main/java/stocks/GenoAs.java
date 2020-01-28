@@ -2,10 +2,10 @@ package stocks;
 
 import java.util.LinkedList;
 
-public class UniAsia {
-    private static final String NAME = "UniAsia";
-    private static final String ISIN = "LU0037079034";
-    private static final String WKN = "971267";
+public class GenoAs {
+    private static final String NAME = "GenoAs: 1";
+    private static final String ISIN = "DE0009757682";
+    private static final String WKN = "975768";
     private double currentPrice;
     private LinkedList<Double> histPrice;
 

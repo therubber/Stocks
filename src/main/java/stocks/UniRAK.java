@@ -5,7 +5,7 @@ import java.util.LinkedList;
 public class UniRAK {
     private static final String NAME = "UniRAK";
     private static final String ISIN = "DE0008491044";
-    private static final int WKN = 849104;
+    private static final String WKN = "849104";
     private double currentPrice;
     private LinkedList<Double> histPrice;
 
@@ -17,7 +17,7 @@ public class UniRAK {
         return ISIN;
     }
 
-    public int getWKN() {
+    public String getWKN() {
         return WKN;
     }
 
