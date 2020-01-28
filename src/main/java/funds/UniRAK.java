@@ -4,22 +4,22 @@ import java.util.LinkedList;
 
 public class UniRAK implements Fund {
 
-    private final String name = "UniRAK";
-    private final String isin = "DE0008491044";
-    private final int wkn = 849104;
+    private static final String NAME = "UniRAK";
+    private static final String ISIN = "DE0008491044";
+    private static final int WKN = 849104;
     private double currentPrice;
     private LinkedList<Double> histPrice;
 
     public String getName() {
-        return name;
+        return NAME;
     }
 
     public String getISIN() {
-        return isin;
+        return ISIN;
     }
 
     public int getWKN() {
-        return wkn;
+        return WKN;
     }
 
     public double getCurrentPrice() {
