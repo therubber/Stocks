@@ -1,5 +1,7 @@
 package stocks;
 
+import stocks.funds.Fund;
+
 public class Position {
     private int count;
     private Fund fund;
@@ -23,6 +25,7 @@ public class Position {
         position.append(fund.getISIN());
         position.append("   ");
         position.append(fund.getWKN());
+        position.append(System.lineSeparator());
         return position.toString();
     }
 }

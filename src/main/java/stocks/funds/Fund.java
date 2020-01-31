@@ -1,4 +1,4 @@
-package stocks;
+package stocks.funds;
 
 import java.util.LinkedList;
 

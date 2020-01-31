@@ -1,11 +1,11 @@
-package stocks;
+package stocks.funds;
 
 import java.util.LinkedList;
 
-public class UniEuroAnleihen {
-    private static final String NAME = "UniEuroAnleihen";
-    private static final String ISIN = "LU0966118209";
-    private static final String WKN = "A1W4QB";
+public class UniRAK {
+    private static final String NAME = "UniRAK";
+    private static final String ISIN = "DE0008491044";
+    private static final String WKN = "849104";
     private double currentPrice;
     private LinkedList<Double> histPrice;
 
@@ -39,6 +39,6 @@ public class UniEuroAnleihen {
 
     @Override
     public String toString() {
-        return NAME + "   " + ISIN + "   " + WKN + "   " + getCurrentPrice() + " EUR";
+        return NAME + "   " + ISIN + "   " + WKN + "   " + getCurrentPrice() + " EUR" + System.lineSeparator();
     }
 }

@@ -11,7 +11,6 @@ public class User {
     public User(String username) {
         this.equity = 10000.0;
         this.username = username;
-        System.out.println("New user successfully created!");
     }
 
     public void addDepot(String name, int equity) {
