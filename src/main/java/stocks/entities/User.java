@@ -5,9 +5,9 @@ import java.util.Objects;
 
 public class User {
     public int key;
-    public String username;
+    private String username;
     private double equity;
-    public LinkedList<Depot> depots = new LinkedList<>();
+    public LinkedList<Portfolio> portfolios = new LinkedList<>();
 
     public User(String username) {
         this.equity = 10000.0;
@@ -19,14 +19,22 @@ public class User {
     }
 
     public void listDepots() {
-        for(Depot depot : depots) {
-            System.out.println(depot.toString() + ": " + depot.getEquity() + " EUR, ");
+        for(Portfolio portfolio : portfolios) {
+            System.out.println(portfolio.toString() + ": " + portfolio.getValue() + " EUR, ");
         }
+    }
+
+    public String getName() {
+        return username;
+    }
+
+    public void setEquity(double equity) {
+        this.equity = equity;
     }
 
     @Override
     public String toString() {
-        return key + "   " +  username + "   " + equity + "   " + depots;
+        return key + "   " +  username + "   " + equity + "   " + portfolios;
     }
 
     @Override

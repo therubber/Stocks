@@ -2,6 +2,8 @@ package stocks.entities;
 
 import stocks.dows.FundDow;
 
+import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class Position {
@@ -10,12 +12,14 @@ public class Position {
     private FundDow fund;
     private double value;
     private String id;
+    private LocalDate execution;
 
     public Position(int count, FundDow fund) {
         this.count = count;
         this.fund = fund;
         this.value = count * fund.getSpotPrice();
-        this.id = "POS00" + count + (int)value * count;
+        this.id = "POS" + new DecimalFormat("000000").format((int)(Math.random() * 100000));
+        this.execution = LocalDate.now();
     }
 
     public int getCount() {
@@ -23,7 +27,7 @@ public class Position {
     }
 
     public double getValue() {
-        return count * fund.getSpotPrice();
+        return value;
     }
 
     public String getId() {
@@ -34,9 +38,13 @@ public class Position {
         return fund.getName();
     }
 
+    public String getExecution() {
+        return execution.toString();
+    }
+
     @Override
     public String toString() {
-        return count +"\t" + fund.getName() + "\t" + fund.getIsin() + "\t" + fund.getWkn() + "\t" + getValue() + System.lineSeparator();
+        return count + "\t" + fund.getName() + "\t" + fund.getIsin() + "\t" + fund.getWkn() + "\t" + new DecimalFormat("###,###.00").format(getValue()) + "\t\t" + execution.toString() + System.lineSeparator();
     }
 
     @Override
