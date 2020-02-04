@@ -58,16 +58,16 @@ public class Broker {
         String input = scanner.next();
         switch (input) {
             case "selected":
-                selectedDepot();
+                selectedPortfolio();
                 return "selected";
             case "select":
-                selectDepot();
+                selectPortfolio();
                 return "select";
             case "add":
-                addDepot();
+                addPortfolio();
                 return "add";
             case "ld":
-                listDepots();
+                listPortfolios();
                 return "ld";
             case "lf":
                 listFunds();
@@ -79,10 +79,14 @@ public class Broker {
                     System.out.println("No Depot selected! Please select a depot using the -select- command.");
                 }
                 return "buy";
-            case "listpos":
-                selectedPortfolio.positions();
-                return "listpos";
-            case "overview":
+            case "sell":
+                if (selectedPortfolio != null) {
+                    sell();
+                } else {
+                    System.out.println("No Depot selected! Please select a depot using the -select- command.");
+                }
+                return "sell";
+            case "ov":
                 selectedPortfolio.overview();
                 return "overview";
             case "help":
@@ -118,7 +122,8 @@ public class Broker {
         System.out.println("ld: \t\t List all depots");
         System.out.println("lf: \t\t List all funds");
         System.out.println("buy: \t\t Add a new position to the selected depot");
-        System.out.println("listpos: \t Overview of all positions in selected depot");
+        System.out.println("sell: \t\t Reduce an existing position in the selected depot");
+        System.out.println("ov: \t Overview of all positions in selected depot");
         System.out.println("help: \t\t Shows this dialog");
         System.out.println("clear: \t\t Clears the console");
         System.out.println("logout: \t\t Logs current user out and displays the login menu");
@@ -167,7 +172,7 @@ public class Broker {
         }
     }
 
-    private void addDepot() {
+    private void addPortfolio() {
         System.out.println("User equity: " + selectedUser.getEquity() + "EUR");
         System.out.println("Enter a Name for the depot you want to create: ");
         String name = scanner.next();
@@ -182,7 +187,7 @@ public class Broker {
         }
     }
 
-    private void listDepots() {
+    private void listPortfolios() {
         if (!selectedUser.portfolios.isEmpty()) {
             selectedUser.listDepots();
         } else {
@@ -201,29 +206,55 @@ public class Broker {
         }
         FundDow fund = funds.get(funds.indexOf(new FundDow(fundName)));
         System.out.println("Enter the count of shares you want to buy: ");
-        int count = scanner.nextInt();
-        Position position = new Position(count, fund);
-        System.out.println("current equity: " + selectedPortfolio.getEquity() + " EUR, remaining after execution: " + (selectedPortfolio.getEquity() - position.getValue()) + " EUR");
+        int transactionCount = scanner.nextInt();
+        Position position = new Position(transactionCount, fund);
+        System.out.println("Current equity: " + selectedPortfolio.getEquity() + " EUR, remaining after execution: " + format(selectedPortfolio.getEquity() - position.getValue()) + " EUR");
+        System.out.println("Buying " + transactionCount + " shares of " + fund.getName() + " at " + fund.getSpotPrice() + " EUR Spot. Confirm (y/n)");
         if (position.getValue() <= selectedPortfolio.getEquity()) {
-            System.out.println("Do you want to place the order? (y/n)");
+            System.out.println("Buying " + transactionCount + " shares of " + fund.getName() + " at " + fund.getSpotPrice() + " EUR Spot. Confirm (y/n)");
             String input = scanner.next();
             if (input.equals("y")) {
                 selectedPortfolio.addPosition(position);
-                selectedPortfolio.setEquity(selectedPortfolio.getEquity() - position.getValue());
-                System.out.println("Buy order successfully executed! New depot equity: " + selectedPortfolio.getEquity());
+                selectedPortfolio.changeEquity(-position.getValue());
+                System.out.println("Buy order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity());
             } else {
-                System.out.println("Buy order aborted, back to menu");
+                System.out.println("Buy order cancelled, back to menu.");
             }
         } else {
             System.out.println("Insufficient balance! Please try ordering fewer shares.");
         }
     }
 
-    private void sell() {
-
+    public void sell() {
+        selectedPortfolio.indexPositions();
+        System.out.println("Please select the position you want to reduce by entering its index.");
+        int index = scanner.nextInt();
+        if (index <= selectedPortfolio.getPositionCount() && index > 0) {
+            Position selectedPosition = selectedPortfolio.getPosition(index - 1);
+            System.out.println("Enter the amount of shares you want to reduce/increase the position by");
+            int transactionCount = scanner.nextInt();
+            if (transactionCount <= selectedPosition.getCount()) {
+                System.out.println("Current equity: " + selectedPortfolio.getEquity() + " EUR, remaining after execution: " + format(selectedPortfolio.getEquity() - (selectedPosition.getValue()) - transactionCount * selectedPosition.getFund().getSpotPrice()) + " EUR");
+                System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getFundName() + " at " + selectedPosition.getFund().getSpotPrice() + " EUR Spot. Confirm (y/n)");
+                String confirm = scanner.next();
+                if (confirm.equals("y")) {
+                    selectedPortfolio.changeEquity(selectedPosition.changeCount(transactionCount));
+                    System.out.println("Sell order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity());
+                    if (selectedPosition.getCount() == 0) {
+                        selectedPortfolio.deletePosition(selectedPosition);
+                    }
+                } else {
+                    System.out.println("Sell order cancelled, back to menu.");
+                }
+            } else {
+                System.out.println("Amount of shares to sell exceeds amount of shares owned. Please try again.");
+            }
+        } else {
+            System.out.println("The selected position does not exist, please try again.");
+        }
     }
 
-    private void selectedDepot() {
+    private void selectedPortfolio() {
         System.out.println("User selected:\t" + selectedUser.getName());
         if (selectedPortfolio != null) {
             System.out.println("Depot selected:\t" + selectedPortfolio.getName());
@@ -232,7 +263,7 @@ public class Broker {
         }
     }
 
-    private void selectDepot() {
+    private void selectPortfolio() {
         String depotName = scanner.next();
         if (selectedUser.portfolios.contains(new Portfolio(depotName, selectedUser))) {
             selectedPortfolio = selectedUser.portfolios.get(selectedUser.portfolios.indexOf(new Portfolio(depotName, selectedUser)));
@@ -240,5 +271,14 @@ public class Broker {
         } else {
             System.out.println("Depot " + depotName + " does not exist or isn't owned by you, please try a different depot.");
         }
+    }
+
+    /**
+     * Formats numbers to fit for use with currency
+     * @param toFormat Double number to be formatted
+     * @return Formatted input
+     */
+    public double format(double toFormat) {
+        return Math.round(toFormat*1e2)/1e2;
     }
 }
