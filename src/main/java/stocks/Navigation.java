@@ -8,7 +8,7 @@ import stocks.dows.FundDow;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-public class Broker {
+public class Navigation {
 
     private User selectedUser;
     private Portfolio selectedPortfolio;
@@ -17,15 +17,15 @@ public class Broker {
     private LinkedList<FundDow> funds = new LinkedList<>();
 
     public static void main(String[] args) {
-        Broker broker = new Broker();
-        broker.loadFunds();
-        broker.help();
-        String navCurrent = broker.navigation();
+        Navigation navigation = new Navigation();
+        navigation.loadFunds();
+        navigation.help();
+        String navCurrent = navigation.navigation();
         while (navCurrent != "exit") {
-            if (broker.selectedUser == null) {
-                navCurrent = broker.navigation();
+            if (navigation.selectedUser == null) {
+                navCurrent = navigation.navigation();
             } else {
-                navCurrent = broker.userNavigation();
+                navCurrent = navigation.userNavigation();
             }
         }
     }
@@ -123,7 +123,7 @@ public class Broker {
         System.out.println("lf: \t\t List all funds");
         System.out.println("buy: \t\t Add a new position to the selected depot");
         System.out.println("sell: \t\t Reduce an existing position in the selected depot");
-        System.out.println("ov: \t Overview of all positions in selected depot");
+        System.out.println("ov: \t\t Overview of all positions in selected depot");
         System.out.println("help: \t\t Shows this dialog");
         System.out.println("clear: \t\t Clears the console");
         System.out.println("logout: \t\t Logs current user out and displays the login menu");
@@ -131,9 +131,10 @@ public class Broker {
     }
 
     private void listFunds() {
-        System.out.println(System.lineSeparator() + "Name\t\t" + "ISIN\t" + "WKN\t" + "Spot Price");
+        // TODO: Format using System.out.printf / System.out.format
+        System.out.println(System.lineSeparator() + "Name\t\t" + "ISIN\t" + "WKN\t" + "Spot Price" + System.lineSeparator());
         for (FundDow fundDow : funds) {
-            System.out.println(fundDow.getName() + "\t" + fundDow.getIsin() + "\t" + fundDow.getWkn() + "\t" + fundDow.getSpotPrice());
+            System.out.println(fundDow.getName() + "\t" + fundDow.getIsin() + "\t" + fundDow.getWkn() + "\t" + fundDow.getSpotPrice() + System.lineSeparator());
         }
     }
 
@@ -208,9 +209,8 @@ public class Broker {
         System.out.println("Enter the count of shares you want to buy: ");
         int transactionCount = scanner.nextInt();
         Position position = new Position(transactionCount, fund);
-        System.out.println("Current equity: " + selectedPortfolio.getEquity() + " EUR, remaining after execution: " + format(selectedPortfolio.getEquity() - position.getValue()) + " EUR");
-        System.out.println("Buying " + transactionCount + " shares of " + fund.getName() + " at " + fund.getSpotPrice() + " EUR Spot. Confirm (y/n)");
         if (position.getValue() <= selectedPortfolio.getEquity()) {
+            System.out.println("Current equity: " + selectedPortfolio.getEquity() + " EUR, remaining after execution: " + format(selectedPortfolio.getEquity() - position.getValue()) + " EUR");
             System.out.println("Buying " + transactionCount + " shares of " + fund.getName() + " at " + fund.getSpotPrice() + " EUR Spot. Confirm (y/n)");
             String input = scanner.next();
             if (input.equals("y")) {
