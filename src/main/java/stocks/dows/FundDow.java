@@ -2,8 +2,13 @@ package stocks.dows;
 
 import stocks.interfaces.Fund;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class FundDow implements Fund {
 
@@ -11,7 +16,8 @@ public class FundDow implements Fund {
     private String isin;
     private String wkn;
     private double spotPrice;
-    private LinkedList<Double> histPrices;
+    private LocalDate spotDate = LocalDate.now().minus(1, ChronoUnit.DAYS);
+    private LinkedList<Double> historicalPrices = new LinkedList<>();
 
     public FundDow (String name) {
         this.name = name;
@@ -45,11 +51,26 @@ public class FundDow implements Fund {
     }
 
     public LinkedList<Double> histPrices() {
-        return histPrices;
+        return historicalPrices;
     }
 
-    public void setHistPrices(LinkedList<Double> histPrice) {
-        this.histPrices = histPrice;
+    public void update() throws FileNotFoundException {
+        String pathname = this.name + ".txt";
+        Scanner input = new Scanner(new File(pathname));
+        if (input.next().equals(name)) {
+            while (input.hasNext()) {
+                String updateDate = input.next();
+                this.isin = input.next();
+                this.wkn = input.next();
+                if (!updateDate.equals(spotDate.toString())) {
+                    historicalPrices.add(spotPrice);
+                    this.spotPrice = input.nextDouble();
+                }
+            }
+        } else {
+            throw new FileNotFoundException("Datafile " + pathname + " does not match fund " + this.name + "!");
+        }
+        input.close();
     }
 
     @Override

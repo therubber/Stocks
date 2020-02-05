@@ -1,5 +1,6 @@
 package stocks.interfaces;
 
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 
 public interface Fund {
@@ -8,6 +9,6 @@ public interface Fund {
     String getWkn();
     double getSpotPrice();
     LinkedList<Double> histPrices();
-    void setHistPrices(LinkedList<Double> histPrice);
+    void update() throws FileNotFoundException;
     String toString();
 }

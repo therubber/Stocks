@@ -1,10 +1,12 @@
-package stocks;
+package stocks.output;
 
 import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.dows.FundDow;
+import stocks.interfaces.Fund;
 
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -19,7 +21,7 @@ public class Navigation {
     public static void main(String[] args) {
         Navigation navigation = new Navigation();
         navigation.loadFunds();
-        navigation.help();
+        Output.normal();
         String navCurrent = navigation.navigation();
         while (!navCurrent.equals("exit")) {
             if (navigation.selectedUser == null) {
@@ -41,13 +43,17 @@ public class Navigation {
             case "add":
                 addUser();
                 return "add";
+            case "lf":
+                listFunds();
+                return "lf";
             case "help":
-                help();
+                Output.normal();
                 return "help";
             case "clear":
-                clear();
+                Output.clear();
                 return "clear";
             case "exit":
+                // TODO: Speichern vor dem beenden.
                 return "exit";
             default:
                 return "help";
@@ -94,80 +100,69 @@ public class Navigation {
                 }
                 return "overview";
             case "help":
-                userHelp();
+                Output.user();
                 return "help";
             case "clear":
-                clear();
+                Output.clear();
                 return "clear";
             case "logout":
                 System.out.println("User " + selectedUser.getName() + " successfully logged out!");
                 selectedUser = null;
                 selectedPortfolio = null;
-                help();
+                Output.normal();
                 return "logout";
             case "exit":
+                // TODO: Speichern vor dem beenden.
                 return "exit";
             default:
                 return "help";
         }
     }
 
-    private void help() {
-        System.out.printf("%-15s %s%n", "login:", "Log in with existing user");
-        System.out.printf("%-15s %s%n", "add:", "Register a new user");
-        System.out.printf("%-15s %s%n", "help:", "Shows this dialog");
-        System.out.printf("%-15s %s%n", "clear:", "Clears the console");
-        System.out.printf("%-15s %s%n", "exit:", "Exit Stocks");
-    }
-
-    private void userHelp() {
-        System.out.printf("%-15s %s%n", "selected:", "Overview of user & portfolio currently selected");
-        System.out.printf("%-15s %s%n", "select:", "Select an existing portfolio");
-        System.out.printf("%-15s %s%n","add:", "Add a new portfolio");
-        System.out.printf("%-15s %s%n", "ld:", "List all portfolios");
-        System.out.printf("%-15s %s%n", "lf:", "List all funds");
-        System.out.printf("%-15s %s%n", "buy:", "Add a new position to the selected portfolio");
-        System.out.printf("%-15s %s%n", "sell:", "Reduce an existing position in the selected portfolio");
-        System.out.printf("%-15s %s%n", "ov:", "Overview of all positions in selected portfolio");
-        System.out.printf("%-15s %s%n", "help:", "Shows this dialog");
-        System.out.printf("%-15s %s%n", "clear:", "Clears the console");
-        System.out.printf("%-15s %s%n", "logout:", "Logs current user out and displays the login menu");
-        System.out.printf("%-15s %s%n", "exit:", "Exit Stocks");
-    }
-
     private void listFunds() {
+        System.out.println();
         System.out.printf("%-18s %-16s %-10s %-4s%n", "Name", "ISIN", "WKN", "Spot Price");
         for (FundDow fundDow : funds) {
             System.out.printf("%-18s %-16s %-10s %.2f %n", fundDow.getName(), fundDow.getIsin(), fundDow.getWkn(), fundDow.getSpotPrice());
         }
+        System.out.println();
     }
 
     private void login(String username) {
         if (users.contains(new User(username)) && !username.equals("unlogged")) {
             selectedUser = users.get(users.indexOf(new User(username)));
             System.out.println("User " + username + " is now logged in!");
-            clear();
+            Output.clear();
         } else {
             System.out.println("User does not exist! Please register a new User");
         }
     }
 
-    // Hardcode setup for Funds, read from File in Future versions
+    /**
+     * Sets up names of available funds and fetches data using updateFunds()
+     */
     private void loadFunds() {
-        funds.add(new FundDow("GenoAs: 1", "DE0009757682", "975768", 87.91));
-        funds.add(new FundDow("UniAsia", "LU0037079034", "971267", 76.78));
-        funds.add(new FundDow("UniEuroAnleihen", "LU0966118209", "A1W4QB", 57.51));
-        funds.add(new FundDow("UniRAK", "DE0008491044", "849104", 134.64));
+        funds.add(new FundDow("UniRAK"));
+        funds.add(new FundDow("UniEuroAnleihen"));
+        funds.add(new FundDow("GenoAs"));
+        funds.add(new FundDow("UniAsia"));
+        updateFunds();
     }
 
-    private void clear() {
-        for (int i = 0; i <= 40; i++) {
-            System.out.println();
+    private void updateFunds() {
+        System.out.print("Updating spot prices...");
+        for (Fund fund : funds) {
+            try {
+                fund.update();
+            } catch (FileNotFoundException fnfe) {
+                System.out.println(fnfe.toString());
+            }
         }
+        System.out.println(" Done!");
     }
 
     private void addUser() {
-        System.out.print("Enter a username to create a new user: ");
+        System.out.println("Enter a username to create a new user: ");
         String name = scanner.next();
         if (!users.contains(new User(name))) {
             users.add(new User(name));
@@ -214,7 +209,7 @@ public class Navigation {
         int transactionCount = scanner.nextInt();
         Position position = new Position(transactionCount, fund);
         if (position.getValue() <= selectedPortfolio.getEquity()) {
-            System.out.println("Current equity: " + selectedPortfolio.getEquity() + " EUR, remaining after execution: " + format(selectedPortfolio.getEquity() - position.getValue()) + " EUR");
+            System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() - position.getValue()));
             System.out.println("Buying " + transactionCount + " shares of " + fund.getName() + " at " + fund.getSpotPrice() + " EUR Spot. Confirm (y/n)");
             String input = scanner.next();
             if (input.equals("y")) {
@@ -238,7 +233,7 @@ public class Navigation {
             System.out.println("Enter the amount of shares you want to reduce/increase the position by");
             int transactionCount = scanner.nextInt();
             if (transactionCount <= selectedPosition.getCount()) {
-                System.out.println("Current equity: " + selectedPortfolio.getEquity() + " EUR, remaining after execution: " + format(selectedPortfolio.getEquity() - (selectedPosition.getValue()) - transactionCount * selectedPosition.getFund().getSpotPrice()) + " EUR");
+                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() - (selectedPosition.getValue()) - transactionCount * selectedPosition.getFund().getSpotPrice()));
                 System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getFundName() + " at " + selectedPosition.getFund().getSpotPrice() + " EUR Spot. Confirm (y/n)");
                 String confirm = scanner.next();
                 if (confirm.equals("y")) {
@@ -276,14 +271,5 @@ public class Navigation {
         } else {
             System.out.println("Depot " + depotName + " does not exist or isn't owned by you, please try a different depot.");
         }
-    }
-
-    /**
-     * Formats numbers to fit for use with currency
-     * @param toFormat Double number to be formatted
-     * @return Formatted input
-     */
-    public double format(double toFormat) {
-        return Math.round(toFormat*1e2)/1e2;
     }
 }

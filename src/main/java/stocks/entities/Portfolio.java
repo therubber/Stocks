@@ -71,6 +71,7 @@ public class Portfolio {
      * Displays data of all existing positions in the portfolio to the console
      */
     public void positions() {
+        System.out.println();
         System.out.printf("%-9s %10s   %-18s %-10s %-10s%n", "ID", "Count", "Name", "Value", "Execution");
         for (Position position : positions) {
             System.out.printf("%-9s %10d   %-18s %-10.2f %-10s%n", position.getId(), position.getCount(), position.getFundName(), position.getValue(), position.getExecution());
@@ -79,7 +80,8 @@ public class Portfolio {
     }
 
     public void indexPositions() {
-        System.out.printf("%7s %-9s %10s   %-18s %-10s %-10s%n", "Index", "ID", "Count", "Name", "Value", "Execution");
+        System.out.println();
+        System.out.printf("%-7s %-9s %10s   %-18s %-10s %-10s%n", "Index", "ID", "Count", "Name", "Value", "Execution");
         int i = 0;
         for (Position position : positions) {
             System.out.printf("%-7d %-9s %10d   %-18s %-10.2f %-10s%n", i + 1, position.getId(), position.getCount(), position.getFundName(), position.getValue(), position.getExecution());
