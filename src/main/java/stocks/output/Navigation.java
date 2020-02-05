@@ -121,9 +121,9 @@ public class Navigation {
 
     private void listFunds() {
         System.out.println();
-        System.out.printf("%-18s %-16s %-10s %-4s%n", "Name", "ISIN", "WKN", "Spot Price");
+        System.out.printf("%-18s %-16s %-10s %-10s %-15s%n", "Name", "ISIN", "WKN", "Price", "Date");
         for (FundDow fundDow : funds) {
-            System.out.printf("%-18s %-16s %-10s %.2f %n", fundDow.getName(), fundDow.getIsin(), fundDow.getWkn(), fundDow.getSpotPrice());
+            System.out.printf("%-18s %-16s %-10s %-10.2f %-15s%n", fundDow.getName(), fundDow.getIsin(), fundDow.getWkn(), fundDow.getSpotPrice(), fundDow.getSpotDate());
         }
         System.out.println();
     }
@@ -233,8 +233,8 @@ public class Navigation {
             System.out.println("Enter the amount of shares you want to reduce/increase the position by");
             int transactionCount = scanner.nextInt();
             if (transactionCount <= selectedPosition.getCount()) {
-                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() - (selectedPosition.getValue()) - transactionCount * selectedPosition.getFund().getSpotPrice()));
-                System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getFundName() + " at " + selectedPosition.getFund().getSpotPrice() + " EUR Spot. Confirm (y/n)");
+                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() - (selectedPosition.getValue()) - transactionCount * selectedPosition.getSpotPrice()));
+                System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getFundName() + " at " + selectedPosition.getSpotPrice() + " EUR Spot. Confirm (y/n)");
                 String confirm = scanner.next();
                 if (confirm.equals("y")) {
                     selectedPortfolio.changeEquity(selectedPosition.changeCount(transactionCount));

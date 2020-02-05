@@ -15,15 +15,15 @@ public class FundDow implements Fund {
     private String name;
     private String isin;
     private String wkn;
-    private double spotPrice;
+    private SpotPrice spotPrice;
     private LocalDate spotDate = LocalDate.now().minus(1, ChronoUnit.DAYS);
-    private LinkedList<Double> historicalPrices = new LinkedList<>();
+    private LinkedList<SpotPrice> historicalPrices = new LinkedList<>();
 
     public FundDow (String name) {
         this.name = name;
     }
 
-    public FundDow(String name, String isin, String wkn, double spotPrice) {
+    public FundDow(String name, String isin, String wkn, SpotPrice spotPrice) {
         this.name = name;
         this.isin = isin;
         this.wkn = wkn;
@@ -43,14 +43,14 @@ public class FundDow implements Fund {
     }
 
     public double getSpotPrice() {
-        return spotPrice;
+        return spotPrice.getSpotPrice();
     }
 
-    public void setCurrentPrice(double spotPrice) {
-        this.spotPrice = spotPrice;
+    public String getSpotDate() {
+        return spotPrice.getDate();
     }
 
-    public LinkedList<Double> histPrices() {
+    public LinkedList<SpotPrice> histPrices() {
         return historicalPrices;
     }
 
@@ -64,7 +64,7 @@ public class FundDow implements Fund {
                 this.wkn = input.next();
                 if (!updateDate.equals(spotDate.toString())) {
                     historicalPrices.add(spotPrice);
-                    this.spotPrice = input.nextDouble();
+                    this.spotPrice = new SpotPrice(input.nextDouble(), updateDate);
                 }
             }
         } else {

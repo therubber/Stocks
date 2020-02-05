@@ -1,6 +1,8 @@
 package stocks.entities;
 
 import stocks.dows.FundDow;
+import stocks.interfaces.Fund;
+
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -8,7 +10,7 @@ import java.util.Objects;
 public class Position {
 
     private int count;
-    private FundDow fund;
+    private Fund fund;
     private double value;
     private String id;
     private LocalDate execution;
@@ -36,12 +38,12 @@ public class Position {
         return count * fund.getSpotPrice();
     }
 
-    public String getId() {
-        return id;
+    public double getSpotPrice() {
+        return fund.getSpotPrice();
     }
 
-    public FundDow getFund() {
-        return fund;
+    public String getId() {
+        return id;
     }
 
     public String getFundName() {

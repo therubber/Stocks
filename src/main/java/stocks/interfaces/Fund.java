@@ -1,5 +1,7 @@
 package stocks.interfaces;
 
+import stocks.dows.SpotPrice;
+
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
 
@@ -8,7 +10,7 @@ public interface Fund {
     String getIsin();
     String getWkn();
     double getSpotPrice();
-    LinkedList<Double> histPrices();
+    LinkedList<SpotPrice> histPrices();
     void update() throws FileNotFoundException;
     String toString();
 }

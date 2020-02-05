@@ -7,7 +7,7 @@ public class Portfolio {
     private String name;
     public User owner;
     private LinkedList<Position> positions = new LinkedList<>();     // List with all Positions
-    private double equity;                                          // Cash value
+    private double equity;
 
     public Portfolio(String name, User owner) {
         this.name = name;
