@@ -19,8 +19,9 @@ public class User {
     }
 
     public void listDepots() {
+        System.out.printf("%-15s %-10s%n", "Name", "Value");
         for(Portfolio portfolio : portfolios) {
-            System.out.println(portfolio.toString() + ": " + portfolio.getValue() + " EUR, ");
+            System.out.printf("%-15s %-10.2f%n", portfolio.toString(), portfolio.getValue());
         }
     }
 

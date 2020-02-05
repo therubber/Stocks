@@ -58,7 +58,7 @@ public class Navigation {
         String input = scanner.next();
         switch (input) {
             case "selected":
-                selectedPortfolio();
+                selected();
                 return "selected";
             case "select":
                 selectPortfolio();
@@ -76,18 +76,22 @@ public class Navigation {
                 if (selectedPortfolio != null) {
                     buy();
                 } else {
-                    System.out.println("No Depot selected! Please select a depot using the -select- command.");
+                    System.out.println("No portfolio selected! Please select a portfolio using the -select- command.");
                 }
                 return "buy";
             case "sell":
                 if (selectedPortfolio != null) {
                     sell();
                 } else {
-                    System.out.println("No Depot selected! Please select a depot using the -select- command.");
+                    System.out.println("No portfolio selected! Please select a portfolio using the -select- command.");
                 }
                 return "sell";
             case "ov":
-                selectedPortfolio.overview();
+                if (selectedPortfolio != null) {
+                    selectedPortfolio.overview();
+                } else {
+                    System.out.println("No portfolio selected, Please select one using the -select- command.");
+                }
                 return "overview";
             case "help":
                 userHelp();
@@ -108,38 +112,37 @@ public class Navigation {
     }
 
     private void help() {
-        System.out.println("login: \t Log in with existing user");
-        System.out.println("add: \t Register a new user");
-        System.out.println("help: \t Shows this dialog");
-        System.out.println("clear: \t Clears the console");
-        System.out.println("exit: \t Exit Stocks");
+        System.out.printf("%-15s %s%n", "login:", "Log in with existing user");
+        System.out.printf("%-15s %s%n", "add:", "Register a new user");
+        System.out.printf("%-15s %s%n", "help:", "Shows this dialog");
+        System.out.printf("%-15s %s%n", "clear:", "Clears the console");
+        System.out.printf("%-15s %s%n", "exit:", "Exit Stocks");
     }
 
     private void userHelp() {
-        System.out.println("selected: \t Overview of user & depot currently selected");
-        System.out.println("select: \t Select an existing depot");
-        System.out.println("add: \t\t Add a new depot");
-        System.out.println("ld: \t\t List all depots");
-        System.out.println("lf: \t\t List all funds");
-        System.out.println("buy: \t\t Add a new position to the selected depot");
-        System.out.println("sell: \t\t Reduce an existing position in the selected depot");
-        System.out.println("ov: \t\t Overview of all positions in selected depot");
-        System.out.println("help: \t\t Shows this dialog");
-        System.out.println("clear: \t\t Clears the console");
-        System.out.println("logout: \t\t Logs current user out and displays the login menu");
-        System.out.println("exit: \t\t Exit Stocks");
+        System.out.printf("%-15s %s%n", "selected:", "Overview of user & portfolio currently selected");
+        System.out.printf("%-15s %s%n", "select:", "Select an existing portfolio");
+        System.out.printf("%-15s %s%n","add:", "Add a new portfolio");
+        System.out.printf("%-15s %s%n", "ld:", "List all portfolios");
+        System.out.printf("%-15s %s%n", "lf:", "List all funds");
+        System.out.printf("%-15s %s%n", "buy:", "Add a new position to the selected portfolio");
+        System.out.printf("%-15s %s%n", "sell:", "Reduce an existing position in the selected portfolio");
+        System.out.printf("%-15s %s%n", "ov:", "Overview of all positions in selected portfolio");
+        System.out.printf("%-15s %s%n", "help:", "Shows this dialog");
+        System.out.printf("%-15s %s%n", "clear:", "Clears the console");
+        System.out.printf("%-15s %s%n", "logout:", "Logs current user out and displays the login menu");
+        System.out.printf("%-15s %s%n", "exit:", "Exit Stocks");
     }
 
     private void listFunds() {
-        // TODO: Format using System.out.printf / System.out.format
-        System.out.println(System.lineSeparator() + "Name\t\t" + "ISIN\t" + "WKN\t" + "Spot Price" + System.lineSeparator());
+        System.out.printf("%-18s %-16s %-10s %-4s%n", "Name", "ISIN", "WKN", "Spot Price");
         for (FundDow fundDow : funds) {
-            System.out.println(fundDow.getName() + "\t" + fundDow.getIsin() + "\t" + fundDow.getWkn() + "\t" + fundDow.getSpotPrice() + System.lineSeparator());
+            System.out.printf("%-18s %-16s %-10s %.2f %n", fundDow.getName(), fundDow.getIsin(), fundDow.getWkn(), fundDow.getSpotPrice());
         }
     }
 
     private void login(String username) {
-        if (users.contains(new User(username)) && username != "unlogged") {
+        if (users.contains(new User(username)) && !username.equals("unlogged")) {
             selectedUser = users.get(users.indexOf(new User(username)));
             System.out.println("User " + username + " is now logged in!");
             clear();
@@ -175,9 +178,9 @@ public class Navigation {
 
     private void addPortfolio() {
         System.out.println("User equity: " + selectedUser.getEquity() + "EUR");
-        System.out.println("Enter a Name for the depot you want to create: ");
+        System.out.println("Enter a Name for the portfolio you want to create: ");
         String name = scanner.next();
-        System.out.println("Enter the amount of equity to transfer to the depot account: ");
+        System.out.println("Enter the amount of equity to transfer to the portfolio account: ");
         double depotEquity = scanner.nextDouble();
         if (depotEquity <= selectedUser.getEquity()) {
             selectedUser.portfolios.add(new Portfolio(name, selectedUser, depotEquity));
@@ -254,7 +257,7 @@ public class Navigation {
         }
     }
 
-    private void selectedPortfolio() {
+    private void selected() {
         System.out.println("User selected:\t" + selectedUser.getName());
         if (selectedPortfolio != null) {
             System.out.println("Depot selected:\t" + selectedPortfolio.getName());
@@ -264,6 +267,7 @@ public class Navigation {
     }
 
     private void selectPortfolio() {
+        System.out.println("Please enter the name of the portfolio you want to select.");
         String depotName = scanner.next();
         if (selectedUser.portfolios.contains(new Portfolio(depotName, selectedUser))) {
             selectedPortfolio = selectedUser.portfolios.get(selectedUser.portfolios.indexOf(new Portfolio(depotName, selectedUser)));
