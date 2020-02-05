@@ -7,7 +7,6 @@ public class Portfolio {
     private String name;
     public User owner;
     private LinkedList<Position> positions = new LinkedList<>();     // List with all Positions
-    private LinkedList<String> positionIDs = new LinkedList<>();    // List with all owned securities
     private double equity;                                          // Cash value
 
     public Portfolio(String name, User owner) {
@@ -54,7 +53,6 @@ public class Portfolio {
     /** Adds a position to the portfolio */
     public void addPosition(Position position) {
         positions.add(position);
-        positionIDs.add(position.getId());
     }
 
     public Position getPosition(int index) {

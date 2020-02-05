@@ -21,7 +21,7 @@ public class Navigation {
         navigation.loadFunds();
         navigation.help();
         String navCurrent = navigation.navigation();
-        while (navCurrent != "exit") {
+        while (!navCurrent.equals("exit")) {
             if (navigation.selectedUser == null) {
                 navCurrent = navigation.navigation();
             } else {
@@ -101,7 +101,8 @@ public class Navigation {
                 return "clear";
             case "logout":
                 System.out.println("User " + selectedUser.getName() + " successfully logged out!");
-                selectedUser = null;            // main checks whether selectedUser = null to see which menu to display
+                selectedUser = null;
+                selectedPortfolio = null;
                 help();
                 return "logout";
             case "exit":
@@ -161,7 +162,7 @@ public class Navigation {
 
     private void clear() {
         for (int i = 0; i <= 40; i++) {
-            System.out.println("");
+            System.out.println();
         }
     }
 

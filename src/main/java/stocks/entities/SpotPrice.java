@@ -4,11 +4,11 @@ import java.time.LocalDate;
 
 public class SpotPrice {
 
-    private double spotPrice;
+    private double price;
     private LocalDate date;
 
     public SpotPrice(double spotPrice) {
-        this.spotPrice = spotPrice;
+        this.price = spotPrice;
         date = LocalDate.now();
     }
 
@@ -17,6 +17,6 @@ public class SpotPrice {
     }
 
     public double getSpotPrice() {
-        return spotPrice;
+        return price;
     }
 }
