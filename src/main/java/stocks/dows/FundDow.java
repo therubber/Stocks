@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -17,7 +18,7 @@ public class FundDow implements Fund {
     private String wkn;
     private SpotPrice spotPrice;
     private LocalDate spotDate = LocalDate.now().minus(1, ChronoUnit.DAYS);
-    private LinkedList<SpotPrice> historicalPrices = new LinkedList<>();
+    private List<SpotPrice> historicalPrices = new LinkedList<>();
 
     public FundDow (String name) {
         this.name = name;
@@ -51,7 +52,7 @@ public class FundDow implements Fund {
     }
 
     public LinkedList<SpotPrice> histPrices() {
-        return historicalPrices;
+        return new LinkedList<>(historicalPrices);
     }
 
     public void update() throws FileNotFoundException {

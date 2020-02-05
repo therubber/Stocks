@@ -5,9 +5,12 @@ import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.dows.FundDow;
 import stocks.interfaces.Fund;
+import stocks.serialization.Serialization;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Navigation {
@@ -15,8 +18,8 @@ public class Navigation {
     private User selectedUser;
     private Portfolio selectedPortfolio;
     private Scanner scanner = new Scanner(System.in);
-    private LinkedList<User> users = new LinkedList<>();
-    private LinkedList<FundDow> funds = new LinkedList<>();
+    private List<User> users = new LinkedList<>();
+    private List<FundDow> funds = new LinkedList<>();
 
     public static void main(String[] args) {
         Navigation navigation = new Navigation();
@@ -53,7 +56,7 @@ public class Navigation {
                 Output.clear();
                 return "clear";
             case "exit":
-                // TODO: Speichern vor dem beenden.
+                save();
                 return "exit";
             default:
                 return "help";
@@ -112,7 +115,7 @@ public class Navigation {
                 Output.normal();
                 return "logout";
             case "exit":
-                // TODO: Speichern vor dem beenden.
+                save();
                 return "exit";
             default:
                 return "help";
@@ -122,6 +125,7 @@ public class Navigation {
     private void listFunds() {
         System.out.println();
         System.out.printf("%-18s %-16s %-10s %-10s %-15s%n", "Name", "ISIN", "WKN", "Price", "Date");
+        System.out.println();
         for (FundDow fundDow : funds) {
             System.out.printf("%-18s %-16s %-10s %-10.2f %-15s%n", fundDow.getName(), fundDow.getIsin(), fundDow.getWkn(), fundDow.getSpotPrice(), fundDow.getSpotDate());
         }
@@ -188,8 +192,9 @@ public class Navigation {
     }
 
     private void listPortfolios() {
+        System.out.println();
         if (!selectedUser.portfolios.isEmpty()) {
-            selectedUser.listDepots();
+            selectedUser.listPortfolios();
         } else {
             System.out.println("No depots existing for user " + selectedUser.getName() + ". Please add a new one.");
         }
@@ -259,6 +264,14 @@ public class Navigation {
             System.out.println("Depot selected:\t" + selectedPortfolio.getName());
         } else {
             System.out.println("No depot selected");
+        }
+    }
+
+    private void save() {
+        try {
+            Serialization.save(this);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
     }
 

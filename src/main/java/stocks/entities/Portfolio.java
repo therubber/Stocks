@@ -1,12 +1,13 @@
 package stocks.entities;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class Portfolio {
     private String name;
     public User owner;
-    private LinkedList<Position> positions = new LinkedList<>();     // List with all Positions
+    private List<Position> positions = new LinkedList<>();     // List with all Positions
     private double equity;
 
     public Portfolio(String name, User owner) {
