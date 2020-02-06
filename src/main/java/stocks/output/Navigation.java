@@ -8,6 +8,7 @@ import stocks.interfaces.Fund;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -164,7 +165,7 @@ public class Navigation {
      */
     public void initiateFunds() {
         try {
-            Scanner input = new Scanner(new File("Funds.txt"));
+            Scanner input = new Scanner(new File("FundData/Funds.txt"));
             while (input.hasNext()) {
                 String name = input.next();
                 String isin = input.next();
@@ -323,7 +324,7 @@ public class Navigation {
 
     public void saveUsers() {
         try {
-            final XMLEncoder encoder = new XMLEncoder(new ObjectOutputStream(new FileOutputStream("Users.xml")));
+            final XMLEncoder encoder = new XMLEncoder(new ObjectOutputStream(new FileOutputStream("Saves/recent.xml")));
             encoder.writeObject(users);
             encoder.close();
         } catch (IOException ioe) {
@@ -333,10 +334,18 @@ public class Navigation {
 
     public List<User> loadUsers() {
         try {
-            XMLDecoder decoder = new XMLDecoder(new ObjectInputStream(new FileInputStream("Users.xml")));
+            XMLDecoder decoder = new XMLDecoder(new ObjectInputStream(new FileInputStream("Saves/recent.xml")));
             return (List<User>)decoder.readObject();
-        } catch  (Exception e) {
-            System.out.println("Error: File Users.xml not found. Creating new save...");
+        } catch  (IOException ioe) {
+            System.out.println("No recent save found. Creating new one...");
+            try {
+                File save = new File("Saves/recent.xml");
+                if(!save.createNewFile()) {
+                    System.out.println("New save created!");
+                }
+            } catch (IOException fileioe){
+                System.out.println("New Save could not be created. Progress will not be saved.");
+            }
         }
         return null;
     }

@@ -74,7 +74,7 @@ public class FundDow implements Fund {
     }
 
     public void update() throws FileNotFoundException {
-        String pathname = this.name + ".txt";
+        String pathname = "FundData/" + this.name + ".txt";
         Scanner input = new Scanner(new File(pathname));
         if (input.next().equals(name)) {
             if (input.next().equals(isin)) {
