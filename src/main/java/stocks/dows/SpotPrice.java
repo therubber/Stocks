@@ -7,6 +7,9 @@ public class SpotPrice {
     private double price;
     private String date;
 
+    /**
+     * Empty constructor for serialization
+     */
     public SpotPrice() {}
 
     public SpotPrice(double spotPrice, String date) {

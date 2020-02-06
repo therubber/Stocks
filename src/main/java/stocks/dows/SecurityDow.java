@@ -1,15 +1,16 @@
 package stocks.dows;
 
-import stocks.interfaces.Fund;
+import stocks.interfaces.Security;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
-public class FundDow implements Fund {
+public class SecurityDow implements Security {
 
     private String name;
     private String isin;
@@ -17,13 +18,26 @@ public class FundDow implements Fund {
     private SpotPrice spotPrice;
     private List<SpotPrice> historicalPrices = new LinkedList<>();
 
-    public FundDow() {}
+    /**
+     * Empty constructor for serialization
+     */
+    public SecurityDow() {}
 
-    public FundDow (String name) {
+    /**
+     * Constructor with name -> Needed to select a security in buy orders
+     * @param name
+     */
+    public SecurityDow(String name) {
         this.name = name;
     }
 
-    public FundDow(String name, String isin, String wkn) {
+    /**
+     * Regular Constructor
+     * @param name Name of the security
+     * @param isin ISIN of the security
+     * @param wkn WKN of the security
+     */
+    public SecurityDow(String name, String isin, String wkn) {
         this.name = name;
         this.isin = isin;
         this.wkn = wkn;
@@ -73,21 +87,28 @@ public class FundDow implements Fund {
         this.historicalPrices = historicalPrices;
     }
 
-    public void update() throws FileNotFoundException {
-        String pathname = "FundData/" + this.name + ".txt";
+    /**
+     * Updates price to most recent one using data from SecurityData files.
+     */
+    public void update() {
+        try {
+            updateSpotPrice();
+        } catch (FileNotFoundException fnfe) {
+            System.out.println("No update file found for " + this.name + ".");
+            this.spotPrice = new SpotPrice(0, "UPDATE ERROR");
+        }
+    }
+
+    private void updateSpotPrice() throws FileNotFoundException {
+        String pathname = "SecurityData/" + this.name + "_" + LocalDate.now().toString() + ".txt";
         Scanner input = new Scanner(new File(pathname));
         if (input.next().equals(name)) {
             if (input.next().equals(isin)) {
                 if (input.next().equals(wkn)) {
                     String date = input.next();
-                    if (spotPrice != null) {
-                        if (!spotPrice.getDate().equals(date)) {
-                            this.spotPrice = new SpotPrice(input.nextDouble(), date);
-                        }
-                    } else {
+                    if (!LocalDate.now().toString().equals(date) || spotPrice == null) {
                         this.spotPrice = new SpotPrice(input.nextDouble(), date);
                     }
-                    input.close();
                 } else {
                     System.out.println("WKN does not match!");
                 }
@@ -95,8 +116,9 @@ public class FundDow implements Fund {
                 System.out.println("ISIN does not match!");
             }
         } else {
-            throw new FileNotFoundException("Datafile " + pathname + " does not match fund " + this.name + "!");
+            System.out.println("Datafile " + pathname + " does not match security " + this.name + "!");
         }
+        input.close();
     }
 
     @Override
@@ -108,8 +130,8 @@ public class FundDow implements Fund {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FundDow fundDow = (FundDow) o;
-        return Objects.equals(name, fundDow.name);
+        SecurityDow securityDow = (SecurityDow) o;
+        return Objects.equals(name, securityDow.name);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package stocks.entities;
 
 import stocks.dows.SpotPrice;
-import stocks.interfaces.Fund;
+import stocks.interfaces.Security;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -9,74 +9,129 @@ import java.util.Objects;
 public class Position {
 
     private int count;
-    private Fund fund;
-    private double value;
+    private Security security;
     private String id;
-    private String execution;
+    private String executionDate;
 
+    /**
+     * Empty constructor required for serialization
+     */
     public Position() {}
 
-    public Position(int count, Fund fund) {
+    /**
+     * Regular constructor to be used
+     * @param count int count of shares contained in the position
+     * @param security Security which is object of the position
+     */
+    public Position(int count, Security security) {
         this.count = count;
-        this.fund = fund;
+        this.security = security;
         this.id = "POS" + new DecimalFormat("000000").format((int)(Math.random() * 100000));
-        this.execution = LocalDate.now().toString();
+        this.executionDate = LocalDate.now().toString();
     }
 
+    /**
+     * Getter method to receive count parameter
+     * @return
+     */
     public int getCount() {
         return count;
     }
 
+    /**
+     * Setter method for count parameter
+     * @param count
+     */
     public void setCount(int count) {
         this.count = count;
     }
 
-    public Fund getFund() {
-        return fund;
+    /**
+     * Getter method to receive security parameter
+     * @return
+     */
+    public Security getSecurity() {
+        return security;
     }
 
-    public void setFund(Fund fund) {
-        this.fund = fund;
+    /**
+     * Setter method for security parameter
+     * @param security
+     */
+    public void setSecurity(Security security) {
+        this.security = security;
     }
 
+    /**
+     * Getter method to receive value of the position
+     * @return
+     */
     public double getValue() {
-        return count * fund.getSpotPrice().getPrice();
+        return count * security.getSpotPrice().getPrice();
     }
 
+    /**
+     * Getter method to receive the ID of the position
+     * @return
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Setter method for ID parameter
+     * @param id
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Getter method for spot price of the contained security object
+     * @return
+     */
     public SpotPrice getSpotPrice() {
-        return fund.getSpotPrice();
+        return security.getSpotPrice();
     }
 
-    public String getFundName() {
-        return fund.getName();
+    /**
+     * Getter method for the name of the contained security
+     * @return
+     */
+    public String getSecurityName() {
+        return security.getName();
     }
 
-    public String getExecution() {
-        return execution;
+    /**
+     * Getter method for the executionDate of the position
+     * @return
+     */
+    public String getExecutionDate() {
+        return executionDate;
     }
 
-    public void setExecution(String execution) {
-        this.execution = execution;
+    /**
+     * Setter method for execution date
+     * @param executionDate
+     */
+    public void setExecutionDate(String executionDate) {
+        this.executionDate = executionDate;
     }
 
+    /**
+     * Changes the count of the position by the amount of parameter
+     * @param count int count that the position is reduced/increased by
+     * @return double updated value of the position
+     */
     public double changeCount(int count) {
         this.count -= count;
-        this.value = getValue();
-        this.execution = LocalDate.now().toString();
-        return count * fund.getSpotPrice().getPrice();
+        this.executionDate = LocalDate.now().toString();
+        return count * security.getSpotPrice().getPrice();
     }
 
     @Override
     public String toString() {
-        return count + "\t" + fund.getName() + "\t" + fund.getIsin() + "\t" + fund.getWkn() + "\t" + fund.getSpotPrice().getPrice() + "\t\t" + execution + System.lineSeparator();
+        return count + "\t" + security.getName() + "\t" + security.getIsin() + "\t" + security.getWkn() + "\t" + security.getSpotPrice().getPrice() + "\t\t" + executionDate + System.lineSeparator();
     }
 
     @Override
@@ -85,13 +140,12 @@ public class Position {
         if (o == null || getClass() != o.getClass()) return false;
         Position position = (Position) o;
         return count == position.count &&
-                Double.compare(position.value, value) == 0 &&
-                Objects.equals(fund, position.fund) &&
+                Objects.equals(security, position.security) &&
                 Objects.equals(id, position.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(count, fund, value, id);
+        return Objects.hash(count, security, id);
     }
 }

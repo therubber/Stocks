@@ -3,12 +3,11 @@ package stocks.output;
 import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
-import stocks.dows.FundDow;
-import stocks.interfaces.Fund;
+import stocks.dows.SecurityDow;
+import stocks.interfaces.Security;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
-import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -19,7 +18,7 @@ public class Navigation {
     private Portfolio selectedPortfolio;
     private final Scanner scanner = new Scanner(System.in);
     private List<User> users = new LinkedList<>();
-    private List<Fund> funds = new LinkedList<>();
+    private List<Security> securities = new LinkedList<>();
 
     public List<User> getUsers() {
         return users;
@@ -29,12 +28,12 @@ public class Navigation {
         this.users = users;
     }
 
-    public List<Fund> getFunds() {
-        return funds;
+    public List<Security> getSecurities() {
+        return securities;
     }
 
-    public void setFunds(List<Fund> funds) {
-        this.funds = funds;
+    public void setSecurities(List<Security> securities) {
+        this.securities = securities;
     }
 
     public static void main(String[] args) {
@@ -42,7 +41,7 @@ public class Navigation {
         if (currentInstance.loadUsers() != null) {
             currentInstance.setUsers(currentInstance.loadUsers());
         }
-        currentInstance.initiateFunds();
+        currentInstance.initiateSecurities();
         Output.help();
         String navCurrent = currentInstance.navigation();
         while (!navCurrent.equals("exit")) {
@@ -67,7 +66,7 @@ public class Navigation {
                 addUser();
                 return "add";
             case "lf":
-                listFunds();
+                listSecurities();
                 return "lf";
             case "help":
                 Output.help();
@@ -98,7 +97,7 @@ public class Navigation {
                 listPortfolios();
                 return "ld";
             case "lf":
-                listFunds();
+                listSecurities();
                 return "lf";
             case "buy":
                 if (selectedPortfolio != null) {
@@ -140,12 +139,12 @@ public class Navigation {
         }
     }
 
-    private void listFunds() {
+    private void listSecurities() {
         System.out.println();
         System.out.printf("%-18s %-16s %-10s %-10s %-15s%n", "Name", "ISIN", "WKN", "Price", "Date");
         System.out.println();
-        for (Fund fund : funds) {
-            System.out.printf("%-18s %-16s %-10s %-10.2f %-15s%n", fund.getName(), fund.getIsin(), fund.getWkn(), fund.getSpotPrice().getPrice(), fund.getSpotDate());
+        for (Security security : securities) {
+            System.out.printf("%-18s %-16s %-10s %-10.2f %-15s%n", security.getName(), security.getIsin(), security.getWkn(), security.getSpotPrice().getPrice(), security.getSpotDate());
         }
         System.out.println();
     }
@@ -161,36 +160,36 @@ public class Navigation {
     }
 
     /**
-     * Sets up names of available funds and fetches data using updateFunds()
+     * Sets up names of available security and fetches data using updateSecurities()
      */
-    public void initiateFunds() {
+    public void initiateSecurities() {
         try {
-            Scanner input = new Scanner(new File("FundData/Funds.txt"));
+            Scanner input = new Scanner(new File("SecurityData/Securities.txt"));
             while (input.hasNext()) {
                 String name = input.next();
                 String isin = input.next();
                 String wkn = input.next();
-                if (!funds.contains(new FundDow(name, isin, wkn))) {
-                    funds.add(new FundDow(name, isin, wkn));
+                if (!securities.contains(new SecurityDow(name, isin, wkn))) {
+                    securities.add(new SecurityDow(name, isin, wkn));
                 }
             }
         } catch (FileNotFoundException fnfe) {
-            System.out.println("Error: File Funds.txt not found. Unable to load funds.");
+            System.out.println("Error: File Securities.txt not found. Unable to load securities.");
         }
-        updateFundPrices();
+        updateSecurityPrices();
     }
 
-    private void updateFundPrices() {
-        System.out.print("Updating spot prices...");
-        if (!funds.isEmpty()) {
-            for (Fund fund : funds) {
+    private void updateSecurityPrices() {
+        System.out.println("Updating spot prices...");
+        if (!securities.isEmpty()) {
+            for (Security security : securities) {
                 try {
-                    fund.update();
+                    security.update();
                 } catch (FileNotFoundException fnfe) {
                     System.out.println(fnfe.toString());
                 }
             }
-            System.out.println(" Done!");
+            System.out.println("Done!");
         }
     }
 
@@ -230,33 +229,36 @@ public class Navigation {
             if (!selectedUser.portfolios.isEmpty()) {
                 selectedUser.listPortfolios();
             } else {
-                System.out.println("No depots existing for user " + selectedUser.getUsername() + ". Please add a new one.");
+                System.out.println("No portfolios existing for user " + selectedUser.getUsername() + ". Please add a new one.");
             }
         } else {
-            System.out.println("No user selected, plese log in!");
+            System.out.println("No user selected, please log in!");
         }
     }
 
     private void buy() {
-        listFunds();
+        listSecurities();
         System.out.println("Depot equity: " + selectedPortfolio.getEquity() + " EUR");
-        System.out.println("Enter the name of the Fund that you want to buy: ");
-        String fundName = scanner.next();
-        if (!funds.contains(new FundDow(fundName))) {
-            System.out.println("Fund not available, please try again.");
+        System.out.println("Enter the name of the Security that you want to buy: ");
+        String securityName = scanner.next();
+        if (!securities.contains(new SecurityDow(securityName))) {
+            System.out.println("Security not available, please try again.");
             buy();
         }
-        Fund fund = funds.get(funds.indexOf(new FundDow(fundName)));
+        Security security = securities.get(securities.indexOf(new SecurityDow(securityName)));
         System.out.println("Enter the count of shares you want to buy: ");
         int transactionCount = scanner.nextInt();
-        Position position = new Position(transactionCount, fund);
+        Position position = new Position(transactionCount, security);
         if (position.getValue() <= selectedPortfolio.getEquity()) {
             System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() - position.getValue()));
-            System.out.println("Buying " + transactionCount + " shares of " + fund.getName() + " at " + fund.getSpotPrice() + " EUR Spot. Confirm (y/n)");
+            System.out.println("Buying " + transactionCount + " shares of " + security.getName() + " at " + security.getSpotPrice() + " EUR Spot. Confirm (y/n)");
             String input = scanner.next();
             if (input.equals("y")) {
                 selectedPortfolio.addPosition(position);
                 selectedPortfolio.changeEquity(-position.getValue());
+                if (!selectedPortfolio.ownedSecurities.contains(security)) {
+                    selectedPortfolio.ownedSecurities.add(security);
+                }
                 System.out.println("Buy order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity());
             } else {
                 System.out.println("Buy order cancelled, back to menu.");
@@ -277,13 +279,14 @@ public class Navigation {
             int transactionCount = scanner.nextInt();
             if (transactionCount <= selectedPosition.getCount()) {
                 System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() + (selectedPosition.getValue()) - transactionCount * selectedPosition.getSpotPrice().getPrice()));
-                System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getFundName() + " at " + selectedPosition.getSpotPrice() + " EUR Spot. Confirm (y/n)");
+                System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getSecurityName() + " at " + selectedPosition.getSpotPrice() + " EUR Spot. Confirm (y/n)");
                 String confirm = scanner.next();
                 if (confirm.equals("y")) {
                     selectedPortfolio.changeEquity(selectedPosition.changeCount(transactionCount));
                     System.out.println("Sell order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity());
                     if (selectedPosition.getCount() == 0) {
                         selectedPortfolio.deletePosition(selectedPosition);
+                        selectedPortfolio.ownedSecurities.remove(selectedPosition.getSecurity());
                     }
                 } else {
                     System.out.println("Sell order cancelled, back to menu.");
