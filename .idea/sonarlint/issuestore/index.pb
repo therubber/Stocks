@@ -30,3 +30,5 @@ W
 'src/main/java/stocks/output/Output.java,8\b\8b49e1ebf0d51aa7b69b8f8f356ae20031771833
 [
 +src/main/java/stocks/output/Navigation.java,b\e\be18371be326647d9302cc5caa9b3d9413750c0e
+8
+save.xml,6\5\65a9d0cf1bd5b9b564ac473ac94decdb6c43bf20

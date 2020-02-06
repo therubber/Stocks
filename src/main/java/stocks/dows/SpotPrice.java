@@ -7,20 +7,26 @@ public class SpotPrice {
     private double price;
     private String date;
 
+    public SpotPrice() {}
+
     public SpotPrice(double spotPrice, String date) {
         this.price = spotPrice;
         this.date = date;
     }
 
-    String getDate() {
+    public String getDate() {
         return date;
     }
 
-    double getSpotPrice() {
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public double getPrice() {
         return price;
     }
 
-    void setPrice(double price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
@@ -36,5 +42,10 @@ public class SpotPrice {
     @Override
     public int hashCode() {
         return Objects.hash(price, date);
+    }
+
+    @Override
+    public String toString() {
+        return price + "/" + date;
     }
 }

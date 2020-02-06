@@ -1,5 +1,7 @@
 package stocks.entities;
 
+import javafx.geometry.Pos;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -9,6 +11,8 @@ public class Portfolio {
     public User owner;
     private List<Position> positions = new LinkedList<>();     // List with all Positions
     private double equity;
+
+    public Portfolio() {}
 
     public Portfolio(String name, User owner) {
         this.name = name;
@@ -35,12 +39,36 @@ public class Portfolio {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public List<Position> getPositions() {
+        return positions;
+    }
+
+    public void setPositions(List<Position> positions) {
+        this.positions = positions;
+    }
+
     /**
      *
      * @return Returns equity value of the portfolio
      */
     public double getEquity() {
         return equity;
+    }
+
+    public void setEquity(double equity) {
+        this.equity = equity;
     }
 
     /**

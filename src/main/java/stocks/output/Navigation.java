@@ -5,10 +5,9 @@ import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.dows.FundDow;
 import stocks.interfaces.Fund;
-import stocks.serialization.Serialization;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -17,22 +16,42 @@ public class Navigation {
 
     private User selectedUser;
     private Portfolio selectedPortfolio;
-    private Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
     private List<User> users = new LinkedList<>();
-    private List<FundDow> funds = new LinkedList<>();
+    private List<Fund> funds = new LinkedList<>();
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    public List<Fund> getFunds() {
+        return funds;
+    }
+
+    public void setFunds(List<Fund> funds) {
+        this.funds = funds;
+    }
 
     public static void main(String[] args) {
-        Navigation navigation = new Navigation();
-        navigation.loadFunds();
-        Output.normal();
-        String navCurrent = navigation.navigation();
+        Navigation currentInstance = new Navigation();
+        if (currentInstance.loadUsers() != null) {
+            currentInstance.setUsers(currentInstance.loadUsers());
+        }
+        currentInstance.initiateFunds();
+        Output.help();
+        String navCurrent = currentInstance.navigation();
         while (!navCurrent.equals("exit")) {
-            if (navigation.selectedUser == null) {
-                navCurrent = navigation.navigation();
+            if (currentInstance.selectedUser == null) {
+                navCurrent = currentInstance.navigation();
             } else {
-                navCurrent = navigation.userNavigation();
+                navCurrent = currentInstance.userNavigation();
             }
         }
+        currentInstance.saveUsers();
     }
 
     public String navigation() {
@@ -50,13 +69,12 @@ public class Navigation {
                 listFunds();
                 return "lf";
             case "help":
-                Output.normal();
+                Output.help();
                 return "help";
             case "clear":
                 Output.clear();
                 return "clear";
             case "exit":
-                save();
                 return "exit";
             default:
                 return "help";
@@ -75,7 +93,7 @@ public class Navigation {
             case "add":
                 addPortfolio();
                 return "add";
-            case "ld":
+            case "lp":
                 listPortfolios();
                 return "ld";
             case "lf":
@@ -103,19 +121,18 @@ public class Navigation {
                 }
                 return "overview";
             case "help":
-                Output.user();
+                Output.userHelp();
                 return "help";
             case "clear":
                 Output.clear();
                 return "clear";
             case "logout":
-                System.out.println("User " + selectedUser.getName() + " successfully logged out!");
+                System.out.println("User " + selectedUser.getUsername() + " successfully logged out!");
                 selectedUser = null;
                 selectedPortfolio = null;
-                Output.normal();
+                Output.help();
                 return "logout";
             case "exit":
-                save();
                 return "exit";
             default:
                 return "help";
@@ -126,8 +143,8 @@ public class Navigation {
         System.out.println();
         System.out.printf("%-18s %-16s %-10s %-10s %-15s%n", "Name", "ISIN", "WKN", "Price", "Date");
         System.out.println();
-        for (FundDow fundDow : funds) {
-            System.out.printf("%-18s %-16s %-10s %-10.2f %-15s%n", fundDow.getName(), fundDow.getIsin(), fundDow.getWkn(), fundDow.getSpotPrice(), fundDow.getSpotDate());
+        for (Fund fund : funds) {
+            System.out.printf("%-18s %-16s %-10s %-10.2f %-15s%n", fund.getName(), fund.getIsin(), fund.getWkn(), fund.getSpotPrice().getPrice(), fund.getSpotDate());
         }
         System.out.println();
     }
@@ -145,24 +162,35 @@ public class Navigation {
     /**
      * Sets up names of available funds and fetches data using updateFunds()
      */
-    private void loadFunds() {
-        funds.add(new FundDow("UniRAK"));
-        funds.add(new FundDow("UniEuroAnleihen"));
-        funds.add(new FundDow("GenoAs"));
-        funds.add(new FundDow("UniAsia"));
-        updateFunds();
+    public void initiateFunds() {
+        try {
+            Scanner input = new Scanner(new File("Funds.txt"));
+            while (input.hasNext()) {
+                String name = input.next();
+                String isin = input.next();
+                String wkn = input.next();
+                if (!funds.contains(new FundDow(name, isin, wkn))) {
+                    funds.add(new FundDow(name, isin, wkn));
+                }
+            }
+        } catch (FileNotFoundException fnfe) {
+            System.out.println("Error: File Funds.txt not found. Unable to load funds.");
+        }
+        updateFundPrices();
     }
 
-    private void updateFunds() {
+    private void updateFundPrices() {
         System.out.print("Updating spot prices...");
-        for (Fund fund : funds) {
-            try {
-                fund.update();
-            } catch (FileNotFoundException fnfe) {
-                System.out.println(fnfe.toString());
+        if (!funds.isEmpty()) {
+            for (Fund fund : funds) {
+                try {
+                    fund.update();
+                } catch (FileNotFoundException fnfe) {
+                    System.out.println(fnfe.toString());
+                }
             }
+            System.out.println(" Done!");
         }
-        System.out.println(" Done!");
     }
 
     private void addUser() {
@@ -171,9 +199,11 @@ public class Navigation {
         if (!users.contains(new User(name))) {
             users.add(new User(name));
             System.out.println("New user " + name + " has been created!");
+            login(name);
         } else {
             System.out.println("User with that username already exists, please login.");
         }
+        saveUsers();
     }
 
     private void addPortfolio() {
@@ -185,18 +215,24 @@ public class Navigation {
         if (depotEquity <= selectedUser.getEquity()) {
             selectedUser.portfolios.add(new Portfolio(name, selectedUser, depotEquity));
             selectedUser.setEquity(selectedUser.getEquity() - depotEquity);
+            selectPortfolio(name);
             System.out.println("Depot " + name + " successfully created!");
         } else {
             System.out.println("Insufficient account equity for depot creation! please try again");
         }
+        saveUsers();
     }
 
     private void listPortfolios() {
         System.out.println();
-        if (!selectedUser.portfolios.isEmpty()) {
-            selectedUser.listPortfolios();
+        if (selectedUser != null) {
+            if (!selectedUser.portfolios.isEmpty()) {
+                selectedUser.listPortfolios();
+            } else {
+                System.out.println("No depots existing for user " + selectedUser.getUsername() + ". Please add a new one.");
+            }
         } else {
-            System.out.println("No depots existing for user " + selectedUser.getName() + ". Please add a new one.");
+            System.out.println("No user selected, plese log in!");
         }
     }
 
@@ -209,7 +245,7 @@ public class Navigation {
             System.out.println("Fund not available, please try again.");
             buy();
         }
-        FundDow fund = funds.get(funds.indexOf(new FundDow(fundName)));
+        Fund fund = funds.get(funds.indexOf(new FundDow(fundName)));
         System.out.println("Enter the count of shares you want to buy: ");
         int transactionCount = scanner.nextInt();
         Position position = new Position(transactionCount, fund);
@@ -227,6 +263,7 @@ public class Navigation {
         } else {
             System.out.println("Insufficient balance! Please try ordering fewer shares.");
         }
+        saveUsers();
     }
 
     public void sell() {
@@ -238,7 +275,7 @@ public class Navigation {
             System.out.println("Enter the amount of shares you want to reduce/increase the position by");
             int transactionCount = scanner.nextInt();
             if (transactionCount <= selectedPosition.getCount()) {
-                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() - (selectedPosition.getValue()) - transactionCount * selectedPosition.getSpotPrice()));
+                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() + (selectedPosition.getValue()) - transactionCount * selectedPosition.getSpotPrice().getPrice()));
                 System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getFundName() + " at " + selectedPosition.getSpotPrice() + " EUR Spot. Confirm (y/n)");
                 String confirm = scanner.next();
                 if (confirm.equals("y")) {
@@ -256,22 +293,15 @@ public class Navigation {
         } else {
             System.out.println("The selected position does not exist, please try again.");
         }
+        saveUsers();
     }
 
     private void selected() {
-        System.out.println("User selected:\t" + selectedUser.getName());
+        System.out.println("User selected:\t" + selectedUser.getUsername());
         if (selectedPortfolio != null) {
             System.out.println("Depot selected:\t" + selectedPortfolio.getName());
         } else {
             System.out.println("No depot selected");
-        }
-    }
-
-    private void save() {
-        try {
-            Serialization.save(this);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
         }
     }
 
@@ -284,5 +314,30 @@ public class Navigation {
         } else {
             System.out.println("Depot " + depotName + " does not exist or isn't owned by you, please try a different depot.");
         }
+    }
+
+    private void selectPortfolio(String name) {
+        selectedPortfolio = selectedUser.portfolios.get(selectedUser.portfolios.indexOf(new Portfolio(name, selectedUser)));
+        System.out.println("Portfolio " + name + " has been selected!");
+    }
+
+    public void saveUsers() {
+        try {
+            final XMLEncoder encoder = new XMLEncoder(new ObjectOutputStream(new FileOutputStream("Users.xml")));
+            encoder.writeObject(users);
+            encoder.close();
+        } catch (IOException ioe) {
+            System.out.println("Savefile not found, saving failed!");
+        }
+    }
+
+    public List<User> loadUsers() {
+        try {
+            XMLDecoder decoder = new XMLDecoder(new ObjectInputStream(new FileInputStream("Users.xml")));
+            return (List<User>)decoder.readObject();
+        } catch  (Exception e) {
+            System.out.println("Error: File Users.xml not found. Creating new save...");
+        }
+        return null;
     }
 }

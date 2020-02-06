@@ -1,8 +1,7 @@
 package stocks.entities;
 
-import stocks.dows.FundDow;
+import stocks.dows.SpotPrice;
 import stocks.interfaces.Fund;
-
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -13,37 +12,47 @@ public class Position {
     private Fund fund;
     private double value;
     private String id;
-    private LocalDate execution;
+    private String execution;
 
-    public Position(int count, FundDow fund) {
+    public Position() {}
+
+    public Position(int count, Fund fund) {
         this.count = count;
         this.fund = fund;
-        this.value = count * fund.getSpotPrice();
         this.id = "POS" + new DecimalFormat("000000").format((int)(Math.random() * 100000));
-        this.execution = LocalDate.now();
+        this.execution = LocalDate.now().toString();
     }
 
     public int getCount() {
         return count;
     }
 
-    public double changeCount(int count) {
-        this.count -= count;
-        this.value = getValue();
-        this.execution = LocalDate.now();
-        return count * fund.getSpotPrice();
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public Fund getFund() {
+        return fund;
+    }
+
+    public void setFund(Fund fund) {
+        this.fund = fund;
     }
 
     public double getValue() {
-        return count * fund.getSpotPrice();
-    }
-
-    public double getSpotPrice() {
-        return fund.getSpotPrice();
+        return count * fund.getSpotPrice().getPrice();
     }
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public SpotPrice getSpotPrice() {
+        return fund.getSpotPrice();
     }
 
     public String getFundName() {
@@ -51,12 +60,23 @@ public class Position {
     }
 
     public String getExecution() {
-        return execution.toString();
+        return execution;
+    }
+
+    public void setExecution(String execution) {
+        this.execution = execution;
+    }
+
+    public double changeCount(int count) {
+        this.count -= count;
+        this.value = getValue();
+        this.execution = LocalDate.now().toString();
+        return count * fund.getSpotPrice().getPrice();
     }
 
     @Override
     public String toString() {
-        return count + "\t" + fund.getName() + "\t" + fund.getIsin() + "\t" + fund.getWkn() + "\t" + new DecimalFormat("###,###.00").format(getValue()) + "\t\t" + execution.toString() + System.lineSeparator();
+        return count + "\t" + fund.getName() + "\t" + fund.getIsin() + "\t" + fund.getWkn() + "\t" + fund.getSpotPrice().getPrice() + "\t\t" + execution + System.lineSeparator();
     }
 
     @Override
