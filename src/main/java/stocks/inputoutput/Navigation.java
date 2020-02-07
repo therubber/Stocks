@@ -1,11 +1,10 @@
-package stocks.inputOutput;
+package stocks.inputoutput;
 
 import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.dows.SecurityDow;
 import stocks.interfaces.Security;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -18,18 +17,34 @@ public class Navigation {
     private List<User> users = new LinkedList<>();
     private List<Security> securities = new LinkedList<>();
 
+    /**
+     * Getter method for user list
+     * @return List containing all registered users
+     */
     public List<User> getUsers() {
         return users;
     }
 
+    /**
+     * Setter method for user list
+     * @param users List containing users to be registered
+     */
     public void setUsers(List<User> users) {
         this.users = users;
     }
 
+    /**
+     * Getter method for list of available securities
+     * @return
+     */
     public List<Security> getSecurities() {
         return securities;
     }
 
+    /**
+     * Setter method for available securities
+     * @param securities List containing all securities to be made available
+     */
     public void setSecurities(List<Security> securities) {
         this.securities = securities;
     }

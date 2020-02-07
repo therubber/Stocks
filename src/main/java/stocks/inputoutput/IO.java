@@ -1,4 +1,4 @@
-package stocks.inputOutput;
+package stocks.inputoutput;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -19,6 +19,10 @@ public class IO {
 
     public static class Load {
 
+        /**
+         * Loads an instance from save file Saves/recent.xml
+         * @return Loaded instance of Navigation
+         */
         public static Navigation fromXml() {
             Navigation instance = new Navigation();
             try {
@@ -42,7 +46,7 @@ public class IO {
         /**
          * Sets up names of available security and fetches data using updateSecurities()
          */
-        public static Navigation initiateSecurities(Navigation instance) {
+        private static Navigation initiateSecurities(Navigation instance) {
             try {
                 Scanner input = new Scanner(new File("SecurityData/Securities.txt"));
                 while (input.hasNext()) {
@@ -101,6 +105,10 @@ public class IO {
 
     public static class Save {
 
+        /**
+         * Saves instance of Navigation to Saves.users,json
+         * @param currentInstance Instance of Navigation to be saved
+         */
         public static void toJson(Navigation currentInstance) {
             JSONArray userListJson = new JSONArray();
             for (User user : currentInstance.getUsers()) {
@@ -141,7 +149,7 @@ public class IO {
                 userJson.put("portfolios", userPortfoliosJson);
                 userListJson.add(userJson);
             }
-            try (FileWriter file = new FileWriter("users.json")) {
+            try (FileWriter file = new FileWriter("Saves/users.json")) {
                 file.write(userListJson.toJSONString());
                 file.flush();
             } catch (IOException ioe) {
@@ -149,6 +157,10 @@ public class IO {
             }
         }
 
+        /**
+         * Saves instance to xml file Saves/recent.xml
+         * @param currentInstance Instance of Navigation to be saved to file
+         */
         public static void toXml(Navigation currentInstance) {
             try {
                 final XMLEncoder encoder = new XMLEncoder(new ObjectOutputStream(new FileOutputStream("Saves/recent.xml")));
@@ -162,9 +174,15 @@ public class IO {
 
     public static class Help {
 
+        /**
+         * Private Constructor to hide public one
+         */
         private Help() {
         }
 
+        /**
+         * Displays menu when no user is logged in
+         */
         static void noUser() {
             System.out.printf("%n%-15s %s%n", "login:", "Log in with existing user");
             System.out.printf("%-15s %s%n", "add:", "Register a new user");
@@ -174,6 +192,9 @@ public class IO {
             System.out.printf("%-15s %s%n%n", "exit:", "Exit Stocks");
         }
 
+        /**
+         * Displays menu when a user is logged in
+         */
         static void loggedIn() {
             System.out.printf("%n%-15s %s%n", "selected:", "Overview of user & portfolio currently selected");
             System.out.printf("%-15s %s%n", "select:", "Select an existing portfolio");
@@ -189,6 +210,9 @@ public class IO {
             System.out.printf("%-15s %s%n%n", "exit:", "Exit Stocks");
         }
 
+        /**
+         * Clears console window
+         */
         static void clear() {
             System.out.printf("%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n");
         }

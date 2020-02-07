@@ -19,6 +19,11 @@ public class Portfolio {
      */
     public Portfolio() {}
 
+    /**
+     * Constructor for setting up a portfolio without equity
+     * @param name
+     * @param owner
+     */
     public Portfolio(String name, User owner) {
         this.name = name;
         this.owner = owner;

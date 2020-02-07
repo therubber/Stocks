@@ -14,7 +14,7 @@ public class SecurityDow implements Security {
     private List<SpotPrice> historicalPrices = new LinkedList<>();
 
     /**
-     * Empty constructor for serialization
+     * Empty constructor for serialization purposes
      */
     public SecurityDow() {}
 

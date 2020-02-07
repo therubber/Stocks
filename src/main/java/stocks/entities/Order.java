@@ -31,10 +31,18 @@ public class Order {
         this.security = security;
     }
 
+    /**
+     * Getter method for count of order
+     * @return
+     */
     public int getCount() {
         return count;
     }
 
+    /**
+     * Setter method for count of order
+     * @param count
+     */
     public void setCount(int count) {
         this.count = count;
     }

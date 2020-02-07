@@ -136,10 +136,18 @@ public class Position {
         return count * security.getSpotPrice().getPrice();
     }
 
+    /**
+     * Checks whether the count is zero -> used for deleting empty positions
+     * @return
+     */
     public boolean isZero() {
         return count == 0;
     }
 
+    /**
+     * Generates an ID for the positions, no check for duplicates but unlikely
+     * @return
+     */
     public String generateId() {
         return "POS" + new DecimalFormat("000000").format((int)(Math.random() * 100000));
     }
