@@ -2,6 +2,8 @@ package stocks.entities;
 
 import stocks.interfaces.Security;
 
+import java.text.DecimalFormat;
+
 public class Order {
 
     private int count;
@@ -9,6 +11,7 @@ public class Order {
     private String executionDate;
     private boolean type;
     private Security security;
+    private String id;
 
     /**
      * Default constructor for serialization
@@ -22,13 +25,15 @@ public class Order {
      * @param type Boolean stating whether the order is Buy/Sell -> default = buy = false
      * @param security Security which is object of the order
      */
-    public Order(double executionPrice, String executionDate, String type, Security security) {
+    public Order(int count, double executionPrice, String executionDate, String type, Security security) {
+        this.count = count;
         this.executionPrice = executionPrice;
         this.executionDate = executionDate;
-        if (type.equals("sell")) {
+        if (type.equals("SELL")) {
             this.type = true;
         }
         this.security = security;
+        this.id = generateId();
     }
 
     /**
@@ -84,7 +89,7 @@ public class Order {
      * @return String buy/sell depending on type of order
      */
     public String getType() {
-        return (!type) ? "buy" : "sell";
+        return (!type) ? "BUY" : "SELL";
     }
 
     /**
@@ -92,9 +97,33 @@ public class Order {
      * @param type String buy/sell to set order type
      */
     public void setType(String type) {
-        if (type.equals("sell")) {
-            this.type = false;
+        if (type.equals("SELL")) {
+            this.type = true;
         }
+    }
+
+    /**
+     * Getter method for id
+     * @return String ID
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Setter method for id
+     * @param id String ID
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * Generates an ID for the order, no check for duplicates but unlikely
+     * @return String order ID
+     */
+    public String generateId() {
+        return new DecimalFormat("00000000").format((int)(Math.random() * 10000000));
     }
 
     /**

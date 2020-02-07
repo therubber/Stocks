@@ -9,7 +9,7 @@ import java.util.Objects;
 public class Portfolio {
     private String name;
     private double equity;
-    public User owner;
+    public String owner;
     private List<Position> positions = new LinkedList<>();
     public List<Security> ownedSecurities = new LinkedList<>();
     public List<Order> history = new LinkedList<>();
@@ -24,7 +24,7 @@ public class Portfolio {
      * @param name
      * @param owner
      */
-    public Portfolio(String name, User owner) {
+    public Portfolio(String name, String owner) {
         this.name = name;
         this.owner = owner;
     }
@@ -35,7 +35,7 @@ public class Portfolio {
      * @param owner Owner of the portfolio
      * @param equity Amount of equity allocated to the portfolio
      */
-    public Portfolio(String name, User owner, double equity) {
+    public Portfolio(String name, String owner, double equity) {
         this.name = name;
         this.equity = equity;
         this.owner = owner;
@@ -61,7 +61,7 @@ public class Portfolio {
      * Getter method to receive the owner of the portfolio
      * @return User Owner of the portfolio
      */
-    public User getOwner() {
+    public String getOwner() {
         return owner;
     }
 
@@ -69,7 +69,7 @@ public class Portfolio {
      * Setter method for the owner parameter
      * @param owner User to be set as owner
      */
-    public void setOwner(User owner) {
+    public void setOwner(String owner) {
         this.owner = owner;
     }
 

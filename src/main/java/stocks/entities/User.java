@@ -9,6 +9,7 @@ public class User {
     private String username;
     private double equity;
     public List<Portfolio> portfolios = new LinkedList<>();
+    public List<Order> orderHistory = new LinkedList<>();
 
     /**
      * Empty constructor for serialization
@@ -73,6 +74,22 @@ public class User {
     }
 
     /**
+     * Getter method for order history
+     * @return List with order history
+     */
+    public List<Order> getOrderHistory() {
+        return orderHistory;
+    }
+
+    /**
+     * Setter method for order history
+     * @param orderHistory List of order history to be set
+     */
+    public void setOrderHistory(List<Order> orderHistory) {
+        this.orderHistory = orderHistory;
+    }
+
+    /**
      * Displays a list of all portfolios owned and their current value
      */
     public void listPortfolios() {
@@ -86,9 +103,21 @@ public class User {
         }
     }
 
+    public void orderHistory() {
+        if (!orderHistory.isEmpty()) {
+            System.out.printf("%-8s %10s %5s %15s %10s %15s%n", "ID", "Type", "Count", "Name", "Price", "Date");
+            System.out.println();
+            for (Order order : orderHistory) {
+                System.out.printf("%-8s %10s %5d %15s %10.2f %15s%n", order.getId(), order.getType(), order.getCount(), order.getSecurity().getName(), order.getExecutionPrice(), order.getExecutionDate());
+            }
+        } else {
+            System.out.println("No orders yet! Please add a position to your portfolio.");
+        }
+    }
+
     @Override
     public String toString() {
-        return username + "   " + equity + "   " + portfolios;
+        return username;
     }
 
     @Override

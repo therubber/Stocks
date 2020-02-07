@@ -1,10 +1,13 @@
 package stocks.inputoutput;
 
+import stocks.dows.SpotPrice;
+import stocks.entities.Order;
 import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.dows.SecurityDow;
 import stocks.interfaces.Security;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -50,7 +53,7 @@ public class Navigation {
     }
 
     public static void main(String[] args) {
-        Navigation currentInstance = IO.Load.fromXml();
+        Navigation currentInstance = IO.Load.fromJson();
         IO.Help.noUser();
         String navCurrent = currentInstance.navigation();
         while (!navCurrent.equals("exit")) {
@@ -77,6 +80,9 @@ public class Navigation {
             case "lf":
                 listSecurities();
                 return "lf";
+            case "ph":
+                priceHistory();
+                return "ph";
             case "help":
                 IO.Help.noUser();
                 return "help";
@@ -108,6 +114,9 @@ public class Navigation {
             case "lf":
                 listSecurities();
                 return "lf";
+            case "ph":
+                priceHistory();
+                return "ph";
             case "buy":
                 if (selectedPortfolio != null) {
                     buy();
@@ -129,6 +138,9 @@ public class Navigation {
                     System.out.println("No portfolio selected, Please select one using the -select- command.");
                 }
                 return "overview";
+            case "oh":
+                selectedUser.orderHistory();
+                return "oh";
             case "help":
                 IO.Help.loggedIn();
                 return "help";
@@ -193,7 +205,7 @@ public class Navigation {
         System.out.println("Enter the amount of equity to transfer to the portfolio account: ");
         double depotEquity = scanner.nextDouble();
         if (depotEquity <= selectedUser.getEquity()) {
-            selectedUser.portfolios.add(new Portfolio(name, selectedUser, depotEquity));
+            selectedUser.portfolios.add(new Portfolio(name, selectedUser.toString(), depotEquity));
             selectedUser.setEquity(selectedUser.getEquity() - depotEquity);
             selectPortfolio(name);
             System.out.println("Depot " + name + " successfully created!");
@@ -237,6 +249,7 @@ public class Navigation {
                 if (input.equals("y")) {
                     selectedPortfolio.addPosition(position);
                     selectedPortfolio.changeEquity(-position.getValue());
+                    selectedUser.getOrderHistory().add(new Order(transactionCount, security.getSpotPrice().getPrice(), LocalDate.now().toString(), "BUY", security));
                     if (!selectedPortfolio.ownedSecurities.contains(security)) {
                         selectedPortfolio.ownedSecurities.add(security);
                     }
@@ -266,6 +279,8 @@ public class Navigation {
                     System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() + (selectedPosition.getValue()) - transactionCount * selectedPosition.getSpotPrice().getPrice()));
                     System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getSecurityName() + " at " + selectedPosition.getSpotPrice() + " EUR Spot. Confirm (y/n)");
                     if (confirmOrder()) {
+                        selectedPosition.setCount(selectedPosition.getCount() - transactionCount);
+                        selectedUser.getOrderHistory().add(new Order(transactionCount, selectedPosition.getSecurity().getSpotPrice().getPrice(), LocalDate.now().toString(), "SELL", selectedPosition.getSecurity()));
                         selectedPortfolio.setEquity(selectedPortfolio.getEquity() + transactionCount * selectedPosition.getSpotPrice().getPrice());
                         System.out.println("Sell order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity());
                         if (selectedPosition.isZero()) {
@@ -317,8 +332,8 @@ public class Navigation {
     private void selectPortfolio() {
         System.out.println("Please enter the name of the portfolio you want to select.");
         String depotName = scanner.next();
-        if (selectedUser.portfolios.contains(new Portfolio(depotName, selectedUser))) {
-            selectedPortfolio = selectedUser.portfolios.get(selectedUser.portfolios.indexOf(new Portfolio(depotName, selectedUser)));
+        if (selectedUser.portfolios.contains(new Portfolio(depotName, selectedUser.toString()))) {
+            selectedPortfolio = selectedUser.portfolios.get(selectedUser.portfolios.indexOf(new Portfolio(depotName, selectedUser.toString())));
             System.out.println("Depot " + depotName + " has been selected!");
         } else {
             System.out.println("Depot " + depotName + " does not exist or isn't owned by you, please try a different depot.");
@@ -326,7 +341,21 @@ public class Navigation {
     }
 
     private void selectPortfolio(String name) {
-        selectedPortfolio = selectedUser.portfolios.get(selectedUser.portfolios.indexOf(new Portfolio(name, selectedUser)));
+        selectedPortfolio = selectedUser.portfolios.get(selectedUser.portfolios.indexOf(new Portfolio(name, selectedUser.toString())));
         System.out.println("Portfolio " + name + " has been selected!");
+    }
+
+    private void priceHistory() {
+        listSecurities();
+        System.out.println("Enter the name of the Security whose price history you want to display:");
+        Security selectedSecurity = securities.get(securities.indexOf(new SecurityDow(scanner.next())));
+        if (!selectedSecurity.getHistoricalPrices().isEmpty()) {
+            System.out.printf("%-15s %-10s%n", "Date", "Price");
+            for (SpotPrice spotPrice : selectedSecurity.getHistoricalPrices()) {
+                System.out.printf("%-15s %-10.2f%n", spotPrice.getDate(), spotPrice.getPrice());
+            }
+        } else {
+            System.out.println("No historical prices found, please update prices.");
+        }
     }
 }

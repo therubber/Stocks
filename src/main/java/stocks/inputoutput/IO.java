@@ -1,23 +1,63 @@
 package stocks.inputoutput;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import stocks.dows.SecurityDow;
 import stocks.dows.SpotPrice;
-import stocks.entities.Portfolio;
-import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.interfaces.Security;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
+import java.lang.reflect.Type;
 import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
 public class IO {
 
     public static class Load {
+
+        public static Navigation fromJson() {
+            Navigation instance = new Navigation();
+            try {
+                FileInputStream fileInputStream = new FileInputStream("Saves/users.json");
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                StringBuilder sb = new StringBuilder();
+                String input;
+                while ((input = bufferedReader.readLine()) != null) {
+                    sb.append(input);
+                }
+                String json = sb.toString();
+                Gson gson = new Gson();
+                JSONParser jsonParser = new JSONParser();
+                try {
+                    //TODO: Liste mit unterinstanzen füllen! -> Verschachtelung
+                    instance.setUsers((List<User>) jsonParser.parse(json));
+                } catch (ParseException pe) {
+                    pe.printStackTrace();
+                }
+            } catch (FileNotFoundException fnfe) {
+                System.out.println("No Savefile found, creating new one...");
+                try {
+                    File save = new File("Saves/users.json");
+                    if (save.createNewFile()) {
+                        System.out.println("New save created!");
+                    }
+                } catch (IOException ioe) {
+                    System.out.println("New Save could not be created. Progress will not be saved.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return instance;
+        }
 
         /**
          * Loads an instance from save file Saves/recent.xml
@@ -32,7 +72,7 @@ public class IO {
                 System.out.println("No recent save found. Creating new one...");
                 try {
                     File save = new File("Saves/recent.xml");
-                    if (!save.createNewFile()) {
+                    if (save.createNewFile()) {
                         System.out.println("New save created!");
                     }
                 } catch (IOException fileioe) {
@@ -95,23 +135,29 @@ public class IO {
             }
             return instance;
         }
-
-        public static Navigation fromJson() {
-            Navigation instance = new Navigation();
-            // TODO: Load instance from JSON file
-            return instance;
-        }
     }
 
     public static class Save {
 
+        public static void toJson(Navigation instance) {
+            Gson gson = new Gson();
+            try {
+                FileOutputStream fileOutputStream= new FileOutputStream("Saves/users.json");
+                String save = gson.toJson(instance.getUsers());
+                fileOutputStream.write(save.getBytes());
+                fileOutputStream.close();
+            }  catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+
         /**
          * Saves instance of Navigation to Saves.users,json
-         * @param currentInstance Instance of Navigation to be saved
+         * @param instance Instance of Navigation to be saved
          */
-        public static void toJson(Navigation currentInstance) {
+        /* public static void toJson(Navigation instance) {
             JSONArray userListJson = new JSONArray();
-            for (User user : currentInstance.getUsers()) {
+            for (User user : instance.getUsers()) {
                 JSONObject userJson = new JSONObject();
                 JSONArray userPortfoliosJson = new JSONArray();
                 userJson.put("username", user.getUsername());
@@ -155,7 +201,7 @@ public class IO {
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
-        }
+        } */
 
         /**
          * Saves instance to xml file Saves/recent.xml
