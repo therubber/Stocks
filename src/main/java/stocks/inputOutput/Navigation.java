@@ -1,14 +1,11 @@
-package stocks.output;
+package stocks.inputOutput;
 
-import stocks.dows.SpotPrice;
 import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.dows.SecurityDow;
 import stocks.interfaces.Security;
-import java.beans.XMLDecoder;
-import java.io.*;
-import java.time.LocalDate;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -38,10 +35,8 @@ public class Navigation {
     }
 
     public static void main(String[] args) {
-        Navigation currentInstance = new Navigation();
-        currentInstance.loadUsers();
-        currentInstance.initiateSecurities();
-        Output.help();
+        Navigation currentInstance = IO.Load.fromXml();
+        IO.Help.noUser();
         String navCurrent = currentInstance.navigation();
         while (!navCurrent.equals("exit")) {
             if (currentInstance.selectedUser == null) {
@@ -68,10 +63,10 @@ public class Navigation {
                 listSecurities();
                 return "lf";
             case "help":
-                Output.help();
+                IO.Help.noUser();
                 return "help";
             case "clear":
-                Output.clear();
+                IO.Help.clear();
                 return "clear";
             case "exit":
                 return "exit";
@@ -120,16 +115,16 @@ public class Navigation {
                 }
                 return "overview";
             case "help":
-                Output.userHelp();
+                IO.Help.loggedIn();
                 return "help";
             case "clear":
-                Output.clear();
+                IO.Help.clear();
                 return "clear";
             case "logout":
                 System.out.println("User " + selectedUser.getUsername() + " successfully logged out!");
                 selectedUser = null;
                 selectedPortfolio = null;
-                Output.help();
+                IO.Help.noUser();
                 return "logout";
             case "exit":
                 return "exit";
@@ -139,8 +134,8 @@ public class Navigation {
     }
 
     private void save() {
-        Save.toXml(this);
-        Save.toJson(this);
+        IO.Save.toXml(this);
+        IO.Save.toJson(this);
     }
 
     private void listSecurities() {
@@ -157,7 +152,7 @@ public class Navigation {
         if (users.contains(new User(username)) && !username.equals("unlogged")) {
             selectedUser = users.get(users.indexOf(new User(username)));
             System.out.println("User " + username + " is now logged in!");
-            Output.clear();
+            IO.Help.clear();
         } else {
             System.out.println("User does not exist! Please register a new User");
         }
@@ -318,73 +313,5 @@ public class Navigation {
     private void selectPortfolio(String name) {
         selectedPortfolio = selectedUser.portfolios.get(selectedUser.portfolios.indexOf(new Portfolio(name, selectedUser)));
         System.out.println("Portfolio " + name + " has been selected!");
-    }
-
-    private void loadUsers() {
-        try {
-            XMLDecoder decoder = new XMLDecoder(new ObjectInputStream(new FileInputStream("Saves/recent.xml")));
-            setUsers((List<User>)decoder.readObject());
-        } catch  (IOException ioe) {
-            System.out.println("No recent save found. Creating new one...");
-            try {
-                File save = new File("Saves/recent.xml");
-                if(!save.createNewFile()) {
-                    System.out.println("New save created!");
-                }
-            } catch (IOException fileioe){
-                System.out.println("New Save could not be created. Progress will not be saved.");
-            }
-        }
-    }
-
-    /**
-     * Sets up names of available security and fetches data using updateSecurities()
-     */
-    private void initiateSecurities() {
-        try {
-            Scanner input = new Scanner(new File("SecurityData/Securities.txt"));
-            while (input.hasNext()) {
-                String name = input.next();
-                String isin = input.next();
-                String wkn = input.next();
-                if (!securities.contains(new SecurityDow(name, isin, wkn))) {
-                    securities.add(new SecurityDow(name, isin, wkn));
-                }
-            }
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("Error: File Securities.txt not found. Unable to load securities.");
-        }
-        updateSpotPrices();
-    }
-
-    /**
-     * Updates prices to most recent using data from SecurityData file.
-     */
-    private void updateSpotPrices() {
-        try {
-            String pathname = "SecurityData/" + LocalDate.now().toString() + ".txt";
-            Scanner input = new Scanner(new File(pathname));
-            for (Security security : securities) {
-                if (input.next().equals(security.getName())) {
-                    if (input.next().equals(security.getIsin())) {
-                        if (input.next().equals(security.getWkn())) {
-                            security.setSpotPrice(new SpotPrice(input.nextDouble(), LocalDate.now().toString()));
-                        } else {
-                            System.out.println("WKN does not match!");
-                        }
-                    } else {
-                        System.out.println("ISIN does not match!");
-                    }
-                } else {
-                    System.out.println("Datafile " + pathname + " does not match security " + security + "!");
-                }
-            }
-            input.close();
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("No Update file found!");
-            for (Security security : securities) {
-                security.setSpotPrice(new SpotPrice(0, "UPDATE ERROR"));
-            }
-        }
     }
 }
