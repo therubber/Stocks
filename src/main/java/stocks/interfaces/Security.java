@@ -1,7 +1,6 @@
 package stocks.interfaces;
 
 import stocks.dows.SpotPrice;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 public interface Security {
@@ -59,7 +58,7 @@ public interface Security {
      * Getter method for historical price list
      * @return List of price history
      */
-    List<SpotPrice> historicalPrices();
+    List<SpotPrice> getHistoricalPrices();
 
     /**
      * Setter method for historical price list
@@ -67,9 +66,4 @@ public interface Security {
      */
     void setHistoricalPrices(List<SpotPrice> histPrices);
 
-    /**
-     * Updates securitys spot prices if they are not most recent
-     * @throws FileNotFoundException If files to fetch data from are in wrong directory, have wrong names or are corrupted.
-     */
-    void update() throws FileNotFoundException;
 }

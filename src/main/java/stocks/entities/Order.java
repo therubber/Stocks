@@ -4,6 +4,7 @@ import stocks.interfaces.Security;
 
 public class Order {
 
+    private int count;
     private double executionPrice;
     private String executionDate;
     private boolean type;
@@ -28,6 +29,14 @@ public class Order {
             this.type = true;
         }
         this.security = security;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
     /**

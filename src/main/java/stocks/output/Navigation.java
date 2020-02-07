@@ -1,13 +1,14 @@
 package stocks.output;
 
+import stocks.dows.SpotPrice;
 import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.dows.SecurityDow;
 import stocks.interfaces.Security;
 import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
 import java.io.*;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -38,9 +39,7 @@ public class Navigation {
 
     public static void main(String[] args) {
         Navigation currentInstance = new Navigation();
-        if (currentInstance.loadUsers() != null) {
-            currentInstance.setUsers(currentInstance.loadUsers());
-        }
+        currentInstance.loadUsers();
         currentInstance.initiateSecurities();
         Output.help();
         String navCurrent = currentInstance.navigation();
@@ -51,10 +50,10 @@ public class Navigation {
                 navCurrent = currentInstance.userNavigation();
             }
         }
-        currentInstance.saveUsers();
+        currentInstance.save();
     }
 
-    public String navigation() {
+    private String navigation() {
         String input = scanner.next();
         switch (input) {
             case "login":
@@ -81,7 +80,7 @@ public class Navigation {
         }
     }
 
-    public String userNavigation() {
+    private String userNavigation() {
         String input = scanner.next();
         switch (input) {
             case "selected":
@@ -139,6 +138,11 @@ public class Navigation {
         }
     }
 
+    private void save() {
+        Save.toXml(this);
+        Save.toJson(this);
+    }
+
     private void listSecurities() {
         System.out.println();
         System.out.printf("%-18s %-16s %-10s %-10s %-15s%n", "Name", "ISIN", "WKN", "Price", "Date");
@@ -159,40 +163,6 @@ public class Navigation {
         }
     }
 
-    /**
-     * Sets up names of available security and fetches data using updateSecurities()
-     */
-    public void initiateSecurities() {
-        try {
-            Scanner input = new Scanner(new File("SecurityData/Securities.txt"));
-            while (input.hasNext()) {
-                String name = input.next();
-                String isin = input.next();
-                String wkn = input.next();
-                if (!securities.contains(new SecurityDow(name, isin, wkn))) {
-                    securities.add(new SecurityDow(name, isin, wkn));
-                }
-            }
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("Error: File Securities.txt not found. Unable to load securities.");
-        }
-        updateSecurityPrices();
-    }
-
-    private void updateSecurityPrices() {
-        System.out.println("Updating spot prices...");
-        if (!securities.isEmpty()) {
-            for (Security security : securities) {
-                try {
-                    security.update();
-                } catch (FileNotFoundException fnfe) {
-                    System.out.println(fnfe.toString());
-                }
-            }
-            System.out.println("Done!");
-        }
-    }
-
     private void addUser() {
         System.out.println("Enter a username to create a new user: ");
         String name = scanner.next();
@@ -203,7 +173,7 @@ public class Navigation {
         } else {
             System.out.println("User with that username already exists, please login.");
         }
-        saveUsers();
+        save();
     }
 
     private void addPortfolio() {
@@ -220,7 +190,7 @@ public class Navigation {
         } else {
             System.out.println("Insufficient account equity for depot creation! please try again");
         }
-        saveUsers();
+        save();
     }
 
     private void listPortfolios() {
@@ -237,67 +207,92 @@ public class Navigation {
     }
 
     private void buy() {
-        listSecurities();
-        System.out.println("Depot equity: " + selectedPortfolio.getEquity() + " EUR");
-        System.out.println("Enter the name of the Security that you want to buy: ");
-        String securityName = scanner.next();
-        if (!securities.contains(new SecurityDow(securityName))) {
-            System.out.println("Security not available, please try again.");
-            buy();
-        }
-        Security security = securities.get(securities.indexOf(new SecurityDow(securityName)));
-        System.out.println("Enter the count of shares you want to buy: ");
-        int transactionCount = scanner.nextInt();
-        Position position = new Position(transactionCount, security);
-        if (position.getValue() <= selectedPortfolio.getEquity()) {
-            System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() - position.getValue()));
-            System.out.println("Buying " + transactionCount + " shares of " + security.getName() + " at " + security.getSpotPrice() + " EUR Spot. Confirm (y/n)");
-            String input = scanner.next();
-            if (input.equals("y")) {
-                selectedPortfolio.addPosition(position);
-                selectedPortfolio.changeEquity(-position.getValue());
-                if (!selectedPortfolio.ownedSecurities.contains(security)) {
-                    selectedPortfolio.ownedSecurities.add(security);
+        if (evaluateSpotPrices()) {
+            listSecurities();
+            System.out.println("Depot equity: " + selectedPortfolio.getEquity() + " EUR");
+            System.out.println("Enter the name of the Security that you want to buy: ");
+            String securityName = scanner.next();
+            if (!securities.contains(new SecurityDow(securityName))) {
+                System.out.println("Security not available, please try again.");
+                buy();
+            }
+            Security security = securities.get(securities.indexOf(new SecurityDow(securityName)));
+            System.out.println("Enter the count of shares you want to buy: ");
+            int transactionCount = scanner.nextInt();
+            Position position = new Position(transactionCount, security);
+            if (position.getValue() <= selectedPortfolio.getEquity()) {
+                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() - position.getValue()));
+                System.out.println("Buying " + transactionCount + " shares of " + security.getName() + " at " + security.getSpotPrice() + " EUR Spot. Confirm (y/n)");
+                String input = scanner.next();
+                if (input.equals("y")) {
+                    selectedPortfolio.addPosition(position);
+                    selectedPortfolio.changeEquity(-position.getValue());
+                    if (!selectedPortfolio.ownedSecurities.contains(security)) {
+                        selectedPortfolio.ownedSecurities.add(security);
+                    }
+                    System.out.println("Buy order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity());
+                } else {
+                    System.out.println("Buy order cancelled, back to menu.");
                 }
-                System.out.println("Buy order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity());
             } else {
-                System.out.println("Buy order cancelled, back to menu.");
+                System.out.println("Insufficient balance! Please try ordering fewer shares.");
             }
         } else {
-            System.out.println("Insufficient balance! Please try ordering fewer shares.");
+            System.out.println("Spot prices were not updated properly. Please try again later.");
         }
-        saveUsers();
+        save();
     }
 
-    public void sell() {
-        selectedPortfolio.indexPositions();
-        System.out.println("Please select the position you want to reduce by entering its index.");
-        int index = scanner.nextInt();
-        if (index <= selectedPortfolio.getPositionCount() && index > 0) {
-            Position selectedPosition = selectedPortfolio.getPosition(index - 1);
-            System.out.println("Enter the amount of shares you want to reduce/increase the position by");
-            int transactionCount = scanner.nextInt();
-            if (transactionCount <= selectedPosition.getCount()) {
-                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() + (selectedPosition.getValue()) - transactionCount * selectedPosition.getSpotPrice().getPrice()));
-                System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getSecurityName() + " at " + selectedPosition.getSpotPrice() + " EUR Spot. Confirm (y/n)");
-                String confirm = scanner.next();
-                if (confirm.equals("y")) {
-                    selectedPortfolio.changeEquity(selectedPosition.changeCount(transactionCount));
-                    System.out.println("Sell order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity());
-                    if (selectedPosition.getCount() == 0) {
-                        selectedPortfolio.deletePosition(selectedPosition);
-                        selectedPortfolio.ownedSecurities.remove(selectedPosition.getSecurity());
+    private void sell() {
+        if (evaluateSpotPrices()) {
+            selectedPortfolio.indexPositions();
+            System.out.println("Please select the position you want to reduce by entering its index.");
+            int index = scanner.nextInt();
+            if (index <= selectedPortfolio.getPositionCount() && index > 0) {
+                Position selectedPosition = selectedPortfolio.getPosition(index - 1);
+                System.out.println("Enter the amount of shares you want to reduce/increase the position by");
+                int transactionCount = scanner.nextInt();
+                if (transactionCount <= selectedPosition.getCount()) {
+                    System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() + (selectedPosition.getValue()) - transactionCount * selectedPosition.getSpotPrice().getPrice()));
+                    System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getSecurityName() + " at " + selectedPosition.getSpotPrice() + " EUR Spot. Confirm (y/n)");
+                    if (confirmOrder()) {
+                        selectedPortfolio.setEquity(selectedPortfolio.getEquity() + transactionCount * selectedPosition.getSpotPrice().getPrice());
+                        System.out.println("Sell order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity());
+                        if (selectedPosition.isZero()) {
+                            selectedPortfolio.deletePosition(selectedPosition);
+                            selectedPortfolio.ownedSecurities.remove(selectedPosition.getSecurity());
+                        }
+                    } else {
+                        System.out.println("Sell order cancelled, back to menu.");
                     }
                 } else {
-                    System.out.println("Sell order cancelled, back to menu.");
+                    System.out.println("Amount of shares to sell exceeds amount of shares owned. Please try again.");
                 }
             } else {
-                System.out.println("Amount of shares to sell exceeds amount of shares owned. Please try again.");
+                System.out.println("The selected position does not exist, please try again.");
             }
         } else {
-            System.out.println("The selected position does not exist, please try again.");
+            System.out.println("Spot prices were not updated properly. Please try again later.");
         }
-        saveUsers();
+        save();
+    }
+
+    private boolean evaluateSpotPrices() {
+        boolean validPrices = false;
+        if (!securities.isEmpty()) {
+            validPrices = true;
+            for (Security security : securities) {
+                if (security.getSpotPrice().getDate().equals("UPDATE ERROR")) {
+                    validPrices = false;
+                }
+            }
+        }
+        return validPrices;
+    }
+
+    private boolean confirmOrder() {
+        String input = scanner.next();
+        return input.equals("y");
     }
 
     private void selected() {
@@ -325,20 +320,10 @@ public class Navigation {
         System.out.println("Portfolio " + name + " has been selected!");
     }
 
-    public void saveUsers() {
-        try {
-            final XMLEncoder encoder = new XMLEncoder(new ObjectOutputStream(new FileOutputStream("Saves/recent.xml")));
-            encoder.writeObject(users);
-            encoder.close();
-        } catch (IOException ioe) {
-            System.out.println("Savefile not found, saving failed!");
-        }
-    }
-
-    public List<User> loadUsers() {
+    private void loadUsers() {
         try {
             XMLDecoder decoder = new XMLDecoder(new ObjectInputStream(new FileInputStream("Saves/recent.xml")));
-            return (List<User>)decoder.readObject();
+            setUsers((List<User>)decoder.readObject());
         } catch  (IOException ioe) {
             System.out.println("No recent save found. Creating new one...");
             try {
@@ -350,6 +335,56 @@ public class Navigation {
                 System.out.println("New Save could not be created. Progress will not be saved.");
             }
         }
-        return null;
+    }
+
+    /**
+     * Sets up names of available security and fetches data using updateSecurities()
+     */
+    private void initiateSecurities() {
+        try {
+            Scanner input = new Scanner(new File("SecurityData/Securities.txt"));
+            while (input.hasNext()) {
+                String name = input.next();
+                String isin = input.next();
+                String wkn = input.next();
+                if (!securities.contains(new SecurityDow(name, isin, wkn))) {
+                    securities.add(new SecurityDow(name, isin, wkn));
+                }
+            }
+        } catch (FileNotFoundException fnfe) {
+            System.out.println("Error: File Securities.txt not found. Unable to load securities.");
+        }
+        updateSpotPrices();
+    }
+
+    /**
+     * Updates prices to most recent using data from SecurityData file.
+     */
+    private void updateSpotPrices() {
+        try {
+            String pathname = "SecurityData/" + LocalDate.now().toString() + ".txt";
+            Scanner input = new Scanner(new File(pathname));
+            for (Security security : securities) {
+                if (input.next().equals(security.getName())) {
+                    if (input.next().equals(security.getIsin())) {
+                        if (input.next().equals(security.getWkn())) {
+                            security.setSpotPrice(new SpotPrice(input.nextDouble(), LocalDate.now().toString()));
+                        } else {
+                            System.out.println("WKN does not match!");
+                        }
+                    } else {
+                        System.out.println("ISIN does not match!");
+                    }
+                } else {
+                    System.out.println("Datafile " + pathname + " does not match security " + security + "!");
+                }
+            }
+            input.close();
+        } catch (FileNotFoundException fnfe) {
+            System.out.println("No Update file found!");
+            for (Security security : securities) {
+                security.setSpotPrice(new SpotPrice(0, "UPDATE ERROR"));
+            }
+        }
     }
 }

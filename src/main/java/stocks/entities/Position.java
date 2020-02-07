@@ -9,9 +9,9 @@ import java.util.Objects;
 public class Position {
 
     private int count;
-    private Security security;
     private String id;
     private String executionDate;
+    private Security security;
 
     /**
      * Empty constructor required for serialization
@@ -26,13 +26,20 @@ public class Position {
     public Position(int count, Security security) {
         this.count = count;
         this.security = security;
-        this.id = "POS" + new DecimalFormat("000000").format((int)(Math.random() * 100000));
+        this.id = generateId();
         this.executionDate = LocalDate.now().toString();
+    }
+
+    public Position(Order order) {
+        this.count = order.getCount();
+        this.security = order.getSecurity();
+        this.id = generateId();
+        this.executionDate = order.getExecutionDate();
     }
 
     /**
      * Getter method to receive count parameter
-     * @return
+     * @return Count of securities contained in position
      */
     public int getCount() {
         return count;
@@ -40,7 +47,7 @@ public class Position {
 
     /**
      * Setter method for count parameter
-     * @param count
+     * @param count  Count to set for position
      */
     public void setCount(int count) {
         this.count = count;
@@ -48,7 +55,7 @@ public class Position {
 
     /**
      * Getter method to receive security parameter
-     * @return
+     * @return Security object of position
      */
     public Security getSecurity() {
         return security;
@@ -56,7 +63,7 @@ public class Position {
 
     /**
      * Setter method for security parameter
-     * @param security
+     * @param security Security object to set
      */
     public void setSecurity(Security security) {
         this.security = security;
@@ -64,7 +71,7 @@ public class Position {
 
     /**
      * Getter method to receive value of the position
-     * @return
+     * @return Value of the position
      */
     public double getValue() {
         return count * security.getSpotPrice().getPrice();
@@ -72,7 +79,7 @@ public class Position {
 
     /**
      * Getter method to receive the ID of the position
-     * @return
+     * @return ID of the position
      */
     public String getId() {
         return id;
@@ -80,7 +87,7 @@ public class Position {
 
     /**
      * Setter method for ID parameter
-     * @param id
+     * @param id Id to set
      */
     public void setId(String id) {
         this.id = id;
@@ -88,7 +95,7 @@ public class Position {
 
     /**
      * Getter method for spot price of the contained security object
-     * @return
+     * @return SpotPrice object of security contained in position
      */
     public SpotPrice getSpotPrice() {
         return security.getSpotPrice();
@@ -96,7 +103,7 @@ public class Position {
 
     /**
      * Getter method for the name of the contained security
-     * @return
+     * @return String name of security contained in position
      */
     public String getSecurityName() {
         return security.getName();
@@ -104,7 +111,7 @@ public class Position {
 
     /**
      * Getter method for the executionDate of the position
-     * @return
+     * @return String execution date of the order
      */
     public String getExecutionDate() {
         return executionDate;
@@ -112,7 +119,7 @@ public class Position {
 
     /**
      * Setter method for execution date
-     * @param executionDate
+     * @param executionDate String executionDate to be set for the order
      */
     public void setExecutionDate(String executionDate) {
         this.executionDate = executionDate;
@@ -127,6 +134,14 @@ public class Position {
         this.count -= count;
         this.executionDate = LocalDate.now().toString();
         return count * security.getSpotPrice().getPrice();
+    }
+
+    public boolean isZero() {
+        return count == 0;
+    }
+
+    public String generateId() {
+        return "POS" + new DecimalFormat("000000").format((int)(Math.random() * 100000));
     }
 
     @Override

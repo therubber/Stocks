@@ -8,11 +8,11 @@ import java.util.Objects;
 
 public class Portfolio {
     private String name;
+    private double equity;
     public User owner;
-    private List<Position> positions = new LinkedList<>();     // List with all Positions
+    private List<Position> positions = new LinkedList<>();
     public List<Security> ownedSecurities = new LinkedList<>();
     public List<Order> history = new LinkedList<>();
-    private double equity;
 
     /**
      * Empty constructor for serialization

@@ -1,14 +1,9 @@
 package stocks.dows;
 
 import stocks.interfaces.Security;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Scanner;
 
 public class SecurityDow implements Security {
 
@@ -25,7 +20,7 @@ public class SecurityDow implements Security {
 
     /**
      * Constructor with name -> Needed to select a security in buy orders
-     * @param name
+     * @param name Name to set for security
      */
     public SecurityDow(String name) {
         this.name = name;
@@ -73,52 +68,19 @@ public class SecurityDow implements Security {
 
     public void setSpotPrice(SpotPrice spotPrice) {
         this.spotPrice = spotPrice;
+        historicalPrices.add(spotPrice);
     }
 
     public String getSpotDate() {
         return spotPrice.getDate();
     }
 
-    public List<SpotPrice> historicalPrices() {
+    public List<SpotPrice> getHistoricalPrices() {
         return new LinkedList<>(historicalPrices);
     }
 
     public void setHistoricalPrices(List<SpotPrice> historicalPrices) {
         this.historicalPrices = historicalPrices;
-    }
-
-    /**
-     * Updates price to most recent one using data from SecurityData files.
-     */
-    public void update() {
-        try {
-            updateSpotPrice();
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("No update file found for " + this.name + ".");
-            this.spotPrice = new SpotPrice(0, "UPDATE ERROR");
-        }
-    }
-
-    private void updateSpotPrice() throws FileNotFoundException {
-        String pathname = "SecurityData/" + this.name + "_" + LocalDate.now().toString() + ".txt";
-        Scanner input = new Scanner(new File(pathname));
-        if (input.next().equals(name)) {
-            if (input.next().equals(isin)) {
-                if (input.next().equals(wkn)) {
-                    String date = input.next();
-                    if (!LocalDate.now().toString().equals(date) || spotPrice == null) {
-                        this.spotPrice = new SpotPrice(input.nextDouble(), date);
-                    }
-                } else {
-                    System.out.println("WKN does not match!");
-                }
-            } else {
-                System.out.println("ISIN does not match!");
-            }
-        } else {
-            System.out.println("Datafile " + pathname + " does not match security " + this.name + "!");
-        }
-        input.close();
     }
 
     @Override
