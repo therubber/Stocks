@@ -3,6 +3,7 @@ package stocks.inputoutput;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.internal.bind.util.ISO8601Utils;
 import com.google.gson.reflect.TypeToken;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -46,9 +47,16 @@ public class IO {
             } catch (FileNotFoundException fnfe) {
                 System.out.println("No Savefile found, creating new one...");
                 try {
-                    File save = new File("Saves/users.json");
-                    if (save.createNewFile()) {
-                        System.out.println("New save created!");
+                    File saveDir = new File("Saves");
+                    if (!saveDir.exists()) {
+                        if (saveDir.mkdir()) {
+                            System.out.println("/Saves/ Directory created!");
+                        }
+                    } else {
+                        File save = new File(saveDir.getPath() + "users.json");
+                        if (save.createNewFile()) {
+                            System.out.println("New save created!");
+                        }
                     }
                 } catch (IOException ioe) {
                     System.out.println("New Save could not be created. Progress will not be saved.");
@@ -71,9 +79,16 @@ public class IO {
             } catch (IOException ioe) {
                 System.out.println("No recent save found. Creating new one...");
                 try {
-                    File save = new File("Saves/recent.xml");
-                    if (save.createNewFile()) {
-                        System.out.println("New save created!");
+                    File saveDir = new File("Saves");
+                    if (!saveDir.exists()) {
+                        if (saveDir.mkdir()) {
+                            System.out.println("/Saves/ Directory created!");
+                        }
+                    } else {
+                        File save = new File(saveDir.getPath() + "users.xml");
+                        if (save.createNewFile()) {
+                            System.out.println("New save created!");
+                        }
                     }
                 } catch (IOException fileioe) {
                     System.out.println("New Save could not be created. Progress will not be saved.");
