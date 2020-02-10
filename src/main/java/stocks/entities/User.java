@@ -1,5 +1,7 @@
 package stocks.entities;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -7,7 +9,7 @@ import java.util.Objects;
 public class User {
 
     private String username;
-    private double equity;
+    private BigDecimal equity;
     public List<Portfolio> portfolios = new LinkedList<>();
     public List<Order> orderHistory = new LinkedList<>();
 
@@ -21,7 +23,7 @@ public class User {
      * @param username String username to create user with
      */
     public User(String username) {
-        this.equity = 10000.0;
+        this.equity = new BigDecimal(10000).setScale(2, RoundingMode.CEILING);
         this.username = username;
     }
 
@@ -45,15 +47,15 @@ public class User {
      * Getter method for equity
      * @return double equity
      */
-    public double getEquity() {
+    public BigDecimal getEquity() {
         return equity;
     }
 
     /**
      * Setter method for equity
-     * @param equity
+     * @param equity BigDecimal to set equity to
      */
-    public void setEquity(double equity) {
+    public void setEquity(BigDecimal equity) {
         this.equity = equity;
     }
 

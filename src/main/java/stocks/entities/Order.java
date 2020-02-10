@@ -2,12 +2,13 @@ package stocks.entities;
 
 import stocks.interfaces.Security;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 public class Order {
 
     private int count;
-    private double executionPrice;
+    private BigDecimal executionPrice;
     private String executionDate;
     private boolean type;
     private Security security;
@@ -25,7 +26,7 @@ public class Order {
      * @param type Boolean stating whether the order is Buy/Sell -> default = buy = false
      * @param security Security which is object of the order
      */
-    public Order(int count, double executionPrice, String executionDate, String type, Security security) {
+    public Order(int count, BigDecimal executionPrice, String executionDate, String type, Security security) {
         this.count = count;
         this.executionPrice = executionPrice;
         this.executionDate = executionDate;
@@ -38,7 +39,7 @@ public class Order {
 
     /**
      * Getter method for count of order
-     * @return
+     * @return Int count of order
      */
     public int getCount() {
         return count;
@@ -46,7 +47,7 @@ public class Order {
 
     /**
      * Setter method for count of order
-     * @param count
+     * @param count int count of order
      */
     public void setCount(int count) {
         this.count = count;
@@ -56,7 +57,7 @@ public class Order {
      * Getter method for execution price
      * @return double execution price
      */
-    public double getExecutionPrice() {
+    public BigDecimal getExecutionPrice() {
         return executionPrice;
     }
 
@@ -65,7 +66,7 @@ public class Order {
      * @param executionPrice double price to be set
      */
     public void setExecutionPrice(double executionPrice) {
-        this.executionPrice = executionPrice;
+        this.executionPrice = new BigDecimal(executionPrice);
     }
 
     /**

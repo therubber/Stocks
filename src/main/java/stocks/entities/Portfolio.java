@@ -2,13 +2,14 @@ package stocks.entities;
 
 import stocks.interfaces.Security;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 public class Portfolio {
     private String name;
-    private double equity;
+    private BigDecimal equity;
     public String owner;
     private List<Position> positions = new LinkedList<>();
     public List<Security> ownedSecurities = new LinkedList<>();
@@ -21,8 +22,8 @@ public class Portfolio {
 
     /**
      * Constructor for setting up a portfolio without equity
-     * @param name
-     * @param owner
+     * @param name Name
+     * @param owner Owner
      */
     public Portfolio(String name, String owner) {
         this.name = name;
@@ -35,7 +36,7 @@ public class Portfolio {
      * @param owner Owner of the portfolio
      * @param equity Amount of equity allocated to the portfolio
      */
-    public Portfolio(String name, String owner, double equity) {
+    public Portfolio(String name, String owner, BigDecimal equity) {
         this.name = name;
         this.equity = equity;
         this.owner = owner;
@@ -93,7 +94,7 @@ public class Portfolio {
      * Getter method to retrieve equity value of the portfolio
      * @return Returns equity available in the portfolio
      */
-    public double getEquity() {
+    public BigDecimal getEquity() {
         return equity;
     }
 
@@ -101,7 +102,7 @@ public class Portfolio {
      * Setter function required for serialization
      * @param equity Double value to set portfolio equity to
      */
-    public void setEquity(double equity) {
+    public void setEquity(BigDecimal equity) {
         this.equity = equity;
     }
 
@@ -110,7 +111,7 @@ public class Portfolio {
      * @param equity Equity value of the portfolio
      */
     public void changeEquity(double equity) {
-        this.equity += equity;
+        this.equity = this.equity.add(new BigDecimal(equity));
     }
 
     /**
@@ -199,18 +200,18 @@ public class Portfolio {
      * Calculates the current overall value of all assets in the portfolio
      * @return Value of all positions and equity
      */
-    public double getValue() {
-        return getPositionValue() + equity;
+    public BigDecimal getValue() {
+        return getPositionValue().add(equity);
     }
 
     /**
      * Method to calculate and return combined value of all positions currently in the portfolio
      * @return double value of open positions combined
      */
-    public double getPositionValue() {
-        double value = 0;
+    public BigDecimal getPositionValue() {
+        BigDecimal value = new BigDecimal(0);
         for (Position position : positions) {
-            value += position.getValue();
+            value = value.add(position.getValue());
         }
         return value;
     }

@@ -2,6 +2,8 @@ package stocks.entities;
 
 import stocks.dows.SpotPrice;
 import stocks.interfaces.Security;
+
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -73,8 +75,8 @@ public class Position {
      * Getter method to receive value of the position
      * @return Value of the position
      */
-    public double getValue() {
-        return count * security.getSpotPrice().getPrice();
+    public BigDecimal getValue() {
+        return security.getSpotPrice().getPrice().multiply(new BigDecimal(count));
     }
 
     /**
@@ -130,15 +132,15 @@ public class Position {
      * @param count int count that the position is reduced/increased by
      * @return double updated value of the position
      */
-    public double changeCount(int count) {
+    public BigDecimal changeCount(int count) {
         this.count -= count;
         this.executionDate = LocalDate.now().toString();
-        return count * security.getSpotPrice().getPrice();
+        return security.getSpotPrice().getPrice().multiply(new BigDecimal(count));
     }
 
     /**
      * Checks whether the count is zero -> used for deleting empty positions
-     * @return
+     * @return boolean whether the position has the count of zero
      */
     public boolean isZero() {
         return count == 0;
@@ -146,7 +148,7 @@ public class Position {
 
     /**
      * Generates an ID for the positions, no check for duplicates but unlikely
-     * @return
+     * @return String id to be assigned to the position
      */
     public String generateId() {
         return "POS" + new DecimalFormat("000000").format((int)(Math.random() * 100000));

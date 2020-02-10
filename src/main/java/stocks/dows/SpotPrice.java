@@ -1,10 +1,12 @@
 package stocks.dows;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 public class SpotPrice {
 
-    private double price;
+    private BigDecimal price;
     private String date;
 
     /**
@@ -14,11 +16,11 @@ public class SpotPrice {
 
     /**
      * Constructor for regular use
-     * @param spotPrice
-     * @param date
+     * @param spotPrice Spot price
+     * @param date Date
      */
     public SpotPrice(double spotPrice, String date) {
-        this.price = spotPrice;
+        this.price = new BigDecimal(spotPrice).setScale(2, RoundingMode.CEILING);
         this.date = date;
     }
 
@@ -42,7 +44,7 @@ public class SpotPrice {
      * Getter method for price
      * @return Price value
      */
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
@@ -51,7 +53,7 @@ public class SpotPrice {
      * @param price Price to set
      */
     public void setPrice(double price) {
-        this.price = price;
+        this.price = new BigDecimal(price);
     }
 
     @Override
@@ -59,7 +61,7 @@ public class SpotPrice {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SpotPrice spotPrice = (SpotPrice) o;
-        return Double.compare(spotPrice.price, price) == 0 &&
+        return Objects.equals(price, spotPrice.price) &&
                 Objects.equals(date, spotPrice.date);
     }
 
@@ -70,6 +72,6 @@ public class SpotPrice {
 
     @Override
     public String toString() {
-        return price + "/" + date;
+        return price + " / " + date;
     }
 }

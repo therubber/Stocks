@@ -7,6 +7,8 @@ import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.dows.SecurityDow;
 import stocks.interfaces.Security;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +40,7 @@ public class Navigation {
 
     /**
      * Getter method for list of available securities
-     * @return
+     * @return List of security objects
      */
     public List<Security> getSecurities() {
         return securities;
@@ -161,7 +163,6 @@ public class Navigation {
     }
 
     private void save() {
-        IO.Save.toXml(this);
         IO.Save.toJson(this);
     }
 
@@ -203,10 +204,10 @@ public class Navigation {
         System.out.println("Enter a Name for the portfolio you want to create: ");
         String name = scanner.next();
         System.out.println("Enter the amount of equity to transfer to the portfolio account: ");
-        double depotEquity = scanner.nextDouble();
-        if (depotEquity <= selectedUser.getEquity()) {
+        BigDecimal depotEquity = BigDecimal.valueOf(scanner.nextDouble());
+        if (depotEquity.doubleValue() <= selectedUser.getEquity().doubleValue()) {
             selectedUser.portfolios.add(new Portfolio(name, selectedUser.toString(), depotEquity));
-            selectedUser.setEquity(selectedUser.getEquity() - depotEquity);
+            selectedUser.setEquity(selectedUser.getEquity().subtract(depotEquity));
             selectPortfolio(name);
             System.out.println("Depot " + name + " successfully created!");
         } else {
@@ -242,18 +243,18 @@ public class Navigation {
             System.out.println("Enter the count of shares you want to buy: ");
             int transactionCount = scanner.nextInt();
             Position position = new Position(transactionCount, security);
-            if (position.getValue() <= selectedPortfolio.getEquity()) {
-                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() - position.getValue()));
-                System.out.println("Buying " + transactionCount + " shares of " + security.getName() + " at " + security.getSpotPrice() + " EUR Spot. Confirm (y/n)");
+            if (position.getValue().doubleValue() <= selectedPortfolio.getEquity().doubleValue()) {
+                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity().subtract(position.getValue())));
+                System.out.println("Buying " + transactionCount + " shares of " + security.getName() + " at " + security.getSpotPrice().getPrice().setScale(2, RoundingMode.CEILING) + " EUR Spot. Confirm (y/n)");
                 String input = scanner.next();
                 if (input.equals("y")) {
                     selectedPortfolio.addPosition(position);
-                    selectedPortfolio.changeEquity(-position.getValue());
+                    selectedPortfolio.setEquity(selectedPortfolio.getEquity().subtract(position.getValue()));
                     selectedUser.getOrderHistory().add(new Order(transactionCount, security.getSpotPrice().getPrice(), LocalDate.now().toString(), "BUY", security));
                     if (!selectedPortfolio.ownedSecurities.contains(security)) {
                         selectedPortfolio.ownedSecurities.add(security);
                     }
-                    System.out.println("Buy order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity());
+                    System.out.println("Buy order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity().setScale(2, RoundingMode.CEILING));
                 } else {
                     System.out.println("Buy order cancelled, back to menu.");
                 }
@@ -276,13 +277,13 @@ public class Navigation {
                 System.out.println("Enter the amount of shares you want to reduce/increase the position by");
                 int transactionCount = scanner.nextInt();
                 if (transactionCount <= selectedPosition.getCount()) {
-                    System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity() + (selectedPosition.getValue()) - transactionCount * selectedPosition.getSpotPrice().getPrice()));
-                    System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getSecurityName() + " at " + selectedPosition.getSpotPrice() + " EUR Spot. Confirm (y/n)");
+                    System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity().add(selectedPosition.getValue()).subtract(selectedPosition.getSpotPrice().getPrice().multiply(new BigDecimal(transactionCount)))));
+                    System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getSecurityName() + " at " + selectedPosition.getSpotPrice().getPrice().setScale(2, RoundingMode.CEILING) + " EUR Spot. Confirm (y/n)");
                     if (confirmOrder()) {
                         selectedPosition.setCount(selectedPosition.getCount() - transactionCount);
                         selectedUser.getOrderHistory().add(new Order(transactionCount, selectedPosition.getSecurity().getSpotPrice().getPrice(), LocalDate.now().toString(), "SELL", selectedPosition.getSecurity()));
-                        selectedPortfolio.setEquity(selectedPortfolio.getEquity() + transactionCount * selectedPosition.getSpotPrice().getPrice());
-                        System.out.println("Sell order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity());
+                        selectedPortfolio.setEquity(selectedPortfolio.getEquity().add(selectedPosition.getSpotPrice().getPrice().multiply(new BigDecimal(transactionCount))));
+                        System.out.println("Sell order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity().setScale(2, RoundingMode.CEILING));
                         if (selectedPosition.isZero()) {
                             selectedPortfolio.deletePosition(selectedPosition);
                             selectedPortfolio.ownedSecurities.remove(selectedPosition.getSecurity());
