@@ -47,27 +47,11 @@ public class Order {
     }
 
     /**
-     * Setter method for count of order
-     * @param count int count of order
-     */
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    /**
      * Getter method for execution price
      * @return double execution price
      */
     public BigDecimal getExecutionPrice() {
         return executionPrice;
-    }
-
-    /**
-     * Setter method for execution price
-     * @param executionPrice double price to be set
-     */
-    public void setExecutionPrice(double executionPrice) {
-        this.executionPrice = new BigDecimal(executionPrice);
     }
 
     /**
@@ -78,13 +62,6 @@ public class Order {
         return executionDate;
     }
 
-    /**
-     * Setter method for execution date
-     * @param executionDate String date of execution
-     */
-    public void setExecutionDate(String executionDate) {
-        this.executionDate = executionDate;
-    }
 
     /**
      * Getter method for order type
@@ -95,29 +72,11 @@ public class Order {
     }
 
     /**
-     * Setter method for order type
-     * @param type String buy/sell to set order type
-     */
-    public void setType(String type) {
-        if (type.equals("SELL")) {
-            this.type = true;
-        }
-    }
-
-    /**
      * Getter method for id
      * @return String ID
      */
     public String getId() {
         return id;
-    }
-
-    /**
-     * Setter method for id
-     * @param id String ID
-     */
-    public void setId(String id) {
-        this.id = id;
     }
 
     /**
@@ -134,13 +93,5 @@ public class Order {
      */
     public SecurityDow getSecurity() {
         return security;
-    }
-
-    /**
-     * Setter method for security which is object of the order
-     * @param security Security to set
-     */
-    public void setSecurity(SecurityDow security) {
-        this.security = security;
     }
 }

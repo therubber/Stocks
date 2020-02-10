@@ -29,7 +29,6 @@ public class IO {
 
         static Navigation fromJson() {
             Navigation instance = new Navigation();
-            new TypeToken<List<User>>(){}.getType();
             try {
                 FileInputStream fileInputStream = new FileInputStream("Saves/users.json");
                 InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
@@ -62,37 +61,6 @@ public class IO {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return initiateSecurities(instance);
-        }
-
-        /**
-         * Loads an instance from save file Saves/recent.xml
-         * @return Loaded instance of Navigation
-         */
-        static Navigation fromXml() {
-            Navigation instance = new Navigation();
-            try {
-                XMLDecoder decoder = new XMLDecoder(new ObjectInputStream(new FileInputStream("Saves/recent.xml")));
-                instance.setUsers((List<User>) decoder.readObject());
-            } catch (IOException ioe) {
-                System.out.println("No recent save found. Creating new one...");
-                try {
-                    File saveDir = new File("Saves");
-                    if (!saveDir.exists()) {
-                        if (saveDir.mkdir()) {
-                            System.out.println("/Saves/ Directory created!");
-                        }
-                    } else {
-                        File save = new File(saveDir.getPath() + "users.xml");
-                        if (save.createNewFile()) {
-                            System.out.println("New save created!");
-                        }
-                    }
-                } catch (IOException fileioe) {
-                    System.out.println("New Save could not be created. Progress will not be saved.");
-                }
-            }
-            instance = initiateSecurities(instance);
             return initiateSecurities(instance);
         }
 
@@ -165,20 +133,6 @@ public class IO {
                 fileOutputStream.close();
             }  catch (IOException ioe) {
                 ioe.printStackTrace();
-            }
-        }
-
-        /**
-         * Saves instance to xml file Saves/recent.xml
-         * @param currentInstance Instance of Navigation to be saved to file
-         */
-        static void toXml(Navigation currentInstance) {
-            try {
-                final XMLEncoder encoder = new XMLEncoder(new ObjectOutputStream(new FileOutputStream("Saves/recent.xml")));
-                encoder.writeObject(currentInstance.getUsers());
-                encoder.close();
-            } catch (IOException ioe) {
-                System.out.println("Savefile not found, saving failed!");
             }
         }
     }

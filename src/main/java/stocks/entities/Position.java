@@ -65,14 +65,6 @@ public class Position {
     }
 
     /**
-     * Setter method for security parameter
-     * @param security Security object to set
-     */
-    public void setSecurity(SecurityDow security) {
-        this.security = security;
-    }
-
-    /**
      * Getter method to receive value of the position
      * @return Value of the position
      */
@@ -86,14 +78,6 @@ public class Position {
      */
     public String getId() {
         return id;
-    }
-
-    /**
-     * Setter method for ID parameter
-     * @param id Id to set
-     */
-    public void setId(String id) {
-        this.id = id;
     }
 
     /**
@@ -118,14 +102,6 @@ public class Position {
      */
     public String getExecutionDate() {
         return executionDate;
-    }
-
-    /**
-     * Setter method for execution date
-     * @param executionDate String executionDate to be set for the order
-     */
-    public void setExecutionDate(String executionDate) {
-        this.executionDate = executionDate;
     }
 
     /**

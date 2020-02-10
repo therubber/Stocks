@@ -46,14 +46,6 @@ public class Navigation {
         return securities;
     }
 
-    /**
-     * Setter method for available securities
-     * @param securities List containing all securities to be made available
-     */
-    public void setSecurities(List<SecurityDow> securities) {
-        this.securities = securities;
-    }
-
     public static void main(String[] args) {
         Navigation currentInstance = IO.Load.fromJson();
         IO.Help.noUser();

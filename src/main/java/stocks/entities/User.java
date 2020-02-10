@@ -36,14 +36,6 @@ public class User {
     }
 
     /**
-     * Setter method for username
-     * @param username String username to set
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
      * Getter method for equity
      * @return double equity
      */
@@ -60,35 +52,11 @@ public class User {
     }
 
     /**
-     * Getter method for portfolio list
-     * @return List containing all portfolios owned
-     */
-    public List<Portfolio> getPortfolios() {
-        return portfolios;
-    }
-
-    /**
-     * Setter method for portfolios
-     * @param portfolios List of portfolios to set
-     */
-    public void setPortfolios(List<Portfolio> portfolios) {
-        this.portfolios = portfolios;
-    }
-
-    /**
      * Getter method for order history
      * @return List with order history
      */
     public List<Order> getOrderHistory() {
         return orderHistory;
-    }
-
-    /**
-     * Setter method for order history
-     * @param orderHistory List of order history to be set
-     */
-    public void setOrderHistory(List<Order> orderHistory) {
-        this.orderHistory = orderHistory;
     }
 
     /**

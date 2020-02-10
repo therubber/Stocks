@@ -33,27 +33,11 @@ public class SpotPrice {
     }
 
     /**
-     * Setter method for date of price
-     * @param date String date to set
-     */
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    /**
      * Getter method for price
      * @return Price value
      */
     public BigDecimal getPrice() {
         return price;
-    }
-
-    /**
-     * Setter method for price
-     * @param price Price to set
-     */
-    public void setPrice(double price) {
-        this.price = new BigDecimal(price);
     }
 
     @Override

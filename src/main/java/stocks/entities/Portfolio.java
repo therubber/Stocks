@@ -43,52 +43,8 @@ public class Portfolio {
         this.owner = owner;
     }
 
-    /**
-     *
-     * @return Returns the name of the portfolio
-     */
     public String getName() {
         return name;
-    }
-
-    /**
-     * Setter method for name parameter
-     * @param name String name to be set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Getter method to receive the owner of the portfolio
-     * @return User Owner of the portfolio
-     */
-    public String getOwner() {
-        return owner;
-    }
-
-    /**
-     * Setter method for the owner parameter
-     * @param owner User to be set as owner
-     */
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    /**
-     * Getter method for position list of the portfolio
-     * @return List<Position> List containing all positions
-     */
-    public List<Position> getPositions() {
-        return positions;
-    }
-
-    /**
-     * Setter method for positions list
-     * @param positions List<Position> List to be set as positions list in portfolio
-     */
-    public void setPositions(List<Position> positions) {
-        this.positions = positions;
     }
 
     /**
@@ -186,15 +142,6 @@ public class Portfolio {
             i++;
         }
         System.out.println();
-    }
-
-    /**
-     * Formats numbers to fit for use with currency
-     * @param toFormat Double number to be formatted
-     * @return Formatted input
-     */
-    public double format(double toFormat) {
-        return Math.round(toFormat*1e2)/1e2;
     }
 
     /**
