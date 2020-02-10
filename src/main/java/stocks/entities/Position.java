@@ -1,5 +1,6 @@
 package stocks.entities;
 
+import stocks.dows.SecurityDow;
 import stocks.dows.SpotPrice;
 import stocks.interfaces.Security;
 
@@ -13,7 +14,7 @@ public class Position {
     private int count;
     private String id;
     private String executionDate;
-    private Security security;
+    private SecurityDow security;
 
     /**
      * Empty constructor required for serialization
@@ -25,7 +26,7 @@ public class Position {
      * @param count int count of shares contained in the position
      * @param security Security which is object of the position
      */
-    public Position(int count, Security security) {
+    public Position(int count, SecurityDow security) {
         this.count = count;
         this.security = security;
         this.id = generateId();
@@ -59,7 +60,7 @@ public class Position {
      * Getter method to receive security parameter
      * @return Security object of position
      */
-    public Security getSecurity() {
+    public SecurityDow getSecurity() {
         return security;
     }
 
@@ -67,7 +68,7 @@ public class Position {
      * Setter method for security parameter
      * @param security Security object to set
      */
-    public void setSecurity(Security security) {
+    public void setSecurity(SecurityDow security) {
         this.security = security;
     }
 

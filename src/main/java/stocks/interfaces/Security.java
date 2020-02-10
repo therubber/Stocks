@@ -6,6 +6,10 @@ import java.util.List;
 public interface Security {
 
     /**
+     * NOT CURRENTLY IN USE: PROBLEMS WITH SERIALIZATION BECAUSE INTERFACES DONT HAVE NO ARGS CONSTRUCTOR
+     */
+
+    /**
      * Getter method for name
      * @return String name of the security
      */

@@ -18,6 +18,7 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.SQLOutput;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -28,6 +29,7 @@ public class IO {
 
         static Navigation fromJson() {
             Navigation instance = new Navigation();
+            new TypeToken<List<User>>(){}.getType();
             try {
                 FileInputStream fileInputStream = new FileInputStream("Saves/users.json");
                 InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
@@ -39,6 +41,7 @@ public class IO {
                 }
                 String jsonInput = sb.toString();
                 Gson gson = new Gson();
+                instance.setUsers(new LinkedList<>(new Gson().fromJson(jsonInput, new TypeToken<List<User>>(){}.getType())));
             } catch (FileNotFoundException fnfe) {
                 System.out.println("No Savefile found, creating new one...");
                 try {

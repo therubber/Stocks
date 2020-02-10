@@ -1,5 +1,6 @@
 package stocks.entities;
 
+import stocks.dows.SecurityDow;
 import stocks.interfaces.Security;
 
 import java.math.BigDecimal;
@@ -12,7 +13,7 @@ public class Portfolio {
     private BigDecimal equity;
     public String owner;
     private List<Position> positions = new LinkedList<>();
-    public List<Security> ownedSecurities = new LinkedList<>();
+    public List<SecurityDow> ownedSecurities = new LinkedList<>();
     public List<Order> history = new LinkedList<>();
 
     /**

@@ -20,7 +20,7 @@ public class Navigation {
     private Portfolio selectedPortfolio;
     private final Scanner scanner = new Scanner(System.in);
     private List<User> users = new LinkedList<>();
-    private List<Security> securities = new LinkedList<>();
+    private List<SecurityDow> securities = new LinkedList<>();
 
     /**
      * Getter method for user list
@@ -42,7 +42,7 @@ public class Navigation {
      * Getter method for list of available securities
      * @return List of security objects
      */
-    public List<Security> getSecurities() {
+    public List<SecurityDow> getSecurities() {
         return securities;
     }
 
@@ -50,7 +50,7 @@ public class Navigation {
      * Setter method for available securities
      * @param securities List containing all securities to be made available
      */
-    public void setSecurities(List<Security> securities) {
+    public void setSecurities(List<SecurityDow> securities) {
         this.securities = securities;
     }
 
@@ -239,7 +239,7 @@ public class Navigation {
                 System.out.println("Security not available, please try again.");
                 buy();
             }
-            Security security = securities.get(securities.indexOf(new SecurityDow(securityName)));
+            SecurityDow security = securities.get(securities.indexOf(new SecurityDow(securityName)));
             System.out.println("Enter the count of shares you want to buy: ");
             int transactionCount = scanner.nextInt();
             Position position = new Position(transactionCount, security);
