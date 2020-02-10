@@ -48,6 +48,7 @@ public class Navigation {
 
     public static void main(String[] args) {
         Navigation currentInstance = IO.Load.fromJson();
+        IO.Load.historicalPrices(currentInstance);
         IO.Help.noUser();
         String navCurrent = currentInstance.navigation();
         while (!navCurrent.equals("exit")) {

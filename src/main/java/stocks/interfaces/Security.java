@@ -1,6 +1,8 @@
 package stocks.interfaces;
 
 import stocks.dows.SpotPrice;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public interface Security {
@@ -56,7 +58,12 @@ public interface Security {
      * @param spotPrice SpotPrice to set
      */
     void setSpotPrice(SpotPrice spotPrice);
-    String getSpotDate();
+
+    /**
+     * Getter method for Date of spot price
+     * @return LocalDate of current spot price
+     */
+    LocalDate getSpotDate();
 
     /**
      * Getter method for historical price list

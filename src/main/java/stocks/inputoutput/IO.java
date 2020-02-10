@@ -1,31 +1,26 @@
 package stocks.inputoutput;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.internal.bind.util.ISO8601Utils;
 import com.google.gson.reflect.TypeToken;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import stocks.dows.SecurityDow;
 import stocks.dows.SpotPrice;
 import stocks.entities.User;
 import stocks.interfaces.Security;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
 import java.io.*;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.sql.SQLOutput;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
 public class IO {
 
+    /** Private constructor to hide public one */
+    private IO() {}
+
     public static class Load {
+
+        /** Private constructor to hide public one */
+        private Load() {}
 
         static Navigation fromJson() {
             Navigation instance = new Navigation();
@@ -39,8 +34,10 @@ public class IO {
                     sb.append(input);
                 }
                 String jsonInput = sb.toString();
-                Gson gson = new Gson();
                 instance.setUsers(new LinkedList<>(new Gson().fromJson(jsonInput, new TypeToken<List<User>>(){}.getType())));
+                bufferedReader.close();
+                fileInputStream.close();
+                inputStreamReader.close();
             } catch (FileNotFoundException fnfe) {
                 System.out.println("No Savefile found, creating new one...");
                 try {
@@ -89,13 +86,13 @@ public class IO {
          */
         private static Navigation updateSpotPrices(Navigation instance) {
             try {
-                String pathname = "SecurityData/" + LocalDate.now().toString() + ".txt";
+                String pathname = "SecurityData/SpotData/" + LocalDate.now().toString() + ".txt";
                 Scanner input = new Scanner(new File(pathname));
                 for (Security security : instance.getSecurities()) {
                     if (input.next().equals(security.getName())) {
                         if (input.next().equals(security.getIsin())) {
                             if (input.next().equals(security.getWkn())) {
-                                security.setSpotPrice(new SpotPrice(input.nextDouble(), LocalDate.now().toString()));
+                                security.setSpotPrice(new SpotPrice(input.nextDouble(), LocalDate.now()));
                             } else {
                                 System.out.println("WKN does not match!");
                             }
@@ -110,15 +107,24 @@ public class IO {
             } catch (FileNotFoundException fnfe) {
                 System.out.println("No Update file found!");
                 for (Security security : instance.getSecurities()) {
-                    security.setSpotPrice(new SpotPrice(0, "UPDATE ERROR"));
                     System.out.println("UPDATE ERROR: " + security.getName());
                 }
             }
             return instance;
         }
+
+        public static List<SpotPrice> historicalPrices(Navigation instance) {
+            File spotData = new File("SecurityData/SpotData");
+            File[] securities = spotData.listFiles();
+            //TODO: Read out historical spot data
+            return new LinkedList<SpotPrice>();
+        }
     }
 
     public static class Save {
+
+        /** Private constructor to hide public one */
+        private Save() {}
 
         /**
          * Saves instance of Navigation to Saves.users,json
@@ -139,42 +145,45 @@ public class IO {
 
     public static class Help {
 
-        /**
-         * Private Constructor to hide public one
-         */
-        private Help() {
-        }
+        static final String FORMAT = "%-15s %s%n";
+
+        /** Private Constructor to hide public one */
+        private Help() {}
 
         /**
          * Displays menu when no user is logged in
          */
         static void noUser() {
-            System.out.printf("%n%-15s %s%n", "login:", "Log in with existing user");
-            System.out.printf("%-15s %s%n", "add:", "Register a new user");
-            System.out.printf("%-15s %s%n", "lf", "Displays a list of all securities available in Stocks");
-            System.out.printf("%-15s %s%n", "help:", "Shows this dialog");
-            System.out.printf("%-15s %s%n", "clear:", "Clears the console");
-            System.out.printf("%-15s %s%n%n", "exit:", "Exit Stocks");
+            System.out.println();
+            System.out.printf(FORMAT, "login:", "Log in with existing user");
+            System.out.printf(FORMAT, "add:", "Register a new user");
+            System.out.printf(FORMAT, "lf", "Displays a list of all securities available in Stocks");
+            System.out.printf(FORMAT, "help:", "Shows this dialog");
+            System.out.printf(FORMAT, "clear:", "Clears the console");
+            System.out.printf(FORMAT, "exit:", "Exit Stocks");
+            System.out.println();
         }
 
         /**
          * Displays menu when a user is logged in
          */
         static void loggedIn() {
-            System.out.printf("%n%-15s %s%n", "selected:", "Overview of user & portfolio currently selected");
-            System.out.printf("%-15s %s%n", "select:", "Select an existing portfolio");
-            System.out.printf("%-15s %s%n","add:", "Add a new portfolio");
-            System.out.printf("%-15s %s%n", "lp:", "List all portfolios");
-            System.out.printf("%-15s %s%n", "lf:", "List all securities");
-            System.out.printf("%-15s %s%n", "ph:", "Select a security and show its price history");
-            System.out.printf("%-15s %s%n", "buy:", "Add a new position to the selected portfolio");
-            System.out.printf("%-15s %s%n", "sell:", "Reduce an existing position in the selected portfolio");
-            System.out.printf("%-15s %s%n", "ov:", "Overview of all positions in selected portfolio");
-            System.out.printf("%-15s %s%n", "oh:", "Displays order history");
-            System.out.printf("%-15s %s%n", "help:", "Shows this dialog");
-            System.out.printf("%-15s %s%n", "clear:", "Clears the console");
-            System.out.printf("%-15s %s%n", "logout:", "Logs current user out and displays the login menu");
-            System.out.printf("%-15s %s%n%n", "exit:", "Exit Stocks");
+            System.out.println();
+            System.out.printf(FORMAT, "selected:", "Overview of user & portfolio currently selected");
+            System.out.printf(FORMAT, "select:", "Select an existing portfolio");
+            System.out.printf(FORMAT,"add:", "Add a new portfolio");
+            System.out.printf(FORMAT, "lp:", "List all portfolios");
+            System.out.printf(FORMAT, "lf:", "List all securities");
+            System.out.printf(FORMAT, "ph:", "Select a security and show its price history");
+            System.out.printf(FORMAT, "buy:", "Add a new position to the selected portfolio");
+            System.out.printf(FORMAT, "sell:", "Reduce an existing position in the selected portfolio");
+            System.out.printf(FORMAT, "ov:", "Overview of all positions in selected portfolio");
+            System.out.printf(FORMAT, "oh:", "Displays order history");
+            System.out.printf(FORMAT, "help:", "Shows this dialog");
+            System.out.printf(FORMAT, "clear:", "Clears the console");
+            System.out.printf(FORMAT, "logout:", "Logs current user out and displays the login menu");
+            System.out.printf(FORMAT, "exit:", "Exit Stocks");
+            System.out.println();
         }
 
         /**

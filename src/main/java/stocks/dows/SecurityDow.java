@@ -1,6 +1,8 @@
 package stocks.dows;
 
 import stocks.interfaces.Security;
+
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -71,7 +73,7 @@ public class SecurityDow implements Security {
         historicalPrices.add(spotPrice);
     }
 
-    public String getSpotDate() {
+    public LocalDate getSpotDate() {
         return spotPrice.getDate();
     }
 

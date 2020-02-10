@@ -2,12 +2,13 @@ package stocks.dows;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class SpotPrice {
 
     private BigDecimal price;
-    private String date;
+    private LocalDate date;
 
     /**
      * Empty constructor for serialization
@@ -19,7 +20,7 @@ public class SpotPrice {
      * @param spotPrice Spot price
      * @param date Date
      */
-    public SpotPrice(double spotPrice, String date) {
+    public SpotPrice(double spotPrice, LocalDate date) {
         this.price = new BigDecimal(spotPrice).setScale(2, RoundingMode.CEILING);
         this.date = date;
     }
@@ -28,7 +29,7 @@ public class SpotPrice {
      * Getter method for date of price
      * @return String date value
      */
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
