@@ -48,7 +48,6 @@ public class Navigation {
 
     public static void main(String[] args) {
         Navigation currentInstance = IO.Load.fromJson();
-        IO.Load.historicalPrices(currentInstance);
         IO.Help.noUser();
         String navCurrent = currentInstance.navigation();
         while (!navCurrent.equals("exit")) {
@@ -231,28 +230,29 @@ public class Navigation {
             if (!securities.contains(new SecurityDow(securityName))) {
                 System.out.println("Security not available, please try again.");
                 buy();
-            }
-            SecurityDow security = securities.get(securities.indexOf(new SecurityDow(securityName)));
-            System.out.println("Enter the count of shares you want to buy: ");
-            int transactionCount = scanner.nextInt();
-            Position position = new Position(transactionCount, security);
-            if (position.getValue().doubleValue() <= selectedPortfolio.getEquity().doubleValue()) {
-                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity().subtract(position.getValue())));
-                System.out.println("Buying " + transactionCount + " shares of " + security.getName() + " at " + security.getSpotPrice().getPrice().setScale(2, RoundingMode.CEILING) + " EUR Spot. Confirm (y/n)");
-                String input = scanner.next();
-                if (input.equals("y")) {
-                    selectedPortfolio.addPosition(position);
-                    selectedPortfolio.setEquity(selectedPortfolio.getEquity().subtract(position.getValue()));
-                    selectedUser.getOrderHistory().add(new Order(transactionCount, security.getSpotPrice().getPrice(), LocalDate.now().toString(), "BUY", security));
-                    if (!selectedPortfolio.ownedSecurities.contains(security)) {
-                        selectedPortfolio.ownedSecurities.add(security);
-                    }
-                    System.out.println("Buy order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity().setScale(2, RoundingMode.CEILING));
-                } else {
-                    System.out.println("Buy order cancelled, back to menu.");
-                }
             } else {
-                System.out.println("Insufficient balance! Please try ordering fewer shares.");
+                SecurityDow security = securities.get(securities.indexOf(new SecurityDow(securityName)));
+                System.out.println("Enter the count of shares you want to buy: ");
+                int transactionCount = scanner.nextInt();
+                Position position = new Position(transactionCount, security);
+                if (position.getValue().doubleValue() <= selectedPortfolio.getEquity().doubleValue()) {
+                    System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity().subtract(position.getValue())));
+                    System.out.println("Buying " + transactionCount + " shares of " + security.getName() + " at " + security.getSpotPrice().getPrice().setScale(2, RoundingMode.CEILING) + " EUR Spot. Confirm (y/n)");
+                    String input = scanner.next();
+                    if (input.equals("y")) {
+                        selectedPortfolio.addPosition(position);
+                        selectedPortfolio.setEquity(selectedPortfolio.getEquity().subtract(position.getValue()));
+                        selectedUser.getOrderHistory().add(new Order(transactionCount, security.getSpotPrice().getPrice(), LocalDate.now().toString(), "BUY", security));
+                        if (!selectedPortfolio.ownedSecurities.contains(security)) {
+                            selectedPortfolio.ownedSecurities.add(security);
+                        }
+                        System.out.println("Buy order successfully executed! New portfolio equity: " + selectedPortfolio.getEquity().setScale(2, RoundingMode.CEILING));
+                    } else {
+                        System.out.println("Buy order cancelled, back to menu.");
+                    }
+                } else {
+                    System.out.println("Insufficient balance! Please try ordering fewer shares.");
+                }
             }
         } else {
             System.out.println("Spot prices were not updated properly. Please try again later.");
@@ -270,7 +270,7 @@ public class Navigation {
                 System.out.println("Enter the amount of shares you want to reduce/increase the position by");
                 int transactionCount = scanner.nextInt();
                 if (transactionCount <= selectedPosition.getCount()) {
-                    System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity().add(selectedPosition.getValue()).subtract(selectedPosition.getSpotPrice().getPrice().multiply(new BigDecimal(transactionCount)))));
+                    System.out.printf("Current equity: %10.2f EUR. After execution: %10.2f%n", selectedPortfolio.getEquity(), (selectedPortfolio.getEquity().add(selectedPosition.getValue()).subtract(selectedPosition.getSpotPrice().getPrice().multiply(new BigDecimal(transactionCount)))));
                     System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getSecurityName() + " at " + selectedPosition.getSpotPrice().getPrice().setScale(2, RoundingMode.CEILING) + " EUR Spot. Confirm (y/n)");
                     if (confirmOrder()) {
                         selectedPosition.setCount(selectedPosition.getCount() - transactionCount);
@@ -301,7 +301,7 @@ public class Navigation {
         if (!securities.isEmpty()) {
             validPrices = true;
             for (Security security : securities) {
-                if (security.getSpotPrice().getDate().equals("UPDATE ERROR")) {
+                if (security.getSpotPrice().getDate().toString().equals("UPDATE ERROR")) {
                     validPrices = false;
                 }
             }

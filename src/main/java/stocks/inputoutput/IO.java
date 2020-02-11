@@ -78,32 +78,28 @@ public class IO {
             } catch (FileNotFoundException fnfe) {
                 System.out.println("Error: File Securities.txt not found. Unable to load securities.");
             }
-            return updateSpotPrices(instance);
+            return updateSpotPrice(instance);
         }
 
         /**
-         * Updates prices to most recent using data from SecurityData file.
+         * Updates prices to most recent using data from SecurityData file and fills price history with all other found historical prices
          */
-        private static Navigation updateSpotPrices(Navigation instance) {
+        private static Navigation updateSpotPrice(Navigation instance) {
             try {
-                String pathname = "SecurityData/SpotData/" + LocalDate.now().toString() + ".txt";
-                Scanner input = new Scanner(new File(pathname));
-                for (Security security : instance.getSecurities()) {
-                    if (input.next().equals(security.getName())) {
-                        if (input.next().equals(security.getIsin())) {
-                            if (input.next().equals(security.getWkn())) {
-                                security.setSpotPrice(new SpotPrice(input.nextDouble(), LocalDate.now()));
-                            } else {
-                                System.out.println("WKN does not match!");
-                            }
+                String pathname = "SecurityData/SpotData/";
+                File spotDir = new File(pathname);
+                File[] spotFiles = spotDir.listFiles();
+                for (File file : spotFiles) {
+                    Scanner scanner = new Scanner(file);
+                    for (Security security : instance.getSecurities()) {
+                        if (scanner.next().equals(security.getName()) && scanner.next().equals(security.getIsin()) && scanner.next().equals(security.getWkn())) {
+                            security.setSpotPrice(new SpotPrice(scanner.nextDouble(), LocalDate.parse(file.getName().replace(".txt", ""))));
                         } else {
-                            System.out.println("ISIN does not match!");
+                            System.out.println("Datafile " + pathname + " does not match security " + security + "!");
                         }
-                    } else {
-                        System.out.println("Datafile " + pathname + " does not match security " + security + "!");
                     }
+                    scanner.close();
                 }
-                input.close();
             } catch (FileNotFoundException fnfe) {
                 System.out.println("No Update file found!");
                 for (Security security : instance.getSecurities()) {
@@ -111,13 +107,6 @@ public class IO {
                 }
             }
             return instance;
-        }
-
-        public static List<SpotPrice> historicalPrices(Navigation instance) {
-            File spotData = new File("SecurityData/SpotData");
-            File[] securities = spotData.listFiles();
-            //TODO: Read out historical spot data
-            return new LinkedList<SpotPrice>();
         }
     }
 

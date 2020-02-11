@@ -12,10 +12,6 @@ W
 ,src/main/java/stocks/entities/Portfolio.java,4\9\492e80629262cac5de1e0f25f60e41c7ff4e25a6
 X
 (src/main/java/stocks/dows/SpotPrice.java,2\8\288ba947e596c6ccedab9ce4d424cf08c96bab19
-W
-'src/main/java/stocks/output/Output.java,8\b\8b49e1ebf0d51aa7b69b8f8f356ae20031771833
-[
-+src/main/java/stocks/output/Navigation.java,b\e\be18371be326647d9302cc5caa9b3d9413750c0e
 K
 SecurityData/Securities.txt,2\d\2d822a71ee84eabc3432df6ae2a0f2b3a95c326a
 X
@@ -28,3 +24,9 @@ Z
 Saves/recent.xml,0\1\01709c4b3a2547d139f7ea8193fab1c05705723d
 K
 SecurityData/2020-02-07.txt,6\5\65332da9c142da4a6b074b114207dbf024876c18
+@
+Saves/users.json,2\7\2710c47117cfcec89b7bf78e168a539e0d14e160
+`
+0src/main/java/stocks/inputoutput/Navigation.java,b\c\bccb645346c2915ecdfe04649588ebbb81c3f130
+X
+(src/main/java/stocks/inputoutput/IO.java,c\f\cfdd60b1e92b1c5ef34a360f73588bf3f4c9ef37

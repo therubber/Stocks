@@ -64,18 +64,14 @@ public class Portfolio {
     }
 
     /**
-     * Sets the equity value of the portfolio
-     * @param equity Equity value of the portfolio
-     */
-    public void changeEquity(double equity) {
-        this.equity = this.equity.add(new BigDecimal(equity));
-    }
-
-    /**
-     * Adds a position to the portfolio
+     * Adds a position to the portfolio or increase one if it already exists
      */
     public void addPosition(Position position) {
-        positions.add(position);
+        if (!positions.contains(new Position(position.getSecurity()))) {
+            positions.add(position);
+        } else {
+            positions.get(positions.indexOf(position)).changeCount(position.getCount());
+        }
     }
 
     /**

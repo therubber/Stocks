@@ -16,12 +16,20 @@ public class SpotPrice {
     public SpotPrice() {}
 
     /**
+     * Constructor to search historicalPrices for the price of a certain date
+     * @param date String date to be set as date
+     */
+    public SpotPrice(String date) {
+        this.date = LocalDate.parse(date);
+    }
+
+    /**
      * Constructor for regular use
      * @param spotPrice Spot price
      * @param date Date
      */
     public SpotPrice(double spotPrice, LocalDate date) {
-        this.price = new BigDecimal(spotPrice).setScale(2, RoundingMode.CEILING);
+        this.price = BigDecimal.valueOf(spotPrice).setScale(2, RoundingMode.CEILING);
         this.date = date;
     }
 
@@ -46,8 +54,7 @@ public class SpotPrice {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SpotPrice spotPrice = (SpotPrice) o;
-        return Objects.equals(price, spotPrice.price) &&
-                Objects.equals(date, spotPrice.date);
+        return Objects.equals(date, spotPrice.date);
     }
 
     @Override

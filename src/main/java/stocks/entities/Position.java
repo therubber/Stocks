@@ -21,6 +21,10 @@ public class Position {
      */
     public Position() {}
 
+    public Position(SecurityDow security) {
+        this.security = security;
+    }
+
     /**
      * Regular constructor to be used
      * @param count int count of shares contained in the position
@@ -110,7 +114,7 @@ public class Position {
      * @return double updated value of the position
      */
     public BigDecimal changeCount(int count) {
-        this.count -= count;
+        this.count += count;
         this.executionDate = LocalDate.now().toString();
         return security.getSpotPrice().getPrice().multiply(new BigDecimal(count));
     }
@@ -141,9 +145,7 @@ public class Position {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Position position = (Position) o;
-        return count == position.count &&
-                Objects.equals(security, position.security) &&
-                Objects.equals(id, position.id);
+        return Objects.equals(security, position.security);
     }
 
     @Override
