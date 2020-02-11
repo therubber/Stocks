@@ -2,8 +2,6 @@ package stocks.entities;
 
 import stocks.dows.SecurityDow;
 import stocks.dows.SpotPrice;
-import stocks.interfaces.Security;
-
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;

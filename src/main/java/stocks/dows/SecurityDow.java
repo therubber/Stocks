@@ -1,9 +1,6 @@
 package stocks.dows;
 
-import com.google.gson.internal.bind.util.ISO8601Utils;
-import org.w3c.dom.ls.LSOutput;
 import stocks.interfaces.Security;
-
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,7 +63,7 @@ public class SecurityDow implements Security {
     }
 
     public SpotPrice getSpotPrice() {
-        return !prices.isEmpty() ? prices.get(prices.size() - 1) : new SpotPrice(0, LocalDate.now());
+        return !prices.isEmpty() ? prices.get(prices.size() - 1) : new SpotPrice(0, LocalDate.parse("1970-01-01"));
     }
 
     public void setSpotPrice(SpotPrice spotPrice) {

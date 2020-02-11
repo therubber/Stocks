@@ -1,7 +1,6 @@
 package stocks.interfaces;
 
 import stocks.dows.SpotPrice;
-
 import java.time.LocalDate;
 import java.util.List;
 

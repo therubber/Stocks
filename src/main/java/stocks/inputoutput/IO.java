@@ -68,7 +68,7 @@ public class IO {
          */
         private static Navigation initiateSecurities(Navigation instance) {
             try {
-                Scanner input = new Scanner(new File("SecurityData/Securities.txt"));
+                Scanner input = new Scanner(new File("SecurityData/Securities"));
                 while (input.hasNext()) {
                     String name = input.next();
                     String isin = input.next();
@@ -78,7 +78,7 @@ public class IO {
                     }
                 }
             } catch (FileNotFoundException fnfe) {
-                System.out.println("Error: File Securities.txt not found. Unable to load securities.");
+                System.out.println("Error: File Securities not found. Unable to load securities.");
             }
             return updateSpotPrice(instance);
         }
@@ -96,7 +96,7 @@ public class IO {
                     Scanner scanner = new Scanner(file);
                     for (Security security : instance.getSecurities()) {
                         if (scanner.next().equals(security.getName()) && scanner.next().equals(security.getIsin()) && scanner.next().equals(security.getWkn())) {
-                            security.setSpotPrice(new SpotPrice(scanner.nextDouble(), LocalDate.parse(file.getName().replace(".txt", ""))));
+                            security.setSpotPrice(new SpotPrice(scanner.nextDouble(), LocalDate.parse(file.getName())));
                         } else {
                             System.out.println("Datafile " + pathname + " does not match security " + security + "!");
                         }
@@ -109,18 +109,20 @@ public class IO {
                     System.out.println("UPDATE ERROR: " + security.getName());
                 }
             }
-            return updatePortfolios(instance);
+            return setPortfolioDate(instance);
         }
 
-        private static Navigation updatePortfolios(Navigation instance) {
+        private static Navigation setPortfolioDate(Navigation instance) {
             for (User user : instance.getUsers()) {
                 for (Portfolio portfolio : user.getPortfolios()) {
                     for (Position position : portfolio.getPositions()) {
                         SecurityDow positionSecurity = position.getSecurity();
                         if (instance.getSecurities().contains(positionSecurity)) {
                             SecurityDow instanceSecurity = instance.getSecurities().get(instance.getSecurities().indexOf(positionSecurity));
-                            if (!positionSecurity.getSpotPrice().equals(instanceSecurity.getSpotPrice())) {
-                                positionSecurity.setSpotPrice(instanceSecurity.getSpotPrice());
+                            SpotPrice positionSpotPrice = positionSecurity.getSpotPrice();
+                            SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
+                            if (!positionSpotPrice.equals(instanceSpotPrice)) {
+                                positionSecurity.setSpotPrice(instanceSpotPrice);
                             }
                         }
                     }

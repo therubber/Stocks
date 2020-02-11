@@ -16,9 +16,9 @@ import java.util.Scanner;
 
 public class Navigation {
 
-    private User selectedUser;
-    private Portfolio selectedPortfolio;
-    private final Scanner scanner = new Scanner(System.in);
+    private transient User selectedUser;
+    private transient Portfolio selectedPortfolio;
+    private final transient Scanner scanner = new Scanner(System.in);
     private List<User> users = new LinkedList<>();
     private transient List<SecurityDow> securities = new LinkedList<>();
 
@@ -133,8 +133,11 @@ public class Navigation {
                 }
                 return "overview";
             case "oh":
-                selectedUser.orderHistory();
+                selectedUser.printOrderHistory();
                 return "oh";
+            case "compare":
+                selectedUser.compare();
+                return "compare";
             case "help":
                 IO.Help.loggedIn();
                 return "help";
@@ -195,15 +198,19 @@ public class Navigation {
         System.out.println("User equity: " + selectedUser.getEquity() + "EUR");
         System.out.println("Enter a Name for the portfolio you want to create: ");
         String name = scanner.next();
-        System.out.println("Enter the amount of equity to transfer to the portfolio account: ");
-        BigDecimal depotEquity = BigDecimal.valueOf(scanner.nextDouble());
-        if (depotEquity.doubleValue() <= selectedUser.getEquity().doubleValue()) {
-            selectedUser.getPortfolios().add(new Portfolio(name, selectedUser.toString(), depotEquity));
-            selectedUser.setEquity(selectedUser.getEquity().subtract(depotEquity));
-            selectPortfolio(name);
-            System.out.println("Depot " + name + " successfully created!");
+        if (!selectedUser.getPortfolios().contains(new Portfolio(name, selectedUser.getUsername()))) {
+            System.out.println("Enter the amount of equity to transfer to the portfolio account: ");
+            BigDecimal depotEquity = BigDecimal.valueOf(scanner.nextDouble());
+            if (depotEquity.doubleValue() <= selectedUser.getEquity().doubleValue()) {
+                selectedUser.getPortfolios().add(new Portfolio(name, selectedUser.toString(), depotEquity));
+                selectedUser.setEquity(selectedUser.getEquity().subtract(depotEquity));
+                selectPortfolio(name);
+                System.out.println("Depot " + name + " successfully created!");
+            } else {
+                System.out.println("Insufficient account equity for depot creation! please try again");
+            }
         } else {
-            System.out.println("Insufficient account equity for depot creation! please try again");
+            System.out.println("A portfolio with this name already exists, please try again.");
         }
         save();
     }

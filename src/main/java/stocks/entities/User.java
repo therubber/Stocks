@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class User {
 
@@ -77,7 +78,7 @@ public class User {
         }
     }
 
-    public void orderHistory() {
+    public void printOrderHistory() {
         if (!orderHistory.isEmpty()) {
             System.out.printf("%-8s %10s %5s %15s %10s %15s%n", "ID", "Type", "Count", "Name", "Price", "Date");
             System.out.println();
@@ -87,6 +88,35 @@ public class User {
         } else {
             System.out.println("No orders yet! Please add a position to your portfolio.");
         }
+    }
+
+    public void compare() {
+        listPortfolios();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the name of the first Portfolio: ");
+        String portfolio1 = scanner.next();
+        if (portfolios.contains(new Portfolio(portfolio1, username))) {
+            System.out.println("Enter the name of the second Portfolio: ");
+            String portfolio2 = scanner.next();
+            if (portfolios.contains(new Portfolio(portfolio2, username))) {
+                comparePortfolios(portfolio1, portfolio2);
+            } else {
+                System.out.println("Portfolio doesn't exist. Try again:");
+                compare();
+            }
+        } else {
+            System.out.println("Portfolio doesnt exist. Try again:");
+            compare();
+        }
+    }
+
+    public void comparePortfolios(String portfolio1, String portfolio2) {
+        Portfolio one = portfolios.get(portfolios.indexOf(new Portfolio(portfolio1, username)));
+        Portfolio two = portfolios.get(portfolios.indexOf(new Portfolio(portfolio2, username)));
+        BigDecimal gainOne = one.getValue().subtract(one.getStartequity());
+        BigDecimal gainTwo = two.getValue().subtract(two.getStartequity());
+        System.out.println("Portfolio " + one.getName() + "has gained " + gainOne.toString() + "EUR in value.");
+        System.out.println("Portfolio " + two.getName() + "has gained " + gainTwo.toString() + "EUR in value.");
     }
 
     @Override

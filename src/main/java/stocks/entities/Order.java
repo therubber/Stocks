@@ -1,8 +1,6 @@
 package stocks.entities;
 
 import stocks.dows.SecurityDow;
-import stocks.interfaces.Security;
-
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 

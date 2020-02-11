@@ -2,7 +2,6 @@ package stocks.entities;
 
 import stocks.dows.SecurityDow;
 import stocks.interfaces.Security;
-
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,9 +11,9 @@ public class Portfolio {
     private String name;
     private BigDecimal equity;
     public String owner;
+    private BigDecimal startequity;
     private List<Position> positions = new LinkedList<>();
     public transient List<SecurityDow> ownedSecurities = new LinkedList<>();
-    public List<Order> history = new LinkedList<>();
 
     /**
      * Empty constructor for serialization
@@ -41,6 +40,7 @@ public class Portfolio {
         this.name = name;
         this.equity = equity;
         this.owner = owner;
+        this.startequity = equity;
     }
 
     public String getName() {
@@ -53,6 +53,14 @@ public class Portfolio {
      */
     public BigDecimal getEquity() {
         return equity;
+    }
+
+    /**
+     * Getter for startequity
+     * @return startequity
+     */
+    public BigDecimal getStartequity() {
+        return startequity;
     }
 
     /**

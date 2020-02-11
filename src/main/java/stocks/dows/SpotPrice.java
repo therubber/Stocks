@@ -19,8 +19,8 @@ public class SpotPrice {
      * Constructor to search historicalPrices for the price of a certain date
      * @param date String date to be set as date
      */
-    public SpotPrice(String date) {
-        this.date = LocalDate.parse(date);
+    public SpotPrice(LocalDate date) {
+        this.date = date;
     }
 
     /**
