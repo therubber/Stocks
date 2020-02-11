@@ -11,7 +11,6 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 
 public class IO {
 
@@ -67,17 +66,21 @@ public class IO {
          */
         private static Navigation initiateSecurities(Navigation instance) {
             try {
-                Scanner input = new Scanner(new File("SecurityData/Securities"));
-                while (input.hasNext()) {
-                    String name = input.next();
-                    String isin = input.next();
-                    String wkn = input.next();
+                BufferedReader input = new BufferedReader(new FileReader("SecurityData/Securities.csv"));
+                String line;
+                while ((line = input.readLine()) != null) {
+                    String[] fund = line.split(";");
+                    String name = fund[0];
+                    String isin = fund[1];
+                    String wkn = fund[2];
                     if (!instance.getSecurities().contains(new SecurityDow(name, isin, wkn))) {
                         instance.getSecurities().add(new SecurityDow(name, isin, wkn));
                     }
                 }
             } catch (FileNotFoundException fnfe) {
-                System.out.println("Error: File Securities not found. Unable to load securities.");
+                System.out.println("Error: File Securities.csv not found. Unable to load securities.");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             return updateSpotPrice(instance);
         }
@@ -92,21 +95,25 @@ public class IO {
                 File[] spotFiles = spotDir.listFiles();
                 assert spotFiles != null;
                 for (File file : spotFiles) {
-                    Scanner scanner = new Scanner(file);
+                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
                     for (SecurityDow security : instance.getSecurities()) {
-                        if (scanner.next().equals(security.getName()) && scanner.next().equals(security.getIsin()) && scanner.next().equals(security.getWkn())) {
-                            security.setSpotPrice(new SpotPrice(scanner.nextDouble(), LocalDate.parse(file.getName())));
+                        String line = bufferedReader.readLine();
+                        String[] data = line.split(";");
+                        if (data[0].equals(security.getName()) && data[1].equals(security.getIsin()) && data[2].equals(security.getWkn())) {
+                            security.setSpotPrice(new SpotPrice(Double.parseDouble(data[3]), LocalDate.parse(file.getName().replace(".csv", ""))));
                         } else {
                             System.out.println("Datafile " + pathname + " does not match security " + security + "!");
                         }
                     }
-                    scanner.close();
+                    bufferedReader.close();
                 }
             } catch (FileNotFoundException fnfe) {
                 System.out.println("No Update file found!");
                 for (SecurityDow security : instance.getSecurities()) {
                     System.out.println("UPDATE ERROR: " + security.getName());
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             return setPortfolioDate(instance);
         }
