@@ -13,7 +13,7 @@ public class Portfolio {
     private BigDecimal equity;
     public String owner;
     private List<Position> positions = new LinkedList<>();
-    public List<SecurityDow> ownedSecurities = new LinkedList<>();
+    public transient List<SecurityDow> ownedSecurities = new LinkedList<>();
     public List<Order> history = new LinkedList<>();
 
     /**
@@ -72,6 +72,10 @@ public class Portfolio {
         } else {
             positions.get(positions.indexOf(position)).changeCount(position.getCount());
         }
+    }
+
+    public List<Position> getPositions() {
+        return positions;
     }
 
     /**

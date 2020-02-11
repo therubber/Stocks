@@ -10,7 +10,7 @@ public class User {
 
     private String username;
     private BigDecimal equity;
-    public List<Portfolio> portfolios = new LinkedList<>();
+    private List<Portfolio> portfolios = new LinkedList<>();
     public List<Order> orderHistory = new LinkedList<>();
 
     /**
@@ -57,6 +57,10 @@ public class User {
      */
     public List<Order> getOrderHistory() {
         return orderHistory;
+    }
+
+    public List<Portfolio> getPortfolios() {
+        return portfolios;
     }
 
     /**

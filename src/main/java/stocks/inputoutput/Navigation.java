@@ -20,7 +20,7 @@ public class Navigation {
     private Portfolio selectedPortfolio;
     private final Scanner scanner = new Scanner(System.in);
     private List<User> users = new LinkedList<>();
-    private List<SecurityDow> securities = new LinkedList<>();
+    private transient List<SecurityDow> securities = new LinkedList<>();
 
     /**
      * Getter method for user list
@@ -198,7 +198,7 @@ public class Navigation {
         System.out.println("Enter the amount of equity to transfer to the portfolio account: ");
         BigDecimal depotEquity = BigDecimal.valueOf(scanner.nextDouble());
         if (depotEquity.doubleValue() <= selectedUser.getEquity().doubleValue()) {
-            selectedUser.portfolios.add(new Portfolio(name, selectedUser.toString(), depotEquity));
+            selectedUser.getPortfolios().add(new Portfolio(name, selectedUser.toString(), depotEquity));
             selectedUser.setEquity(selectedUser.getEquity().subtract(depotEquity));
             selectPortfolio(name);
             System.out.println("Depot " + name + " successfully created!");
@@ -211,7 +211,7 @@ public class Navigation {
     private void listPortfolios() {
         System.out.println();
         if (selectedUser != null) {
-            if (!selectedUser.portfolios.isEmpty()) {
+            if (!selectedUser.getPortfolios().isEmpty()) {
                 selectedUser.listPortfolios();
             } else {
                 System.out.println("No portfolios existing for user " + selectedUser.getUsername() + ". Please add a new one.");
@@ -326,8 +326,8 @@ public class Navigation {
     private void selectPortfolio() {
         System.out.println("Please enter the name of the portfolio you want to select.");
         String depotName = scanner.next();
-        if (selectedUser.portfolios.contains(new Portfolio(depotName, selectedUser.toString()))) {
-            selectedPortfolio = selectedUser.portfolios.get(selectedUser.portfolios.indexOf(new Portfolio(depotName, selectedUser.toString())));
+        if (selectedUser.getPortfolios().contains(new Portfolio(depotName, selectedUser.toString()))) {
+            selectedPortfolio = selectedUser.getPortfolios().get(selectedUser.getPortfolios().indexOf(new Portfolio(depotName, selectedUser.toString())));
             System.out.println("Depot " + depotName + " has been selected!");
         } else {
             System.out.println("Depot " + depotName + " does not exist or isn't owned by you, please try a different depot.");
@@ -335,7 +335,7 @@ public class Navigation {
     }
 
     private void selectPortfolio(String name) {
-        selectedPortfolio = selectedUser.portfolios.get(selectedUser.portfolios.indexOf(new Portfolio(name, selectedUser.toString())));
+        selectedPortfolio = selectedUser.getPortfolios().get(selectedUser.getPortfolios().indexOf(new Portfolio(name, selectedUser.toString())));
         System.out.println("Portfolio " + name + " has been selected!");
     }
 
@@ -343,9 +343,9 @@ public class Navigation {
         listSecurities();
         System.out.println("Enter the name of the Security whose price history you want to display:");
         Security selectedSecurity = securities.get(securities.indexOf(new SecurityDow(scanner.next())));
-        if (!selectedSecurity.getHistoricalPrices().isEmpty()) {
+        if (!selectedSecurity.getPrices().isEmpty()) {
             System.out.printf("%-15s %-10s%n", "Date", "Price");
-            for (SpotPrice spotPrice : selectedSecurity.getHistoricalPrices()) {
+            for (SpotPrice spotPrice : selectedSecurity.getPrices()) {
                 System.out.printf("%-15s %-10.2f%n", spotPrice.getDate(), spotPrice.getPrice());
             }
         } else {

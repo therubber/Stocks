@@ -1,5 +1,7 @@
 package stocks.dows;
 
+import com.google.gson.internal.bind.util.ISO8601Utils;
+import org.w3c.dom.ls.LSOutput;
 import stocks.interfaces.Security;
 
 import java.time.LocalDate;
@@ -12,8 +14,7 @@ public class SecurityDow implements Security {
     private String name;
     private String isin;
     private String wkn;
-    private SpotPrice spotPrice;
-    private List<SpotPrice> historicalPrices = new LinkedList<>();
+    private transient List<SpotPrice> prices = new LinkedList<>();
 
     /**
      * Empty constructor for serialization purposes
@@ -65,24 +66,23 @@ public class SecurityDow implements Security {
     }
 
     public SpotPrice getSpotPrice() {
-        return spotPrice;
+        return !prices.isEmpty() ? prices.get(prices.size() - 1) : new SpotPrice(0, LocalDate.now());
     }
 
     public void setSpotPrice(SpotPrice spotPrice) {
-        this.spotPrice = spotPrice;
-        historicalPrices.add(spotPrice);
+        prices.add(spotPrice);
     }
 
     public LocalDate getSpotDate() {
-        return spotPrice.getDate();
+        return getSpotPrice().getDate();
     }
 
-    public List<SpotPrice> getHistoricalPrices() {
-        return new LinkedList<>(historicalPrices);
+    public List<SpotPrice> getPrices() {
+        return new LinkedList<>(prices);
     }
 
-    public void setHistoricalPrices(List<SpotPrice> historicalPrices) {
-        this.historicalPrices = historicalPrices;
+    public void setPrices(List<SpotPrice> prices) {
+        this.prices = prices;
     }
 
     @Override

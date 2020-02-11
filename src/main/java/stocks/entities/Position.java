@@ -73,7 +73,7 @@ public class Position {
      * @return Value of the position
      */
     public BigDecimal getValue() {
-        return security.getSpotPrice().getPrice().multiply(new BigDecimal(count));
+        return security.getSpotPrice().getPrice().multiply(new BigDecimal (count));
     }
 
     /**

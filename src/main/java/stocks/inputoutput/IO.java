@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import stocks.dows.SecurityDow;
 import stocks.dows.SpotPrice;
+import stocks.entities.Portfolio;
+import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.interfaces.Security;
 import java.io.*;
@@ -89,6 +91,7 @@ public class IO {
                 String pathname = "SecurityData/SpotData/";
                 File spotDir = new File(pathname);
                 File[] spotFiles = spotDir.listFiles();
+                assert spotFiles != null;
                 for (File file : spotFiles) {
                     Scanner scanner = new Scanner(file);
                     for (Security security : instance.getSecurities()) {
@@ -104,6 +107,23 @@ public class IO {
                 System.out.println("No Update file found!");
                 for (Security security : instance.getSecurities()) {
                     System.out.println("UPDATE ERROR: " + security.getName());
+                }
+            }
+            return updatePortfolios(instance);
+        }
+
+        private static Navigation updatePortfolios(Navigation instance) {
+            for (User user : instance.getUsers()) {
+                for (Portfolio portfolio : user.getPortfolios()) {
+                    for (Position position : portfolio.getPositions()) {
+                        SecurityDow positionSecurity = position.getSecurity();
+                        if (instance.getSecurities().contains(positionSecurity)) {
+                            SecurityDow instanceSecurity = instance.getSecurities().get(instance.getSecurities().indexOf(positionSecurity));
+                            if (!positionSecurity.getSpotPrice().equals(instanceSecurity.getSpotPrice())) {
+                                positionSecurity.setSpotPrice(instanceSecurity.getSpotPrice());
+                            }
+                        }
+                    }
                 }
             }
             return instance;

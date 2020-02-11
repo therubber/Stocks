@@ -69,12 +69,12 @@ public interface Security {
      * Getter method for historical price list
      * @return List of price history
      */
-    List<SpotPrice> getHistoricalPrices();
+    List<SpotPrice> getPrices();
 
     /**
      * Setter method for historical price list
      * @param histPrices List containing price history
      */
-    void setHistoricalPrices(List<SpotPrice> histPrices);
+    void setPrices(List<SpotPrice> histPrices);
 
 }
