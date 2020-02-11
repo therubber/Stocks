@@ -6,7 +6,6 @@ import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.dows.SecurityDow;
-import stocks.interfaces.Security;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -60,7 +59,7 @@ public class Navigation {
         currentInstance.save();
     }
 
-    private String navigation() {
+    public String navigation() {
         String input = scanner.next();
         switch (input) {
             case "login":
@@ -165,7 +164,7 @@ public class Navigation {
         System.out.println();
         System.out.printf("%-18s %-16s %-10s %-10s %-15s%n", "Name", "ISIN", "WKN", "Price", "Date");
         System.out.println();
-        for (Security security : securities) {
+        for (SecurityDow security : securities) {
             System.out.printf("%-18s %-16s %-10s %-10.2f %-15s%n", security.getName(), security.getIsin(), security.getWkn(), security.getSpotPrice().getPrice(), security.getSpotDate());
         }
         System.out.println();
@@ -307,7 +306,7 @@ public class Navigation {
         boolean validPrices = false;
         if (!securities.isEmpty()) {
             validPrices = true;
-            for (Security security : securities) {
+            for (SecurityDow security : securities) {
                 if (security.getSpotPrice().getDate().toString().equals("UPDATE ERROR")) {
                     validPrices = false;
                 }
@@ -349,7 +348,7 @@ public class Navigation {
     private void priceHistory() {
         listSecurities();
         System.out.println("Enter the name of the Security whose price history you want to display:");
-        Security selectedSecurity = securities.get(securities.indexOf(new SecurityDow(scanner.next())));
+        SecurityDow selectedSecurity = securities.get(securities.indexOf(new SecurityDow(scanner.next())));
         if (!selectedSecurity.getPrices().isEmpty()) {
             System.out.printf("%-15s %-10s%n", "Date", "Price");
             for (SpotPrice spotPrice : selectedSecurity.getPrices()) {

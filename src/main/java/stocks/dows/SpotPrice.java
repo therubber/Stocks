@@ -11,19 +11,6 @@ public class SpotPrice {
     private LocalDate date;
 
     /**
-     * Empty constructor for serialization
-     */
-    public SpotPrice() {}
-
-    /**
-     * Constructor to search historicalPrices for the price of a certain date
-     * @param date String date to be set as date
-     */
-    public SpotPrice(LocalDate date) {
-        this.date = date;
-    }
-
-    /**
      * Constructor for regular use
      * @param spotPrice Spot price
      * @param date Date

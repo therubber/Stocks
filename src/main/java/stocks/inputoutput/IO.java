@@ -7,7 +7,6 @@ import stocks.dows.SpotPrice;
 import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
-import stocks.interfaces.Security;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.LinkedList;
@@ -94,7 +93,7 @@ public class IO {
                 assert spotFiles != null;
                 for (File file : spotFiles) {
                     Scanner scanner = new Scanner(file);
-                    for (Security security : instance.getSecurities()) {
+                    for (SecurityDow security : instance.getSecurities()) {
                         if (scanner.next().equals(security.getName()) && scanner.next().equals(security.getIsin()) && scanner.next().equals(security.getWkn())) {
                             security.setSpotPrice(new SpotPrice(scanner.nextDouble(), LocalDate.parse(file.getName())));
                         } else {
@@ -105,7 +104,7 @@ public class IO {
                 }
             } catch (FileNotFoundException fnfe) {
                 System.out.println("No Update file found!");
-                for (Security security : instance.getSecurities()) {
+                for (SecurityDow security : instance.getSecurities()) {
                     System.out.println("UPDATE ERROR: " + security.getName());
                 }
             }

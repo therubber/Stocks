@@ -15,11 +15,6 @@ public class User {
     public List<Order> orderHistory = new LinkedList<>();
 
     /**
-     * Empty constructor for serialization
-     */
-    public User() {}
-
-    /**
      * Regular constructor to be used
      * @param username String username to create user with
      */

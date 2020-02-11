@@ -1,7 +1,6 @@
 package stocks.entities;
 
 import stocks.dows.SecurityDow;
-import stocks.interfaces.Security;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,11 +13,6 @@ public class Portfolio {
     private BigDecimal startequity;
     private List<Position> positions = new LinkedList<>();
     public transient List<SecurityDow> ownedSecurities = new LinkedList<>();
-
-    /**
-     * Empty constructor for serialization
-     */
-    public Portfolio() {}
 
     /**
      * Constructor for setting up a portfolio without equity
@@ -118,7 +112,7 @@ public class Portfolio {
         System.out.println();
         System.out.printf("%-18s %-16s %-10s %-10s %-15s%n", "Name", "ISIN", "WKN", "Price", "Date");
         System.out.println();
-        for (Security security : ownedSecurities) {
+        for (SecurityDow security : ownedSecurities) {
             System.out.printf("%-18s %-16s %-10s %-10.2f %-15s%n", security.getName(), security.getIsin(), security.getWkn(), security.getSpotPrice().getPrice(), security.getSpotDate());
         }
         System.out.println();

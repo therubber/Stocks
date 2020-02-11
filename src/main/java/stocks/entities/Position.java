@@ -14,11 +14,6 @@ public class Position {
     private String executionDate;
     private SecurityDow security;
 
-    /**
-     * Empty constructor required for serialization
-     */
-    public Position() {}
-
     public Position(SecurityDow security) {
         this.security = security;
     }
@@ -33,13 +28,6 @@ public class Position {
         this.security = security;
         this.id = generateId();
         this.executionDate = LocalDate.now().toString();
-    }
-
-    public Position(Order order) {
-        this.count = order.getCount();
-        this.security = order.getSecurity();
-        this.id = generateId();
-        this.executionDate = order.getExecutionDate();
     }
 
     /**

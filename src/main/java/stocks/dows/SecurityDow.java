@@ -1,22 +1,16 @@
 package stocks.dows;
 
-import stocks.interfaces.Security;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-public class SecurityDow implements Security {
+public class SecurityDow {
 
     private String name;
     private String isin;
     private String wkn;
     private transient List<SpotPrice> prices = new LinkedList<>();
-
-    /**
-     * Empty constructor for serialization purposes
-     */
-    public SecurityDow() {}
 
     /**
      * Constructor with name -> Needed to select a security in buy orders
@@ -42,24 +36,12 @@ public class SecurityDow implements Security {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getIsin() {
         return isin;
     }
 
-    public void setIsin(String isin) {
-        this.isin = isin;
-    }
-
     public String getWkn() {
         return wkn;
-    }
-
-    public void setWkn(String wkn) {
-        this.wkn = wkn;
     }
 
     public SpotPrice getSpotPrice() {
@@ -76,10 +58,6 @@ public class SecurityDow implements Security {
 
     public List<SpotPrice> getPrices() {
         return new LinkedList<>(prices);
-    }
-
-    public void setPrices(List<SpotPrice> prices) {
-        this.prices = prices;
     }
 
     @Override
