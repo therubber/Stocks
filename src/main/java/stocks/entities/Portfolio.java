@@ -166,6 +166,13 @@ public class Portfolio {
         return value;
     }
 
+    public void setOwnedSecurities() {
+        ownedSecurities = new LinkedList<>();
+        for (Position position : positions) {
+            ownedSecurities.add(position.getSecurity());
+        }
+    }
+
     /**
      *  Outputs an overview of portfolio data containing:
      *  - combined value of positions

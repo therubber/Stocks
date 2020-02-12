@@ -36,3 +36,5 @@ T
 $SecurityData/SpotData/2020-02-05.csv,9\b\9b22a1ac424fd94113dffabcbdebe33aa4ee0aca
 T
 $SecurityData/SpotData/2020-02-04.csv,0\8\0847e4db3c1f7b4d10803d96552c1fb40c287726
+T
+$SecurityData/SpotData/2020-02-06.csv,6\b\6b6ae356a692cf9513c4ceb03b2352e64ce14085

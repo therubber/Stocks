@@ -8,6 +8,7 @@ import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
 import java.io.*;
+import java.security.Security;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,12 +116,13 @@ public class IO {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return setPortfolioDate(instance);
+            return updatePortfolio(instance);
         }
 
-        private static Navigation setPortfolioDate(Navigation instance) {
+        private static Navigation updatePortfolio(Navigation instance) {
             for (User user : instance.getUsers()) {
                 for (Portfolio portfolio : user.getPortfolios()) {
+                    portfolio.setOwnedSecurities();
                     for (Position position : portfolio.getPositions()) {
                         SecurityDow positionSecurity = position.getSecurity();
                         if (instance.getSecurities().contains(positionSecurity)) {
@@ -129,6 +131,16 @@ public class IO {
                             SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
                             if (!positionSpotPrice.equals(instanceSpotPrice)) {
                                 positionSecurity.setSpotPrice(instanceSpotPrice);
+                            }
+                        }
+                    }
+                    for (SecurityDow security : portfolio.ownedSecurities) {
+                        if (instance.getSecurities().contains(security)) {
+                            SecurityDow instanceSecurity = instance.getSecurities().get(instance.getSecurities().indexOf(security));
+                            SpotPrice positionSpotPrice = security.getSpotPrice();
+                            SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
+                            if (!positionSpotPrice.equals(instanceSpotPrice)) {
+                                security.setSpotPrice(instanceSpotPrice);
                             }
                         }
                     }

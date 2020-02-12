@@ -10,7 +10,7 @@ public class SecurityDow {
     private String name;
     private String isin;
     private String wkn;
-    private transient List<SpotPrice> prices = new LinkedList<>();
+    private List<SpotPrice> prices = new LinkedList<>();
 
     /**
      * Constructor with name -> Needed to select a security in buy orders

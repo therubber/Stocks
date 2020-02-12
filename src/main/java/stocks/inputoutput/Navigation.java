@@ -6,6 +6,7 @@ import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.dows.SecurityDow;
+import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -15,9 +16,9 @@ import java.util.Scanner;
 
 public class Navigation {
 
-    private transient User selectedUser;
+    public transient User selectedUser;
     private transient Portfolio selectedPortfolio;
-    private final transient Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
     private List<User> users = new LinkedList<>();
     private transient List<SecurityDow> securities = new LinkedList<>();
 
@@ -89,7 +90,7 @@ public class Navigation {
         }
     }
 
-    private String userNavigation() {
+    public String userNavigation() {
         String input = scanner.next();
         switch (input) {
             case "selected":
@@ -357,5 +358,14 @@ public class Navigation {
         } else {
             System.out.println("No historical prices found, please update prices.");
         }
+    }
+
+    /**
+     * Method to set System.in to use the String of the parameter
+     * @param input String commands to be executed
+     */
+    public void test(String input) {
+        ByteArrayInputStream testInput = new ByteArrayInputStream(input.getBytes());
+        System.setIn(testInput);
     }
 }
