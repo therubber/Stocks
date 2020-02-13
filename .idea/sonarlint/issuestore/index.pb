@@ -38,3 +38,7 @@ T
 $SecurityData/SpotData/2020-02-04.csv,0\8\0847e4db3c1f7b4d10803d96552c1fb40c287726
 T
 $SecurityData/SpotData/2020-02-06.csv,6\b\6b6ae356a692cf9513c4ceb03b2352e64ce14085
+T
+$SecurityData/SpotData/2020-02-13.csv,8\9\896fbfd5644af64b07a26558065ff9f0a8a4f263
+d
+4src/test/java/stocks/inputoutput/NavigationTest.java,e\7\e713fe263e2fd7a7389aaf0a23e438564c218aeb

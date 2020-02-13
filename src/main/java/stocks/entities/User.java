@@ -55,6 +55,30 @@ public class User {
         return orderHistory;
     }
 
+    /**
+     * Used to add a portfolio to the user
+     */
+    public String addPortfolio() {
+        System.out.println("User equity: " + equity + "EUR");
+        System.out.println("Enter a Name for the portfolio you want to create: ");
+        Scanner scanner = new Scanner(System.in);
+        String name = scanner.next();
+        if (!portfolios.contains(new Portfolio(name, username))) {
+            System.out.println("Enter the amount of equity to transfer to the portfolio account: ");
+            BigDecimal depotEquity = BigDecimal.valueOf(scanner.nextDouble());
+            if (depotEquity.doubleValue() <= equity.doubleValue()) {
+                portfolios.add(new Portfolio(name, username, depotEquity));
+                equity = equity.subtract(depotEquity);
+                System.out.println("Depot " + name + " successfully created!");
+            } else {
+                System.out.println("Insufficient account equity for depot creation! please try again");
+            }
+        } else {
+            System.out.println("A portfolio with this name already exists, please try again.");
+        }
+        return name;
+    }
+
     public List<Portfolio> getPortfolios() {
         return portfolios;
     }
@@ -108,8 +132,8 @@ public class User {
     public void comparePortfolios(String portfolio1, String portfolio2) {
         Portfolio one = portfolios.get(portfolios.indexOf(new Portfolio(portfolio1, username)));
         Portfolio two = portfolios.get(portfolios.indexOf(new Portfolio(portfolio2, username)));
-        BigDecimal gainOne = one.getValue().subtract(one.getStartequity());
-        BigDecimal gainTwo = two.getValue().subtract(two.getStartequity());
+        BigDecimal gainOne = one.getValue().subtract(one.getStartEquity());
+        BigDecimal gainTwo = two.getValue().subtract(two.getStartEquity());
         System.out.println("Portfolio " + one.getName() + "has gained " + gainOne.toString() + "EUR in value.");
         System.out.println("Portfolio " + two.getName() + "has gained " + gainTwo.toString() + "EUR in value.");
     }

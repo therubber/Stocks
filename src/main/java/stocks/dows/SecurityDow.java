@@ -1,5 +1,6 @@
 package stocks.dows;
 
+import java.io.*;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,8 +57,37 @@ public class SecurityDow {
         return getSpotPrice().getDate();
     }
 
-    public List<SpotPrice> getPrices() {
-        return new LinkedList<>(prices);
+    public boolean emptyPrices() {
+        return prices.isEmpty();
+    }
+
+    public void priceHistory() {
+        if (!emptyPrices()) {
+            System.out.printf("%-15s %-10s%n", "Date", "Price");
+            for (SpotPrice spotPrice : prices) {
+                System.out.printf("%-15s %-10.2f%n", spotPrice.getDate(), spotPrice.getPrice());
+            }
+        } else {
+            System.out.println("No historical prices found, please update prices.");
+        }
+        System.out.println();
+    }
+
+    public void update() {
+        try {
+            String pathname = "SecurityData/SpotData/" + name + ".csv";
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(pathname));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] data = line.split(";");
+                prices.add(new SpotPrice(Double.parseDouble(data[0]), LocalDate.parse(data[1])));
+            }
+            bufferedReader.close();
+        } catch (FileNotFoundException fnfe) {
+            System.out.println("No Update file found!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

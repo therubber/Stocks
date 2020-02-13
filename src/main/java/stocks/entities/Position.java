@@ -11,11 +11,18 @@ public class Position {
 
     private int count;
     private String id;
-    private String executionDate;
+    private LocalDate executionDate;
     private SecurityDow security;
 
     public Position(SecurityDow security) {
         this.security = security;
+    }
+
+    public Position(Order order) {
+        this.count = order.getCount();
+        this.id = generateId();
+        this.executionDate = order.getExecutionDate();
+        this.security = order.getSecurity();
     }
 
     /**
@@ -27,7 +34,7 @@ public class Position {
         this.count = count;
         this.security = security;
         this.id = generateId();
-        this.executionDate = LocalDate.now().toString();
+        this.executionDate = LocalDate.now();
     }
 
     /**
@@ -90,7 +97,7 @@ public class Position {
      * Getter method for the executionDate of the position
      * @return String execution date of the order
      */
-    public String getExecutionDate() {
+    public LocalDate getExecutionDate() {
         return executionDate;
     }
 
@@ -101,7 +108,7 @@ public class Position {
      */
     public BigDecimal changeCount(int count) {
         this.count += count;
-        this.executionDate = LocalDate.now().toString();
+        this.executionDate = LocalDate.now();
         return security.getSpotPrice().getPrice().multiply(new BigDecimal(count));
     }
 

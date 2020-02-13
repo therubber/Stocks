@@ -3,31 +3,26 @@ package stocks.entities;
 import stocks.dows.SecurityDow;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 
 public class Order {
 
     private int count;
     private BigDecimal executionPrice;
-    private String executionDate;
+    private LocalDate executionDate;
     private boolean type;
     private SecurityDow security;
     private String id;
 
     /**
-     * Default constructor for serialization
-     */
-    public Order() {}
-
-    /**
      * Constructor for regular use
-     * @param executionPrice Spot price at which the order was executed
      * @param executionDate String date at which the order was executed
      * @param type Boolean stating whether the order is Buy/Sell -> default = buy = false
      * @param security Security which is object of the order
      */
-    public Order(int count, BigDecimal executionPrice, String executionDate, String type, SecurityDow security) {
+    public Order(int count, LocalDate executionDate, String type, SecurityDow security) {
         this.count = count;
-        this.executionPrice = executionPrice;
+        this.executionPrice = security.getSpotPrice().getPrice();
         this.executionDate = executionDate;
         if (type.equals("SELL")) {
             this.type = true;
@@ -56,7 +51,7 @@ public class Order {
      * Getter method for execution date
      * @return String date of execution
      */
-    public String getExecutionDate() {
+    public LocalDate getExecutionDate() {
         return executionDate;
     }
 
