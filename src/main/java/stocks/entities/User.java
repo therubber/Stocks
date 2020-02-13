@@ -1,5 +1,7 @@
 package stocks.entities;
 
+import stocks.repo.Users;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.LinkedList;
@@ -21,6 +23,7 @@ public class User {
     public User(String username) {
         this.equity = new BigDecimal(10000).setScale(2, RoundingMode.CEILING);
         this.username = username;
+        Users.add(this);
     }
 
     /**
@@ -53,6 +56,14 @@ public class User {
      */
     public List<Order> getOrderHistory() {
         return orderHistory;
+    }
+
+    /**
+     * Adding portfolio for testing
+     * @param portfolio Portfolio to add
+     */
+    public void addPortfolio(Portfolio portfolio) {
+        portfolios.add(portfolio);
     }
 
     /**

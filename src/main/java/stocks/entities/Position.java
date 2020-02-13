@@ -14,10 +14,6 @@ public class Position {
     private LocalDate executionDate;
     private SecurityDow security;
 
-    public Position(SecurityDow security) {
-        this.security = security;
-    }
-
     public Position(Order order) {
         this.count = order.getCount();
         this.id = generateId();

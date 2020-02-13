@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Portfolio {
+
     private String name;
     private BigDecimal equity;
     public String owner;
@@ -70,15 +71,21 @@ public class Portfolio {
      */
     public void orderInput(Order order) {
         Position position = new Position(order);
-        if (!positions.contains(position)) {
-            positions.add(position);
-            if (order.getType().equals("BUY")) {
-                equity = equity.subtract(position.getValue());
+        if (!positions.isEmpty()) {
+            if (!positions.contains(position)) {
+                positions.add(position);
+                Users.get(owner).getOrderHistory().add(order);
+                if (order.getType().equals("BUY")) {
+                    equity = equity.subtract(position.getValue());
+                } else {
+                    equity = equity.add(position.getValue());
+                }
             } else {
-                equity = equity.add(position.getValue());
+                positions.get(positions.indexOf(position)).changeCount(position.getCount());
             }
         } else {
-            positions.get(positions.indexOf(position)).changeCount(position.getCount());
+            positions.add(position);
+            Users.get(owner).getOrderHistory().add(order);
         }
     }
 
