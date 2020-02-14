@@ -74,23 +74,36 @@ public class Portfolio {
             if (!positions.contains(position)) {
                 positions.add(position);
                 Users.get(owner).addOrderToHistory(order);
-                if (order.getType().equals("BUY")) {
-                    equity = equity.subtract(position.getValue());
-                } else {
-                    equity = equity.add(position.getValue());
-                }
+                executeOrder(order);
             } else {
-                positions.get(positions.indexOf(position)).changeCount(position.getCount());
+                Position orderPosition = positions.get(positions.indexOf(position));
+                if (order.getType().equals("BUY")) {
+                    orderPosition.setCount(orderPosition.getCount() + order.getCount());
+                    equity = equity.subtract(order.getValue());
+                } else {
+                    orderPosition.setCount(orderPosition.getCount() - order.getCount());
+                    equity = equity.add(order.getValue());
+                }
+                System.out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
             }
         } else {
-            positions.add(position);
             Users.get(owner).addOrderToHistory(order);
-            if (order.getType().equals("BUY")) {
-                equity = equity.subtract(position.getValue());
+            executeOrder(order);
+        }
+    }
+
+    private void executeOrder(Order order) {
+        if (order.getType().equals("BUY")) {
+            positions.add(new Position(order));
+            equity = equity.subtract(order.getValue());
+        } else {
+            if (order.getCount() < getPosition(positions.indexOf(new Position(order.getSecurity()))).getCount()) {
+                equity = equity.add(order.getValue());
             } else {
-                equity = equity.add(position.getValue());
+                System.out.println("Cannot sell more than you own. Please try again.");
             }
         }
+        System.out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
     }
 
     /**
@@ -172,7 +185,7 @@ public class Portfolio {
      * @return double value of open positions combined
      */
     public BigDecimal getPositionValue() {
-        BigDecimal value = new BigDecimal(0);
+        BigDecimal value = new BigDecimal(Integer.toString(0));
         for (Position position : positions) {
             value = value.add(position.getValue());
         }
@@ -243,37 +256,21 @@ public class Portfolio {
      */
     public void buy() {
         if (Securities.evaluateSpotPrices()) {
-            Securities.list();
-            System.out.println("Depot equity: " + equity + " EUR");
-            System.out.println("Enter the name of the Security that you want to buy: ");
-            Scanner scanner = new Scanner(System.in);
-            String securityName = scanner.next();
-            if (!Securities.getAll().contains(new SecurityDow(securityName))) {
-                System.out.println("Security not available, please try again.");
-                buy();
-            } else {
-                SecurityDow security = Securities.get(Securities.indexOf(new SecurityDow(securityName)));
-                System.out.println("Enter the count of shares you want to buy: ");
-                int transactionCount = scanner.nextInt();
-                Position position = new Position(transactionCount, security);
-                if (position.getValue().doubleValue() <= equity.doubleValue()) {
-                    BigDecimal equityAfterExecution = getEquity().subtract(position.getPrice().multiply(new BigDecimal(transactionCount)));
-                    System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", getEquity(), equityAfterExecution);
-                    System.out.println("Buying " + transactionCount + " shares of " + security.getName() + " at " + security.getSpotPrice().getPrice().setScale(2, RoundingMode.CEILING) + " EUR Spot. Confirm (y/n)");
-                    if (Help.confirmOrder()) {
-                        Order order = new Order(transactionCount, LocalDate.now(), "BUY", security);
-                        orderInput(order);
-                        Users.get(owner).getOrderHistory().add(order);
-                        if (!ownedSecurities.contains(security)) {
-                            ownedSecurities.add(security);
-                        }
-                        System.out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.CEILING));
-                    } else {
-                        System.out.println("Buy order cancelled, back to menu.");
+            Position position = selectionBuy();
+            if (position.getValue().doubleValue() <= equity.doubleValue() && !position.getIsin().equals("ERROR")) {
+                BigDecimal equityAfterExecution = getEquity().subtract(position.getPrice().multiply(new BigDecimal(Integer.toString(position.getCount()))));
+                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", getEquity(), equityAfterExecution);
+                if (Help.confirmOrder(position, true)) {
+                    Order order = new Order(position.getCount(), LocalDate.now(), "BUY", position.getSecurity());
+                    orderInput(order);
+                    if (!ownedSecurities.contains(position.getSecurity())) {
+                        ownedSecurities.add(position.getSecurity());
                     }
                 } else {
-                    System.out.println("Insufficient balance! Please try ordering fewer shares.");
+                    System.out.println("Buy order cancelled, back to menu.");
                 }
+            } else {
+                System.out.println("Insufficient balance! Please try ordering fewer shares.");
             }
             Users.save();
         } else {
@@ -281,46 +278,41 @@ public class Portfolio {
         }
     }
 
-
-    /**
-     * Used to sell out of the portfolio if a position for the security to be sold exists
-     */
-    public void sell() {
-        if (Securities.evaluateSpotPrices()) {
-            indexPositions();
-            System.out.println("Please select the position you want to reduce by entering its index.");
+    private Position selectionBuy() {
+        try {
+            Securities.listIndexed();
+            System.out.println("Depot equity: " + equity + " EUR");
+            System.out.println("Enter the index of the Security that you want to buy: ");
             Scanner scanner = new Scanner(System.in);
-            int index = scanner.nextInt();
-            if (index <= getPositionCount() && index > 0) {
-                Position selectedPosition = getPosition(index - 1);
-                System.out.println("Enter the amount of shares you want to reduce/increase the position by");
-                int transactionCount = scanner.nextInt();
-                if (transactionCount <= selectedPosition.getCount()) {
-                    BigDecimal equityAfterExecution = getEquity().add(selectedPosition.getPrice().multiply(new BigDecimal(transactionCount)));
-                    System.out.printf("Current equity: %10.2f EUR. After execution: %10.2f%n", getEquity(), equityAfterExecution);
-                    System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getSecurityName() + " at " + selectedPosition.getSpotPrice().getPrice().setScale(2, RoundingMode.CEILING) + " EUR Spot. Confirm (y/n)");
-                    if (Help.confirmOrder()) {
-                        Order order = new Order(transactionCount, LocalDate.now(), "SELL", selectedPosition.getSecurity());
-                        selectedPosition.setCount(selectedPosition.getCount() - transactionCount);
-                        Users.get(owner).getOrderHistory().add(order);
-                        equity = equity.add(order.getExecutionPrice().multiply(new BigDecimal(transactionCount)));
-                        System.out.println("Sell order successfully executed! New portfolio equity: " + getEquity());
-                        if (selectedPosition.isZero()) {
-                            deletePosition(selectedPosition);
-                            ownedSecurities.remove(selectedPosition.getSecurity());
-                        }
-                    } else {
-                        System.out.println("Sell order cancelled, back to menu.");
-                    }
-                } else {
-                    System.out.println("Amount of shares to sell exceeds amount of shares owned. Please try again.");
+            SecurityDow security = Securities.get(scanner.nextInt() - 1);
+            System.out.println("Enter the count of shares you want to buy: ");
+            int transactionCount = scanner.nextInt();
+            return new Position(transactionCount, security);
+        } catch (IndexOutOfBoundsException e) {
+            return new Position(666, new SecurityDow("ERROR", "ERROR", "ERROR"));
+        }
+    }
+
+    public void sell() {
+        Securities.listIndexed();
+        System.out.println("Please select the security you want to sell by entering its index.");
+        Scanner scanner = new Scanner(System.in);
+        int index = scanner.nextInt();
+        if (index > 0 && index <= Securities.size()) {
+            SecurityDow selectedSecurity = Securities.get(index - 1);
+            if (ownedSecurities.contains(selectedSecurity)) {
+                System.out.println("Enter the amount of shares you want to reduce the position by: ");
+                int sellCount = scanner.nextInt();
+                Order order = new Order(sellCount, LocalDate.now(), "SELL", selectedSecurity);
+                Position position = new Position(order);
+                if (Help.confirmOrder(position, false)) {
+                    orderInput(order);
                 }
             } else {
-                System.out.println("The selected position does not exist, please try again.");
+                System.out.println("Portfolio doesnt contain that Security. Shortselling will be available in later releases.");
             }
-            Users.save();
         } else {
-            System.out.println("Spot prices were not updated properly. Please try again later.");
+            System.out.println("Invalid index. Please try again.");
         }
     }
 

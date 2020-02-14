@@ -1,5 +1,7 @@
 package stocks.inputoutput;
 
+import stocks.entities.Position;
+
 import java.util.Scanner;
 
 public class Help {
@@ -53,7 +55,12 @@ public class Help {
         System.out.printf("%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n");
     }
 
-    public static boolean confirmOrder() {
+    public static boolean confirmOrder(Position position, boolean type) {
+        if (type) {
+            System.out.println("Buying " + position.getCount() + " shares of " + position.getSecurity().getName() + " at " + position.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
+        } else {
+            System.out.println("Selling " + position.getCount() + " shares of " + position.getSecurity().getName() + " at " + position.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
+        }
         Scanner scanner = new Scanner(System.in);
         String input = scanner.next();
         return input.equals("y");

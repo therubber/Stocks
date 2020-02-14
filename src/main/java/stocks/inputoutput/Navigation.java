@@ -190,13 +190,13 @@ public class Navigation {
     }
 
     private void priceHistory() {
-        int number = Securities.listIndexed();
+        Securities.listIndexed();
         System.out.println("Enter the index of the Security whose price history you want to display or 0 to exit:");
         try {
             int index = scanner.nextInt();
             if (index == 0) {
                 System.out.println("Going back to main menu...");
-            } else if (index < number) {
+            } else if (index < Securities.size()) {
                 SecurityDow selectedSecurity = Securities.get(index - 1);
                 selectedSecurity.priceHistory();
             } else {

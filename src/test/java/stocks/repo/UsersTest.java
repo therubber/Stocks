@@ -49,11 +49,4 @@ class UsersTest {
     void isEmpty() {
         assertFalse(Users.isEmpty());
     }
-
-    @Test
-    void test() {
-        for (User user : Users.userList) {
-            System.out.println();
-        }
-    }
 }

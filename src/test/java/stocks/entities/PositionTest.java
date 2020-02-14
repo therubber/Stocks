@@ -41,7 +41,7 @@ class PositionTest {
 
     @Test
     void getValue() {
-        BigDecimal value = Securities.get("UniRAK").getSpotPrice().getPrice().multiply(new BigDecimal(5)).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal value = Securities.get("UniRAK").getSpotPrice().getPrice().multiply(new BigDecimal(Integer.toString(5))).setScale(2, RoundingMode.HALF_UP);
         assertEquals(value, position.getValue());
     }
 

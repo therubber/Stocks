@@ -19,7 +19,7 @@ public class User {
      * @param username String username to create user with
      */
     public User(String username) {
-        this.equity = new BigDecimal(10000).setScale(2, RoundingMode.HALF_UP);
+        this.equity = new BigDecimal(Integer.toString(10000)).setScale(2, RoundingMode.HALF_UP);
         this.username = username;
     }
 

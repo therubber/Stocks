@@ -81,15 +81,16 @@ class NavigationTest {
         @Test
         void testUpdatePrices() {
             Securities.updatePrices();
-            assertEquals(new BigDecimal(137.93).setScale(2, RoundingMode.HALF_UP), Securities.get(UniRAK).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(80.76).setScale(2, RoundingMode.HALF_UP), Securities.get(UniAsia).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(57.45).setScale(2, RoundingMode.HALF_UP), Securities.get(UniEuroAnleihen).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(90.55).setScale(2, RoundingMode.HALF_UP), Securities.get(GenoAs).getSpotPrice().getPrice());
+            assertEquals(new BigDecimal(Double.toString(137.93)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniRAK).getSpotPrice().getPrice());
+            assertEquals(new BigDecimal(Double.toString(80.76)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniAsia).getSpotPrice().getPrice());
+            assertEquals(new BigDecimal(Double.toString(57.45)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniEuroAnleihen).getSpotPrice().getPrice());
+            assertEquals(new BigDecimal(Double.toString(90.55)).setScale(2, RoundingMode.HALF_UP), Securities.get(GenoAs).getSpotPrice().getPrice());
         }
     }
 
     @Test
     void testPortfolio() {
+        Users.add(new User("testUser"));
         Portfolio portfolio = new Portfolio("test", "testUser", new BigDecimal(5000));
         portfolio.orderInput(new Order(5, LocalDate.now(), "BUY", Securities.get("UniRAK")));
         assertEquals(new Position(5, Securities.get("UniRAK")), portfolio.getPosition(0));

@@ -87,4 +87,8 @@ public class Order {
     public SecurityDow getSecurity() {
         return security;
     }
+
+    public BigDecimal getValue() {
+        return security.getPrice().multiply(new BigDecimal(Integer.toString(count)));
+    }
 }

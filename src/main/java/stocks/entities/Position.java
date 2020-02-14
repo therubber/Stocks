@@ -21,6 +21,10 @@ public class Position {
         this.security = order.getSecurity();
     }
 
+    public Position(SecurityDow security) {
+        this.security = security;
+    }
+
     /**
      * Regular constructor to be used
      * @param count int count of shares contained in the position
@@ -62,7 +66,7 @@ public class Position {
      * @return Value of the position
      */
     public BigDecimal getValue() {
-        return security.getSpotPrice().getPrice().multiply(new BigDecimal (count));
+        return security.getSpotPrice().getPrice().multiply(new BigDecimal (Integer.toString(count)));
     }
 
     /**
@@ -130,6 +134,14 @@ public class Position {
      */
     public String generateId() {
         return "POS" + new DecimalFormat("000000").format((int)(Math.random() * 100000));
+    }
+
+    /**
+     * Getter for ISIN
+     * @return String isin
+     */
+    public String getIsin() {
+        return getSecurity().getIsin();
     }
 
     @Override

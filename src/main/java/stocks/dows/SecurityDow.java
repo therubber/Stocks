@@ -1,6 +1,7 @@
 package stocks.dows;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,6 +56,14 @@ public class SecurityDow {
      */
     public String getWkn() {
         return wkn;
+    }
+
+    /**
+     * Directly gets spot price of security
+     * @return BigDecimal spot price
+     */
+    public BigDecimal getPrice() {
+        return prices.get(prices.size() - 1).getPrice();
     }
 
     /**

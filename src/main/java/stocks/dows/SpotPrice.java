@@ -33,7 +33,7 @@ public class SpotPrice {
      * @return Price value
      */
     public BigDecimal getPrice() {
-        return price;
+        return price.setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override

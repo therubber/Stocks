@@ -114,5 +114,13 @@ public class Securities {
         }
         return validPrices;
     }
+
+    /**
+     * Gets the amount of security objects contained in securityList
+     * @return Int amount of security objects contained
+     */
+    public static int size() {
+        return securityList.size();
+    }
 }
 
