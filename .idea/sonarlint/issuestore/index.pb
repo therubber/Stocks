@@ -24,8 +24,6 @@ K
 SecurityData/Securities.csv,4\4\441f9daa5f3c276ede53a92abb3ace2aa7815067
 d
 4src/test/java/stocks/inputoutput/NavigationTest.java,e\7\e713fe263e2fd7a7389aaf0a23e438564c218aeb
-P
- SecurityData/SpotData/GenoAs.csv,f\2\f29636b78af601dec435d3188317926e8a7da2be
 Q
 !SecurityData/SpotData/UniAsia.csv,4\f\4f10c48276321862799a984e57a5bd2d93613cde
 Y
@@ -54,3 +52,7 @@ _
 .src/test/java/stocks/dows/SecurityDowTest.java,1\b\1b53737dca92988e446a43f6083064da4ae7d7e6
 X
 (src/test/java/stocks/repo/UsersTest.java,9\5\950d551c3f9c4a16ec8f38aacff68e390d95cb91
+W
+'SecurityData/SpotData/UniImmoEuropa.csv,6\1\619792a8f6659a451faea14baffa3200e9152e3f
+Q
+!SecurityData/SpotData/GenoAs1.csv,1\6\1615de25c73ac4aab5ec6e4cb90510fba816e749

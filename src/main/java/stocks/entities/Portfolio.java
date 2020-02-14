@@ -73,7 +73,7 @@ public class Portfolio {
         if (!positions.isEmpty()) {
             if (!positions.contains(position)) {
                 positions.add(position);
-                Users.get(owner).getOrderHistory().add(order);
+                Users.get(owner).addOrderToHistory(order);
                 if (order.getType().equals("BUY")) {
                     equity = equity.subtract(position.getValue());
                 } else {
@@ -84,7 +84,7 @@ public class Portfolio {
             }
         } else {
             positions.add(position);
-            Users.get(owner).getOrderHistory().add(order);
+            Users.get(owner).addOrderToHistory(order);
             if (order.getType().equals("BUY")) {
                 equity = equity.subtract(position.getValue());
             } else {

@@ -177,6 +177,14 @@ public class User {
         System.out.println("and is up " + gainTwo.divide(two.getStartEquity(), 2,  RoundingMode.HALF_UP) + "%");
     }
 
+    /**
+     * Adds an order to the order history
+     * @param order Order to be added to history
+     */
+    public void addOrderToHistory(Order order) {
+        orderHistory.add(order);
+    }
+
     @Override
     public String toString() {
         return username;

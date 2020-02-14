@@ -18,7 +18,7 @@ public class Users {
         return userList.get(userList.indexOf(new User(name)));
     }
 
-    public static List<User> getAll() {
+    static List<User> getAll() {
         return userList;
     }
 
@@ -89,6 +89,7 @@ public class Users {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        updatePortfolios();
     }
 
     public static void updatePortfolios() {
@@ -103,5 +104,9 @@ public class Users {
         for (User user : userList) {
             System.out.println(user.toString());
         }
+    }
+
+    static void clear() {
+        userList.clear();
     }
 }

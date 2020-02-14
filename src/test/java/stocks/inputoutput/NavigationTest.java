@@ -49,7 +49,7 @@ class NavigationTest {
         private SecurityDow UniRAK = new SecurityDow("UniRAK", "DE0008491044", "849104");
         private SecurityDow UniAsia = new SecurityDow("UniAsia", "LU0037079034", "971267");
         private SecurityDow UniEuroAnleihen = new SecurityDow("UniEuroAnleihen", "LU0966118209", "A1W4QB");
-        private SecurityDow GenoAs = new SecurityDow("GenoAs", "DE0009757682", "975768");
+        private SecurityDow GenoAs = new SecurityDow("GenoAs1", "DE0009757682", "975768");
 
         @Test
         void testInitiate() {
@@ -90,7 +90,7 @@ class NavigationTest {
 
     @Test
     void testPortfolio() {
-        Portfolio portfolio = new Portfolio("test", "testUser");
+        Portfolio portfolio = new Portfolio("test", "testUser", new BigDecimal(5000));
         portfolio.orderInput(new Order(5, LocalDate.now(), "BUY", Securities.get("UniRAK")));
         assertEquals(new Position(5, Securities.get("UniRAK")), portfolio.getPosition(0));
     }

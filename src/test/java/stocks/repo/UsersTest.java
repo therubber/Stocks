@@ -11,39 +11,49 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UsersTest {
 
+    static User user = new User("test");
+
     @BeforeAll
     static void setUp() {
-        Users.add(new User("user"));
+        Users.add(user);
     }
 
     @Test
     void get() {
-        assertEquals(new User("user"), Users.get("user"));
+        assertEquals(user, Users.get("test"));
     }
 
     @Test
     void getAll() {
-        List<User> users = Users.getAll();
-        assertTrue(users.contains(new User("user")));
-    }
-
-    @Test
-    void contains() {
-        assertTrue(Users.contains(new User("user")));
-    }
-
-    @Test
-    void testContains() {
         assertTrue(Users.contains(new User("test")));
     }
 
     @Test
+    void contains() {
+        assertTrue(Users.contains(new User("test")));
+    }
+
+    @Test
+    void testContains() {
+        assertFalse(Users.contains("asdfasdf"));
+        assertTrue(Users.contains(user));
+    }
+
+    @Test
     void indexOf() {
-        assertEquals(0, Users.indexOf(new User("user")));
+        Users.add(new User("user"));
+        assertEquals(1, Users.indexOf(new User("user")));
     }
 
     @Test
     void isEmpty() {
         assertFalse(Users.isEmpty());
+    }
+
+    @Test
+    void test() {
+        for (User user : Users.userList) {
+            System.out.println();
+        }
     }
 }

@@ -142,12 +142,9 @@ public class Navigation {
     }
 
     private void login(String username) {
-        if (Users.getAll().contains(new User(username))) {
+        if (Users.contains(new User(username))) {
             selectedUser = Users.get(username);
             System.out.println("User " + username + " is now logged in!");
-            for (Portfolio portfolio : selectedUser.getPortfolios()) {
-                portfolio.update();
-            }
             Help.clear();
         } else {
             System.out.println("User does not exist! Please register a new User");
