@@ -49,6 +49,31 @@ public class Securities {
         System.out.println();
     }
 
+
+    /**
+     * Displays an indexed list of all securities available. Index begins at 1 for simplicity of use
+     * @return Int count of securities available
+     */
+    public static int listIndexed() {
+        System.out.println();
+        System.out.printf("%5s %-18s %-16s %-10s %-10s %-15s%n", "Index", "Name", "ISIN", "WKN", "Price", "Date");
+        int index = 1;
+        for (SecurityDow security : securityList) {
+            System.out.printf("%-5d %-18s %-16s %-10s %-10.2f %-15s%n", index, security.getName(), security.getIsin(), security.getWkn(), security.getSpotPrice().getPrice(), security.getSpotDate());
+            index++;
+        }
+        System.out.println();
+        return index;
+    }
+
+    /**
+     * Method to load Securities and their prices
+     */
+    public static void load() {
+        initiate();
+        updatePrices();
+    }
+
     /**
      * Sets up names of available security and fetches data using updateSecurities()
      */

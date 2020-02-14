@@ -6,6 +6,7 @@ import stocks.dows.SecurityDow;
 import stocks.repo.Securities;
 import stocks.repo.Users;
 import java.io.ByteArrayInputStream;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Navigation {
@@ -17,8 +18,8 @@ public class Navigation {
     public static void main(String[] args) {
         Navigation instance = new Navigation();
         Users.load();
-        Securities.initiate();
-        Securities.updatePrices();
+        Users.printUsers();
+        Securities.load();
         Help.noUser();
         instance.navigation();
     }
@@ -81,7 +82,7 @@ public class Navigation {
                     save();
                     return false;
                 case "lp":
-                    listPortfolios();
+                    selectedUser.listPortfolios();
                     return false;
                 case "lf":
                     Securities.list();
@@ -141,7 +142,7 @@ public class Navigation {
     }
 
     private void login(String username) {
-        if (Users.contains(new User(username)) && !username.equals("unlogged")) {
+        if (Users.getAll().contains(new User(username))) {
             selectedUser = Users.get(username);
             System.out.println("User " + username + " is now logged in!");
             for (Portfolio portfolio : selectedUser.getPortfolios()) {
@@ -155,28 +156,15 @@ public class Navigation {
 
     private void addUser() {
         System.out.println("Enter a username to create a new user: ");
-        String name = scanner.next();
-        if (!Users.contains(new User(name))) {
-            Users.add(new User(name));
-            System.out.println("New user " + name + " has been created!");
-            login(name);
+        String username = scanner.next();
+        if (!Users.contains(username)) {
+            Users.add(new User(username));
+            System.out.println("New user " + username + " has been created!");
+            login(username);
         } else {
             System.out.println("User with that username already exists, please login.");
         }
-        save();
-    }
-
-    private void listPortfolios() {
-        System.out.println();
-        if (selectedUser != null) {
-            if (!selectedUser.getPortfolios().isEmpty()) {
-                selectedUser.listPortfolios();
-            } else {
-                System.out.println("No portfolios existing for user " + selectedUser.getUsername() + ". Please add a new one.");
-            }
-        } else {
-            System.out.println("No user selected, please log in!");
-        }
+        Users.save();
     }
 
     private void selected() {
@@ -191,7 +179,7 @@ public class Navigation {
     private void selectPortfolio() {
         System.out.println("Please enter the name of the portfolio you want to select.");
         String depotName = scanner.next();
-        if (selectedUser.getPortfolios().contains(new Portfolio(depotName, selectedUser.toString()))) {
+        if (selectedUser.hasPortfolio(new Portfolio(depotName, selectedUser.toString()))) {
             selectedPortfolio = selectedUser.getPortfolios().get(selectedUser.getPortfolios().indexOf(new Portfolio(depotName, selectedUser.toString())));
             System.out.println("Depot " + depotName + " has been selected!");
         } else {
@@ -200,15 +188,27 @@ public class Navigation {
     }
 
     private void selectPortfolio(String name) {
-        selectedPortfolio = selectedUser.getPortfolios().get(selectedUser.getPortfolios().indexOf(new Portfolio(name, selectedUser.toString())));
+        selectedPortfolio = selectedUser.getPortfolio(new Portfolio(name, selectedUser.toString()));
         System.out.println("Portfolio " + name + " has been selected!");
     }
 
     private void priceHistory() {
-        Securities.list();
-        System.out.println("Enter the name of the Security whose price history you want to display:");
-        SecurityDow selectedSecurity = Securities.get(new SecurityDow(scanner.next()));
-        selectedSecurity.priceHistory();
+        int number = Securities.listIndexed();
+        System.out.println("Enter the index of the Security whose price history you want to display or 0 to exit:");
+        try {
+            int index = scanner.nextInt();
+            if (index == 0) {
+                System.out.println("Going back to main menu...");
+            } else if (index < number) {
+                SecurityDow selectedSecurity = Securities.get(index - 1);
+                selectedSecurity.priceHistory();
+            } else {
+                System.out.println("Index invalid. Please try again.");
+                priceHistory();
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Index invalid. Please try again.");
+        }
     }
 
     /**

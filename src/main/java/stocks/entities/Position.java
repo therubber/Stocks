@@ -82,6 +82,14 @@ public class Position {
     }
 
     /**
+     * Getter method for spot price of security
+     * @return BigDecimal price of security
+     */
+    public BigDecimal getPrice() {
+        return security.getSpotPrice().getPrice();
+    }
+
+    /**
      * Getter method for the name of the contained security
      * @return String name of security contained in position
      */

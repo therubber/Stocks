@@ -15,8 +15,7 @@ class SecuritiesTest {
 
     @BeforeEach
     void setUp() {
-        Securities.initiate();
-        Securities.updatePrices();
+        Securities.load();
     }
 
     @Test

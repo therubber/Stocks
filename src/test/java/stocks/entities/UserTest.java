@@ -17,13 +17,12 @@ class UserTest {
 
     @BeforeEach
     void setUp() {
-        Securities.initiate();
-        Securities.updatePrices();
+        Securities.load();
         user = new User("user");
         order = new Order(5, LocalDate.now(), "BUY", Securities.get("UniRAK"));
         portfolio = new Portfolio("test", "user", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP));
-        portfolio.orderInput(order);
         user.addPortfolio(portfolio);
+        portfolio.orderInput(order);
     }
     @Test
     void getUsername() {
@@ -49,6 +48,6 @@ class UserTest {
 
     @Test
     void getPortfolios() {
-        assertTrue(user.getPortfolios().contains(portfolio));
+        assertTrue(user.hasPortfolio(portfolio));
     }
 }

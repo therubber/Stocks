@@ -21,7 +21,7 @@ class NavigationTest {
 
     @BeforeEach
     void setUp() {
-        Securities.initiate();
+        Securities.load();
         Users.load();
     }
 

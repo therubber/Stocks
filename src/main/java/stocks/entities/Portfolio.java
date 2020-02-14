@@ -5,7 +5,6 @@ import stocks.dows.SpotPrice;
 import stocks.inputoutput.Help;
 import stocks.repo.Securities;
 import stocks.repo.Users;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -67,7 +66,7 @@ public class Portfolio {
     }
 
     /**
-     * Adds a position to the portfolio or increase one if it already exists
+     * Adds a position to the portfolio or increases one if it already exists
      */
     public void orderInput(Order order) {
         Position position = new Position(order);
@@ -86,6 +85,11 @@ public class Portfolio {
         } else {
             positions.add(position);
             Users.get(owner).getOrderHistory().add(order);
+            if (order.getType().equals("BUY")) {
+                equity = equity.subtract(position.getValue());
+            } else {
+                equity = equity.add(position.getValue());
+            }
         }
     }
 
@@ -175,13 +179,18 @@ public class Portfolio {
         return value;
     }
 
-    public void setOwnedSecurities() {
+    void loadOwnedSecurities() {
         ownedSecurities = new LinkedList<>();
         for (Position position : positions) {
             ownedSecurities.add(position.getSecurity());
         }
     }
 
+    /**
+     * Checks whether the portfolio contains a position with the String name of the security
+     * @param name Name of the security to check for
+     * @return Boolean whether a position with the security name exists
+     */
     public boolean contains(String name) {
         return ownedSecurities.contains(new SecurityDow(name));
     }
@@ -201,8 +210,11 @@ public class Portfolio {
         System.out.printf(format, "Combined value of all assets: ", getValue());
     }
 
+    /**
+     * Updates all positions to the most recent prices available
+     */
     public void update() {
-        setOwnedSecurities();
+        loadOwnedSecurities();
         for (Position position : positions) {
             SecurityDow positionSecurity = position.getSecurity();
             if (Securities.contains(positionSecurity)) {
@@ -226,6 +238,9 @@ public class Portfolio {
         }
     }
 
+    /**
+     * Used to buy securities and add the position to the portfolio
+     */
     public void buy() {
         if (Securities.evaluateSpotPrices()) {
             Securities.list();
@@ -242,7 +257,8 @@ public class Portfolio {
                 int transactionCount = scanner.nextInt();
                 Position position = new Position(transactionCount, security);
                 if (position.getValue().doubleValue() <= equity.doubleValue()) {
-                    System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", getEquity(), (getEquity().subtract(position.getValue())));
+                    BigDecimal equityAfterExecution = getEquity().subtract(position.getPrice().multiply(new BigDecimal(transactionCount)));
+                    System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", getEquity(), equityAfterExecution);
                     System.out.println("Buying " + transactionCount + " shares of " + security.getName() + " at " + security.getSpotPrice().getPrice().setScale(2, RoundingMode.CEILING) + " EUR Spot. Confirm (y/n)");
                     if (Help.confirmOrder()) {
                         Order order = new Order(transactionCount, LocalDate.now(), "BUY", security);
@@ -265,6 +281,10 @@ public class Portfolio {
         }
     }
 
+
+    /**
+     * Used to sell out of the portfolio if a position for the security to be sold exists
+     */
     public void sell() {
         if (Securities.evaluateSpotPrices()) {
             indexPositions();
@@ -276,7 +296,8 @@ public class Portfolio {
                 System.out.println("Enter the amount of shares you want to reduce/increase the position by");
                 int transactionCount = scanner.nextInt();
                 if (transactionCount <= selectedPosition.getCount()) {
-                    System.out.printf("Current equity: %10.2f EUR. After execution: %10.2f%n", getEquity(), (getEquity().add(selectedPosition.getValue()).subtract(selectedPosition.getSpotPrice().getPrice().multiply(new BigDecimal(transactionCount)))));
+                    BigDecimal equityAfterExecution = getEquity().add(selectedPosition.getPrice().multiply(new BigDecimal(transactionCount)));
+                    System.out.printf("Current equity: %10.2f EUR. After execution: %10.2f%n", getEquity(), equityAfterExecution);
                     System.out.println("Selling " + transactionCount + " shares of " + selectedPosition.getSecurityName() + " at " + selectedPosition.getSpotPrice().getPrice().setScale(2, RoundingMode.CEILING) + " EUR Spot. Confirm (y/n)");
                     if (Help.confirmOrder()) {
                         Order order = new Order(transactionCount, LocalDate.now(), "SELL", selectedPosition.getSecurity());

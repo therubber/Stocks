@@ -36,6 +36,6 @@ class SecurityDowTest {
 
     @Test
     void getSpotDate() {
-        assertEquals(LocalDate.now(), securityDow.getSpotDate());
+        assertEquals(LocalDate.parse("2020-02-13"), securityDow.getSpotDate());
     }
 }

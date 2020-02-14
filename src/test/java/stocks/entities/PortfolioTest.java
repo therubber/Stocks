@@ -3,6 +3,7 @@ package stocks.entities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import stocks.dows.SecurityDow;
+import stocks.repo.Users;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,6 +19,7 @@ class PortfolioTest {
 
     @BeforeEach
     void setUp() {
+        Users.add(new User("testUser"));
         portfolio = new Portfolio("test", "testUser", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP));
         securityDow = new SecurityDow("UniRAK");
         order = new Order(1, LocalDate.now(), "BUY", securityDow);
@@ -74,8 +76,8 @@ class PortfolioTest {
     }
 
     @Test
-    void setOwnedSecurities() {
-        portfolio.setOwnedSecurities();
+    void loadOwnedSecurities() {
+        portfolio.loadOwnedSecurities();
         assertTrue(portfolio.contains("UniRAK"));
     }
 }

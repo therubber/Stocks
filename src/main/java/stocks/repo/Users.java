@@ -12,7 +12,7 @@ public class Users {
 
     private Users() {}
 
-    public static List<User> userList = new LinkedList<>();
+    static List<User> userList = new LinkedList<>();
 
     public static User get(String name) {
         return userList.get(userList.indexOf(new User(name)));
@@ -96,6 +96,12 @@ public class Users {
             for (Portfolio portfolio : user.getPortfolios()) {
                 portfolio.update();
             }
+        }
+    }
+
+    public static void printUsers() {
+        for (User user : userList) {
+            System.out.println(user.toString());
         }
     }
 }

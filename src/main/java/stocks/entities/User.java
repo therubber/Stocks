@@ -1,7 +1,5 @@
 package stocks.entities;
 
-import stocks.repo.Users;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.LinkedList;
@@ -21,9 +19,8 @@ public class User {
      * @param username String username to create user with
      */
     public User(String username) {
-        this.equity = new BigDecimal(10000).setScale(2, RoundingMode.CEILING);
+        this.equity = new BigDecimal(10000).setScale(2, RoundingMode.HALF_UP);
         this.username = username;
-        Users.add(this);
     }
 
     /**
@@ -95,11 +92,42 @@ public class User {
     }
 
     /**
+     * Get a single portfolio out of the users portfolio without returning the complete list of portfolios
+     * @param portfolio Portfolio to get out of the Users portfolio list
+     * @return Portfolio owned by the user (with positions)
+     */
+    public Portfolio getPortfolio(Portfolio portfolio) {
+        try {
+            return portfolios.get(portfolios.indexOf(portfolio));
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Portfolio not owned by the User. Returning input Portfolio.");
+        }
+        return portfolio;
+    }
+
+    /**
+     * Method to check whether a user owns a portfolio
+     * @param portfolio Portfolio to check ownership
+     * @return Boolean whether portfolio of parameter is owned by the user
+     */
+    public boolean hasPortfolio(Portfolio portfolio) {
+        return portfolios.contains(portfolio);
+    }
+
+    /**
+     * Checks whether the user has any portfolios
+     * @return boolean whether the user has any portfolios
+     */
+    public boolean hasPortfolios() {
+        return !portfolios.isEmpty();
+    }
+
+    /**
      * Displays a list of all portfolios owned and their current value
      */
     public void listPortfolios() {
         System.out.printf("%-15s %-10s%n", "Name", "Value");
-        if (!portfolios.isEmpty()) {
+        if (hasPortfolios()) {
             for (Portfolio portfolio : portfolios) {
                 System.out.printf("%-15s %-10.2f%n", portfolio.toString(), portfolio.getValue());
             }
@@ -124,29 +152,29 @@ public class User {
         listPortfolios();
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the name of the first Portfolio: ");
-        String portfolio1 = scanner.next();
-        if (portfolios.contains(new Portfolio(portfolio1, username))) {
+        Portfolio portfolio1 = new Portfolio(scanner.next(), username);
+        if (portfolios.contains(portfolio1)) {
             System.out.println("Enter the name of the second Portfolio: ");
-            String portfolio2 = scanner.next();
-            if (portfolios.contains(new Portfolio(portfolio2, username))) {
+            Portfolio portfolio2 = new Portfolio(scanner.next(), username);
+            if (portfolios.contains(portfolio2)) {
                 comparePortfolios(portfolio1, portfolio2);
             } else {
                 System.out.println("Portfolio doesn't exist. Try again:");
-                compare();
             }
         } else {
             System.out.println("Portfolio doesnt exist. Try again:");
-            compare();
         }
     }
 
-    public void comparePortfolios(String portfolio1, String portfolio2) {
-        Portfolio one = portfolios.get(portfolios.indexOf(new Portfolio(portfolio1, username)));
-        Portfolio two = portfolios.get(portfolios.indexOf(new Portfolio(portfolio2, username)));
+    public void comparePortfolios(Portfolio portfolio1, Portfolio portfolio2) {
+        Portfolio one = portfolios.get(portfolios.indexOf(portfolio1));
+        Portfolio two = portfolios.get(portfolios.indexOf(portfolio2));
         BigDecimal gainOne = one.getValue().subtract(one.getStartEquity());
         BigDecimal gainTwo = two.getValue().subtract(two.getStartEquity());
-        System.out.println("Portfolio " + one.getName() + "has gained " + gainOne.toString() + "EUR in value.");
+        System.out.println("Portfolio " + one.getName() + "has gained " + gainOne.toString() + "EUR in value ");
+        System.out.println("and is up " + gainOne.divide(one.getStartEquity(), 2, RoundingMode.HALF_UP)+ "%");
         System.out.println("Portfolio " + two.getName() + "has gained " + gainTwo.toString() + "EUR in value.");
+        System.out.println("and is up " + gainTwo.divide(two.getStartEquity(), 2,  RoundingMode.HALF_UP) + "%");
     }
 
     @Override

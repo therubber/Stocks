@@ -33,34 +33,65 @@ public class SecurityDow {
         this.wkn = wkn;
     }
 
+    /**
+     * Getter method for name
+     * @return String name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Getter method for ISIN
+     * @return String ISIN
+     */
     public String getIsin() {
         return isin;
     }
 
+    /**
+     * Getter method for WKN
+     * @return String WKN
+     */
     public String getWkn() {
         return wkn;
     }
 
+    /**
+     * Gets the most recent price of the security. Sets price to 0 and date to 1970-01-01 if no price is available
+     * @return Most recent price available, Price (0, 1970-01-01) if no price is available
+     */
     public SpotPrice getSpotPrice() {
         return !prices.isEmpty() ? prices.get(prices.size() - 1) : new SpotPrice(0, LocalDate.parse("1970-01-01"));
     }
 
+    /**
+     * Sets the spot price
+     * @param spotPrice SpotPrice to be assigned
+     */
     public void setSpotPrice(SpotPrice spotPrice) {
         prices.add(spotPrice);
     }
 
+    /**
+     * Gets SpotDate of the security, used to check whether the prices are up to date.
+     * @return SpotDate of the most recent SpotPrice
+     */
     public LocalDate getSpotDate() {
         return getSpotPrice().getDate();
     }
 
+    /**
+     * Checks whether a price is allocated to the security
+     * @return Boolean if price is allocated
+     */
     public boolean emptyPrices() {
         return prices.isEmpty();
     }
 
+    /**
+     * Displays price history
+     */
     public void priceHistory() {
         if (!emptyPrices()) {
             System.out.printf("%-15s %-10s%n", "Date", "Price");
@@ -73,6 +104,9 @@ public class SecurityDow {
         System.out.println();
     }
 
+    /**
+     * Updates securities SpotPrice from SpotData files
+     */
     public void update() {
         try {
             String pathname = "SecurityData/SpotData/" + name + ".csv";

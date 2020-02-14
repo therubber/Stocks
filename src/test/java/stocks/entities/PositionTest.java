@@ -19,8 +19,7 @@ class PositionTest {
 
     @BeforeEach
     void setUp() {
-        Securities.initiate();
-        Securities.updatePrices();
+        Securities.load();
         position = new Position(5, Securities.get("UniRAK"));
     }
 
