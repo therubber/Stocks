@@ -80,7 +80,7 @@ public class User {
                     System.out.println("Insufficient account equity for depot creation! please try again");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Use format -0,00- for entering equity. Please try again. %n");
+                System.out.println("Input invalid. Please enter a double in the format - 0,00 -  ");
             }
         } else {
             System.out.println("A portfolio with this name already exists, please try again.");

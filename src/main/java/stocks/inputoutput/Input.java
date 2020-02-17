@@ -27,22 +27,15 @@ public class Input {
         try {
             input = scanner.nextInt();
         } catch (InputMismatchException e) {
-            System.out.println("Input invalid. Please enter an integer");
+            System.out.println("Invalid input. Please try again.");
         }
         return input;
     }
 
     /**
-     * Checks validity of double input
-     * @return Double input if valid
+     * Input method for double values
      */
     public static double doubleValue() {
-        double input = 0;
-        try {
-            input = scanner.nextDouble();
-        } catch (InputMismatchException e) {
-            System.out.println("Input invalid. Please enter a double ");
-        }
-        return input;
+        return scanner.nextDouble();
     }
 }

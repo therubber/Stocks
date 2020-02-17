@@ -4,6 +4,7 @@ import stocks.entities.Security;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class Securities {
 
@@ -79,9 +80,10 @@ public class Securities {
      */
     public static void initiate() {
         try {
-            BufferedReader input = new BufferedReader(new FileReader("SecurityData/Securities.csv"));
+            File file = new File(Objects.requireNonNull(Securities.class.getClassLoader().getResource("SecurityData/Securities.csv")).getFile());
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
             String line;
-            while ((line = input.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null) {
                 String[] fund = line.split(";");
                 String name = fund[0];
                 String isin = fund[1];
@@ -90,8 +92,6 @@ public class Securities {
                     securityList.add(new Security(name, isin, wkn));
                 }
             }
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("Error: File Securities.csv not found. Unable to load securities.");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -118,8 +118,8 @@ public class Security {
      */
     public void update() {
         try {
-            String pathname = "SecurityData/SpotData/" + name + ".csv";
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(pathname));
+            File file = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("SecurityData/" + name + ".csv")).getFile());
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] data = line.split(";");

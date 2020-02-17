@@ -77,7 +77,7 @@ public class Navigation {
                     selectPortfolio();
                     return false;
                 case "add":
-                    selectPortfolio(selectedUser.addPortfolio());
+                    selectedUser.addPortfolio();
                     save();
                     return false;
                 case "lp":
@@ -184,11 +184,6 @@ public class Navigation {
         } else {
             System.out.println("Depot " + depotName + " does not exist or isn't owned by you, please try a different depot.");
         }
-    }
-
-    private void selectPortfolio(String name) {
-        selectedPortfolio = selectedUser.getPortfolio(name);
-        System.out.println("Portfolio " + name + " has been selected!");
     }
 
     private void priceHistory() {
