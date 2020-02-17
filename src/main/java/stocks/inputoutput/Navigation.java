@@ -5,20 +5,19 @@ import stocks.entities.User;
 import stocks.entities.Security;
 import stocks.repo.Securities;
 import stocks.repo.Users;
-import java.io.ByteArrayInputStream;
+
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
-import java.util.Scanner;
 
 public class Navigation {
 
     private transient User selectedUser;
     private transient Portfolio selectedPortfolio;
-    private Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         Navigation instance = new Navigation();
-        Users.load();
         Securities.load();
+        Users.load();
         Help.noUser();
         instance.navigation();
     }
@@ -32,7 +31,6 @@ public class Navigation {
                 exit = userNavigation();
             }
         }
-        scanner.close();
     }
 
     private boolean noUserNavigation() {
@@ -90,24 +88,18 @@ public class Navigation {
                     priceHistory();
                     return false;
                 case "buy":
-                    if (selectedPortfolio != null) {
+                    if (portfolioSelected()) {
                         selectedPortfolio.buy();
-                    } else {
-                        System.out.println("No portfolio selected! Please select a portfolio using the -select- command.");
                     }
                     return false;
                 case "sell":
-                    if (selectedPortfolio != null) {
+                    if (portfolioSelected()) {
                         selectedPortfolio.sell();
-                    } else {
-                        System.out.println("No portfolio selected! Please select a portfolio using the -select- command.");
                     }
                     return false;
                 case "ov":
-                    if (selectedPortfolio != null) {
+                    if (portfolioSelected()) {
                         selectedPortfolio.overview();
-                    } else {
-                        System.out.println("No portfolio selected, Please select one using the -select- command.");
                     }
                     return false;
                 case "oh":
@@ -115,6 +107,15 @@ public class Navigation {
                     return false;
                 case "compare":
                     selectedUser.compare();
+                    return false;
+                case "historical":
+                    if (portfolioSelected()) {
+                        try {
+                            selectedPortfolio.valueFrom(Input.stringValue());
+                        } catch (DateTimeParseException e) {
+                            System.out.println("Input date is invalid. Please try again.");
+                        }
+                    }
                     return false;
                 case "help":
                     Help.loggedIn();
@@ -136,6 +137,15 @@ public class Navigation {
                     Help.loggedIn();
                     return false;
             }
+    }
+
+    private boolean portfolioSelected() {
+        if (selectedPortfolio == null) {
+            System.out.println("No portfolio selected, Please select one using the -select- command.");
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private void save() {
@@ -203,14 +213,5 @@ public class Navigation {
         } catch (InputMismatchException e) {
             System.out.println("Index invalid. Please try again.");
         }
-    }
-
-    /**
-     * Method to set System.in to use the String of the parameter
-     * @param input String commands to be executed
-     */
-    public void test(String input) {
-        ByteArrayInputStream testInput = new ByteArrayInputStream(input.getBytes());
-        scanner = new Scanner(testInput);
     }
 }

@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Scanner;
 
 public class Portfolio {
 
@@ -157,21 +156,6 @@ public class Portfolio {
     }
 
     /**
-     * Assigns an index to the positions and prints them out. Required for position selection when selling
-     */
-    public void indexPositions() {
-        System.out.println();
-        System.out.printf("%-7s %-9s %10s   %-18s %-10s %-10s%n", "Index", "ID", "Count", "Name", "Value", "Execution");
-        System.out.println();
-        int i = 0;
-        for (Position position : positions) {
-            System.out.printf("%-7d %-9s %10d   %-18s %-10.2f %-10s%n", i + 1, position.getId(), position.getCount(), position.getSecurityName(), position.getValue(), position.getExecutionDate());
-            i++;
-        }
-        System.out.println();
-    }
-
-    /**
      * Calculates the current overall value of all assets in the portfolio
      * @return Value of all positions and equity
      */
@@ -220,6 +204,26 @@ public class Portfolio {
         System.out.printf(format, "Combined value of positions: ",  getPositionValue());
         System.out.printf(format, "Equity currently available in portfolio: ", getEquity());
         System.out.printf(format, "Combined value of all assets: ", getValue());
+        BigDecimal gain = getValue().subtract(getStartEquity());
+        if (Double.parseDouble(gain.toString()) >= 0) {
+            System.out.println("Portfolio " + name + " has increased " + getValue().subtract(getStartEquity()) + " EUR (" + gain.divide(getStartEquity(), RoundingMode.HALF_UP) + "%) in value!");
+        } else {
+            System.out.println("Portfolio " + name + " has decreased " + getValue().subtract(getStartEquity()) + " EUR (" + gain.divide(getStartEquity(), RoundingMode.HALF_UP) + "%) in value!");
+        }
+    }
+
+    private void historicalOverview() {
+        positions();
+        String format = "%-45s %10.2f EUR%n";
+        System.out.printf(format, "Combined value of positions: ",  getPositionValue());
+        System.out.printf(format, "Equity currently available in portfolio: ", getEquity());
+        System.out.printf(format, "Combined value of all assets: ", getValue());
+        BigDecimal gain = getValue().subtract(getStartEquity());
+        if (Double.parseDouble(gain.toString()) >= 0) {
+            System.out.println("Portfolio " + name + " would have decreased " + getValue().subtract(getStartEquity()) + " EUR (" + gain.divide(getStartEquity(), RoundingMode.HALF_UP) + "%) in value had it been started with current positions at the given date.");
+        } else {
+            System.out.println("Portfolio " + name + " would have increased " + getValue().subtract(getStartEquity()) + " EUR (" + gain.divide(getStartEquity(), RoundingMode.HALF_UP) + "%) in value had it been started with current positions at the given date.");
+        }
     }
 
     /**
@@ -248,6 +252,19 @@ public class Portfolio {
                 }
             }
         }
+    }
+
+    /**
+     * Sets prices in the portfolio to those of a certain date
+     * @param date Date to which the prices should be set
+     */
+    public void valueFrom(String date) {
+        loadOwnedSecurities();
+        for (Security security : ownedSecurities) {
+            security.priceFrom(date);
+        }
+        historicalOverview();
+        update();
     }
 
     /**

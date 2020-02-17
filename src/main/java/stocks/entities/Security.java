@@ -133,6 +133,31 @@ public class Security {
         }
     }
 
+    /**
+     * Gets the Spotprice of the Security from a certain date
+     * @param date Date of which a spot price should be returned
+     */
+    public void priceFrom(String date) {
+        SpotPrice histPrice = new SpotPrice(0.0, LocalDate.parse("1970-01-01"));
+        for (SpotPrice price : prices) {
+            if (price.getDate().equals(LocalDate.parse(date))) {
+                histPrice = price;
+            }
+        }
+        if (histPrice.getDate().equals(LocalDate.parse("1970-01-01"))) {
+            System.out.println("No price data found matching input date! Please try again");
+        } else {
+            prices.add(histPrice);
+        }
+    }
+
+    /**
+     * Removes last price. Used to reset the Security to the correct most recent price after showing a historical view
+     */
+    public void removeLastPrice() {
+        prices.remove(prices.size() - 1);
+    }
+
     @Override
     public String toString() {
         return name + "   " + isin + "   " + wkn + "   " + getSpotPrice() + " EUR" + System.lineSeparator();
