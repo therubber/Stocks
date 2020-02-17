@@ -1,7 +1,5 @@
 package stocks.entities;
 
-import stocks.dows.SecurityDow;
-import stocks.dows.SpotPrice;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -12,7 +10,7 @@ public class Position {
     private int count;
     private String id;
     private LocalDate executionDate;
-    private SecurityDow security;
+    private Security security;
 
     public Position(Order order) {
         this.count = order.getCount();
@@ -21,7 +19,7 @@ public class Position {
         this.security = order.getSecurity();
     }
 
-    public Position(SecurityDow security) {
+    public Position(Security security) {
         this.security = security;
     }
 
@@ -30,7 +28,7 @@ public class Position {
      * @param count int count of shares contained in the position
      * @param security Security which is object of the position
      */
-    public Position(int count, SecurityDow security) {
+    public Position(int count, Security security) {
         this.count = count;
         this.security = security;
         this.id = generateId();
@@ -57,7 +55,7 @@ public class Position {
      * Getter method to receive security parameter
      * @return Security object of position
      */
-    public SecurityDow getSecurity() {
+    public Security getSecurity() {
         return security;
     }
 

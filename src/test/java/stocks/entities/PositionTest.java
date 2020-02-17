@@ -1,10 +1,7 @@
 package stocks.entities;
 
-import javafx.scene.effect.Light;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import stocks.dows.SecurityDow;
-import stocks.dows.SpotPrice;
 import stocks.repo.Securities;
 
 import java.math.BigDecimal;

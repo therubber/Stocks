@@ -1,6 +1,5 @@
 package stocks.entities;
 
-import stocks.dows.SecurityDow;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -11,7 +10,7 @@ public class Order {
     private BigDecimal executionPrice;
     private LocalDate executionDate;
     private boolean type;
-    private SecurityDow security;
+    private Security security;
     private String id;
 
     /**
@@ -20,7 +19,7 @@ public class Order {
      * @param type Boolean stating whether the order is Buy/Sell -> default = buy = false
      * @param security Security which is object of the order
      */
-    public Order(int count, LocalDate executionDate, String type, SecurityDow security) {
+    public Order(int count, LocalDate executionDate, String type, Security security) {
         this.count = count;
         this.executionPrice = security.getSpotPrice().getPrice();
         this.executionDate = executionDate;
@@ -84,10 +83,14 @@ public class Order {
      * Getter method for security which is object of the order
      * @return Security of order
      */
-    public SecurityDow getSecurity() {
+    public Security getSecurity() {
         return security;
     }
 
+    /**
+     * Gets the combined value of an order
+     * @return BigDecimal value of the order
+     */
     public BigDecimal getValue() {
         return security.getPrice().multiply(new BigDecimal(Integer.toString(count)));
     }

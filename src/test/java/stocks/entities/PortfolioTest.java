@@ -2,26 +2,30 @@ package stocks.entities;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import stocks.dows.SecurityDow;
 import stocks.repo.Users;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PortfolioTest {
 
     Portfolio portfolio;
-    SecurityDow securityDow;
+    Security securityDow;
     Order order;
 
     @BeforeEach
     void setUp() {
         Users.add(new User("testUser"));
         portfolio = new Portfolio("test", "testUser", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP));
-        securityDow = new SecurityDow("UniRAK");
+        securityDow = new Security("UniRAK");
         order = new Order(1, LocalDate.now(), "BUY", securityDow);
         securityDow.update();
         portfolio.orderInput(order);
@@ -34,18 +38,18 @@ class PortfolioTest {
 
     @Test
     void getEquity() {
-        assertEquals(new BigDecimal(4862.07).setScale(2, RoundingMode.HALF_UP), portfolio.getEquity());
+        assertEquals(new BigDecimal(Double.toString(4862.07)).setScale(2, RoundingMode.HALF_UP), portfolio.getEquity());
     }
 
     @Test
     void getStartequity() {
-        assertEquals(new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP), portfolio.getStartEquity());
+        assertEquals(new BigDecimal(Double.toString(5000)).setScale(2, RoundingMode.HALF_UP), portfolio.getStartEquity());
     }
 
     @Test
-    void addPosition() {
+    void addPosition() throws URISyntaxException, IOException {
         portfolio.orderInput(order);
-        assertEquals(new BigDecimal(275.86).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
+        assertEquals(new BigDecimal(Double.toString(275.86)).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
         assertEquals(1, portfolio.getPositionCount());
     }
 

@@ -1,4 +1,4 @@
-package stocks.dows;
+package stocks.entities;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-public class SecurityDow {
+public class Security {
 
     private String name;
     private String isin;
@@ -18,7 +18,7 @@ public class SecurityDow {
      * Constructor with name -> Needed to select a security in buy orders
      * @param name Name to set for security
      */
-    public SecurityDow(String name) {
+    public Security(String name) {
         this.name = name;
     }
 
@@ -28,7 +28,7 @@ public class SecurityDow {
      * @param isin ISIN of the security
      * @param wkn WKN of the security
      */
-    public SecurityDow(String name, String isin, String wkn) {
+    public Security(String name, String isin, String wkn) {
         this.name = name;
         this.isin = isin;
         this.wkn = wkn;
@@ -142,8 +142,8 @@ public class SecurityDow {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SecurityDow securityDow = (SecurityDow) o;
-        return Objects.equals(name, securityDow.name);
+        Security security = (Security) o;
+        return Objects.equals(name, security.name);
     }
 
     @Override

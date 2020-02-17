@@ -2,13 +2,11 @@ package stocks.inputoutput;
 
 import stocks.entities.Position;
 
-import java.util.Scanner;
-
 public class Help {
 
     static final String FORMAT = "%-15s %s%n";
 
-    /** Private Constructor to hide public one */
+    // Private Constructor to hide public one
     private Help() {}
 
     /**
@@ -55,14 +53,19 @@ public class Help {
         System.out.printf("%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n%n");
     }
 
+    /**
+     * Used to confirm buy/sell orders
+     * @param position Position to confirm
+     * @param type Boolean type of order, true if "BUY"
+     * @return Boolean confirmation of the order
+     */
     public static boolean confirmOrder(Position position, boolean type) {
         if (type) {
             System.out.println("Buying " + position.getCount() + " shares of " + position.getSecurity().getName() + " at " + position.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
         } else {
             System.out.println("Selling " + position.getCount() + " shares of " + position.getSecurity().getName() + " at " + position.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
         }
-        Scanner scanner = new Scanner(System.in);
-        String input = scanner.next();
+        String input = Input.stringValue();
         return input.equals("y");
     }
 }

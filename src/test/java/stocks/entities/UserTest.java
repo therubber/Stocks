@@ -42,12 +42,7 @@ class UserTest {
     }
 
     @Test
-    void getOrderHistory() {
-
-    }
-
-    @Test
     void getPortfolios() {
-        assertTrue(user.hasPortfolio(portfolio));
+        assertTrue(user.hasPortfolio(portfolio.getName()));
     }
 }

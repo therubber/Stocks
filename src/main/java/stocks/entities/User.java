@@ -1,11 +1,9 @@
 package stocks.entities;
 
+import stocks.inputoutput.Input;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class User {
 
@@ -69,17 +67,20 @@ public class User {
     public String addPortfolio() {
         System.out.println("User equity: " + equity + "EUR");
         System.out.println("Enter a Name for the portfolio you want to create: ");
-        Scanner scanner = new Scanner(System.in);
-        String name = scanner.next();
+        String name = Input.stringValue();
         if (!portfolios.contains(new Portfolio(name, username))) {
             System.out.println("Enter the amount of equity to transfer to the portfolio account: ");
-            BigDecimal depotEquity = BigDecimal.valueOf(scanner.nextDouble());
-            if (depotEquity.doubleValue() <= equity.doubleValue()) {
-                portfolios.add(new Portfolio(name, username, depotEquity));
-                equity = equity.subtract(depotEquity);
-                System.out.println("Depot " + name + " successfully created!");
-            } else {
-                System.out.println("Insufficient account equity for depot creation! please try again");
+            try {
+                BigDecimal depotEquity = BigDecimal.valueOf(Input.doubleValue());
+                if (depotEquity.doubleValue() <= equity.doubleValue()) {
+                    portfolios.add(new Portfolio(name, username, depotEquity));
+                    equity = equity.subtract(depotEquity);
+                    System.out.println("Depot " + name + " successfully created!");
+                } else {
+                    System.out.println("Insufficient account equity for depot creation! please try again");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Use format -0,00- for entering equity. Please try again. %n");
             }
         } else {
             System.out.println("A portfolio with this name already exists, please try again.");
@@ -87,31 +88,22 @@ public class User {
         return name;
     }
 
-    public List<Portfolio> getPortfolios() {
-        return portfolios;
+    /**
+     * Getter for a certain portfolio out of the list of the users portfolios
+     * @param name String name of the portfolio to get
+     * @return Portfolio requested
+     */
+    public Portfolio getPortfolio(String name) {
+        return portfolios.get(portfolios.indexOf(new Portfolio(name, username)));
     }
 
     /**
-     * Get a single portfolio out of the users portfolio without returning the complete list of portfolios
-     * @param portfolio Portfolio to get out of the Users portfolio list
-     * @return Portfolio owned by the user (with positions)
+     * Method to check whether a user owns a portfolio with the name of the parameter
+     * @param name String name of the portfolio
+     * @return Boolean whether the portfolio is contained in the users portfolio list
      */
-    public Portfolio getPortfolio(Portfolio portfolio) {
-        try {
-            return portfolios.get(portfolios.indexOf(portfolio));
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Portfolio not owned by the User. Returning input Portfolio.");
-        }
-        return portfolio;
-    }
-
-    /**
-     * Method to check whether a user owns a portfolio
-     * @param portfolio Portfolio to check ownership
-     * @return Boolean whether portfolio of parameter is owned by the user
-     */
-    public boolean hasPortfolio(Portfolio portfolio) {
-        return portfolios.contains(portfolio);
+    public boolean hasPortfolio(String name) {
+        return portfolios.contains(new Portfolio(name, username));
     }
 
     /**
@@ -136,6 +128,9 @@ public class User {
         }
     }
 
+    /**
+     * Prints the order history of the user
+     */
     public void printOrderHistory() {
         if (!orderHistory.isEmpty()) {
             System.out.printf("%-8s %10s %5s %15s %10s %15s%n", "ID", "Type", "Count", "Name", "Price", "Date");
@@ -148,14 +143,16 @@ public class User {
         }
     }
 
+    /**
+     * Compares two portfolios in terms of gains made
+     */
     public void compare() {
         listPortfolios();
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the name of the first Portfolio: ");
-        Portfolio portfolio1 = new Portfolio(scanner.next(), username);
+        Portfolio portfolio1 = new Portfolio(Input.stringValue(), username);
         if (portfolios.contains(portfolio1)) {
             System.out.println("Enter the name of the second Portfolio: ");
-            Portfolio portfolio2 = new Portfolio(scanner.next(), username);
+            Portfolio portfolio2 = new Portfolio(Input.stringValue(), username);
             if (portfolios.contains(portfolio2)) {
                 comparePortfolios(portfolio1, portfolio2);
             } else {
@@ -166,7 +163,7 @@ public class User {
         }
     }
 
-    public void comparePortfolios(Portfolio portfolio1, Portfolio portfolio2) {
+    private void comparePortfolios(Portfolio portfolio1, Portfolio portfolio2) {
         Portfolio one = portfolios.get(portfolios.indexOf(portfolio1));
         Portfolio two = portfolios.get(portfolios.indexOf(portfolio2));
         BigDecimal gainOne = one.getValue().subtract(one.getStartEquity());
@@ -175,6 +172,15 @@ public class User {
         System.out.println("and is up " + gainOne.divide(one.getStartEquity(), 2, RoundingMode.HALF_UP)+ "%");
         System.out.println("Portfolio " + two.getName() + "has gained " + gainTwo.toString() + "EUR in value.");
         System.out.println("and is up " + gainTwo.divide(two.getStartEquity(), 2,  RoundingMode.HALF_UP) + "%");
+    }
+
+    /**
+     * Updates all portfolios owned by the user to the most recent prices
+     */
+    public void updatePortfolios() {
+        for (Portfolio portfolio : portfolios) {
+            portfolio.update();
+        }
     }
 
     /**

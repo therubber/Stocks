@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import stocks.dows.SecurityDow;
+import stocks.entities.Security;
 import stocks.entities.Order;
 import stocks.entities.Portfolio;
 import stocks.entities.Position;
@@ -39,17 +39,17 @@ class NavigationTest {
         void testSaveLoad() {
             Users.save();
             Users.load();
-            assertTrue(Users.contains(new User("user")));
+            assertTrue(Users.contains("user"));
         }
     }
 
     @Nested
     class SecuritiesTest {
 
-        private SecurityDow UniRAK = new SecurityDow("UniRAK", "DE0008491044", "849104");
-        private SecurityDow UniAsia = new SecurityDow("UniAsia", "LU0037079034", "971267");
-        private SecurityDow UniEuroAnleihen = new SecurityDow("UniEuroAnleihen", "LU0966118209", "A1W4QB");
-        private SecurityDow GenoAs = new SecurityDow("GenoAs1", "DE0009757682", "975768");
+        private Security UniRAK = new Security("UniRAK", "DE0008491044", "849104");
+        private Security UniAsia = new Security("UniAsia", "LU0037079034", "971267");
+        private Security UniEuroAnleihen = new Security("UniEuroAnleihen", "LU0966118209", "A1W4QB");
+        private Security GenoAs = new Security("GenoAs1", "DE0009757682", "975768");
 
         @Test
         void testInitiate() {

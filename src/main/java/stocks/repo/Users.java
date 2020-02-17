@@ -2,7 +2,6 @@ package stocks.repo;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import stocks.entities.Portfolio;
 import stocks.entities.User;
 import java.io.*;
 import java.util.LinkedList;
@@ -14,18 +13,28 @@ public class Users {
 
     static List<User> userList = new LinkedList<>();
 
+    /**
+     * Getter method to get a User out of the list
+     * @param name String name of the user
+     * @return User user
+     */
     public static User get(String name) {
         return userList.get(userList.indexOf(new User(name)));
     }
 
-    static List<User> getAll() {
-        return userList;
-    }
-
+    /**
+     * Adds a user
+     * @param user User to be added
+     */
     public static void add(User user) {
         userList.add(user);
     }
 
+    /**
+     * Checks whether the user base contains a certain user
+     * @param user User to check containment
+     * @return Boolean whether the user is contained in the list
+     */
     public static boolean contains(User user) {
         return userList.contains(user);
     }
@@ -34,14 +43,26 @@ public class Users {
         return userList.contains(new User(name));
     }
 
+    /**
+     * Gets the index of a user if he is contained in the list. Returns -1 if not.
+     * @param user User to check index
+     * @return Int index of user in the list, -1 if not contained
+     */
     public static int indexOf(User user) {
         return userList.indexOf(user);
     }
 
+    /**
+     * Checks whether the user base contains any users
+     * @return Boolean whether the list of users is empty
+     */
     public static boolean isEmpty() {
         return userList.isEmpty();
     }
 
+    /**
+     * Saves the list of all users to /Saves/users.json file
+     */
     public static void save() {
         Gson gson = new Gson();
         try {
@@ -54,6 +75,9 @@ public class Users {
         }
     }
 
+    /**
+     * Loads all users into Users class from /Saves/users.json
+     */
     public static void load() {
         try {
             FileInputStream fileInputStream = new FileInputStream("Saves/users.json");
@@ -89,24 +113,5 @@ public class Users {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        updatePortfolios();
-    }
-
-    public static void updatePortfolios() {
-        for (User user : userList) {
-            for (Portfolio portfolio : user.getPortfolios()) {
-                portfolio.update();
-            }
-        }
-    }
-
-    public static void printUsers() {
-        for (User user : userList) {
-            System.out.println(user.toString());
-        }
-    }
-
-    static void clear() {
-        userList.clear();
     }
 }

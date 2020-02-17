@@ -2,16 +2,13 @@ package stocks.repo;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import stocks.dows.SecurityDow;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import stocks.entities.Security;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class SecuritiesTest {
 
-    SecurityDow unirak = new SecurityDow("UniRAK");
+    Security unirak = new Security("UniRAK");
 
     @BeforeEach
     void setUp() {
@@ -36,7 +33,7 @@ class SecuritiesTest {
     @Test
     void contains() {
         assertTrue(Securities.contains(unirak));
-        assertFalse(Securities.contains(new SecurityDow("Union")));
+        assertFalse(Securities.contains(new Security("Union")));
     }
 
     @Test

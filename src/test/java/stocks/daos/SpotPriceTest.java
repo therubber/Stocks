@@ -1,7 +1,9 @@
-package stocks.dows;
+package stocks.daos;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import stocks.entities.SpotPrice;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -24,6 +26,6 @@ class SpotPriceTest {
 
     @Test
     void getPrice() {
-        assertEquals(new BigDecimal(130.70).setScale(2, RoundingMode.HALF_UP), spotPrice.getPrice());
+        assertEquals(new BigDecimal(Double.toString(130.70)).setScale(2, RoundingMode.HALF_UP), spotPrice.getPrice());
     }
 }

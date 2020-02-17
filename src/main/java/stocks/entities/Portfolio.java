@@ -1,8 +1,7 @@
 package stocks.entities;
 
-import stocks.dows.SecurityDow;
-import stocks.dows.SpotPrice;
 import stocks.inputoutput.Help;
+import stocks.inputoutput.Input;
 import stocks.repo.Securities;
 import stocks.repo.Users;
 import java.math.BigDecimal;
@@ -20,7 +19,7 @@ public class Portfolio {
     public String owner;
     private BigDecimal startequity;
     private List<Position> positions = new LinkedList<>();
-    public transient List<SecurityDow> ownedSecurities = new LinkedList<>();
+    public transient List<Security> ownedSecurities = new LinkedList<>();
 
     /**
      * Constructor for setting up a portfolio without equity
@@ -138,7 +137,7 @@ public class Portfolio {
         System.out.println();
         System.out.printf("%-18s %-16s %-10s %-10s %-15s%n", "Name", "ISIN", "WKN", "Price", "Date");
         System.out.println();
-        for (SecurityDow security : ownedSecurities) {
+        for (Security security : ownedSecurities) {
             System.out.printf("%-18s %-16s %-10s %-10.2f %-15s%n", security.getName(), security.getIsin(), security.getWkn(), security.getSpotPrice().getPrice(), security.getSpotDate());
         }
         System.out.println();
@@ -205,7 +204,7 @@ public class Portfolio {
      * @return Boolean whether a position with the security name exists
      */
     public boolean contains(String name) {
-        return ownedSecurities.contains(new SecurityDow(name));
+        return ownedSecurities.contains(new Security(name));
     }
 
     /**
@@ -229,9 +228,9 @@ public class Portfolio {
     public void update() {
         loadOwnedSecurities();
         for (Position position : positions) {
-            SecurityDow positionSecurity = position.getSecurity();
+            Security positionSecurity = position.getSecurity();
             if (Securities.contains(positionSecurity)) {
-                SecurityDow instanceSecurity = Securities.get(Securities.indexOf(positionSecurity));
+                Security instanceSecurity = Securities.get(Securities.indexOf(positionSecurity));
                 SpotPrice positionSpotPrice = positionSecurity.getSpotPrice();
                 SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
                 if (!positionSpotPrice.equals(instanceSpotPrice)) {
@@ -239,9 +238,9 @@ public class Portfolio {
                 }
             }
         }
-        for (SecurityDow security : ownedSecurities) {
+        for (Security security : ownedSecurities) {
             if (Securities.contains(security)) {
-                SecurityDow instanceSecurity = Securities.get(Securities.indexOf(security));
+                Security instanceSecurity = Securities.get(Securities.indexOf(security));
                 SpotPrice positionSpotPrice = security.getSpotPrice();
                 SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
                 if (!positionSpotPrice.equals(instanceSpotPrice)) {
@@ -283,33 +282,34 @@ public class Portfolio {
             Securities.listIndexed();
             System.out.println("Depot equity: " + equity + " EUR");
             System.out.println("Enter the index of the Security that you want to buy: ");
-            Scanner scanner = new Scanner(System.in);
-            SecurityDow security = Securities.get(scanner.nextInt() - 1);
+            Security security = Securities.get(Input.intValue() - 1);
             System.out.println("Enter the count of shares you want to buy: ");
-            int transactionCount = scanner.nextInt();
+            int transactionCount = Input.intValue();
             return new Position(transactionCount, security);
         } catch (IndexOutOfBoundsException e) {
-            return new Position(666, new SecurityDow("ERROR", "ERROR", "ERROR"));
+            return new Position(666, new Security("ERROR", "ERROR", "ERROR"));
         }
     }
 
+    /**
+     * Used to reduce a position in the selected portfolio
+     */
     public void sell() {
         Securities.listIndexed();
         System.out.println("Please select the security you want to sell by entering its index.");
-        Scanner scanner = new Scanner(System.in);
-        int index = scanner.nextInt();
+        int index = Input.intValue();
         if (index > 0 && index <= Securities.size()) {
-            SecurityDow selectedSecurity = Securities.get(index - 1);
+            Security selectedSecurity = Securities.get(index - 1);
             if (ownedSecurities.contains(selectedSecurity)) {
                 System.out.println("Enter the amount of shares you want to reduce the position by: ");
-                int sellCount = scanner.nextInt();
+                int sellCount = Input.intValue();
                 Order order = new Order(sellCount, LocalDate.now(), "SELL", selectedSecurity);
                 Position position = new Position(order);
                 if (Help.confirmOrder(position, false)) {
                     orderInput(order);
                 }
             } else {
-                System.out.println("Portfolio doesnt contain that Security. Shortselling will be available in later releases.");
+                System.out.println("Portfolio does not contain the selected Security.");
             }
         } else {
             System.out.println("Invalid index. Please try again.");

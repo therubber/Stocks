@@ -1,4 +1,4 @@
-package stocks.dows;
+package stocks.entities;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
