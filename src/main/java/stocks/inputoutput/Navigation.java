@@ -108,9 +108,10 @@ public class Navigation {
                 case "compare":
                     selectedUser.compare();
                     return false;
-                case "historical":
+                case "hist":
                     if (portfolioSelected()) {
                         try {
+                            System.out.println("Enter a date. Format: YYYY-MM-DD");
                             selectedPortfolio.valueFrom(Input.stringValue());
                         } catch (DateTimeParseException e) {
                             System.out.println("Input date is invalid. Please try again.");

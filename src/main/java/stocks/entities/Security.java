@@ -151,13 +151,6 @@ public class Security {
         }
     }
 
-    /**
-     * Removes last price. Used to reset the Security to the correct most recent price after showing a historical view
-     */
-    public void removeLastPrice() {
-        prices.remove(prices.size() - 1);
-    }
-
     @Override
     public String toString() {
         return name + "   " + isin + "   " + wkn + "   " + getSpotPrice() + " EUR" + System.lineSeparator();

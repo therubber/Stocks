@@ -204,12 +204,6 @@ public class Portfolio {
         System.out.printf(format, "Combined value of positions: ",  getPositionValue());
         System.out.printf(format, "Equity currently available in portfolio: ", getEquity());
         System.out.printf(format, "Combined value of all assets: ", getValue());
-        BigDecimal gain = getValue().subtract(getStartEquity());
-        if (Double.parseDouble(gain.toString()) >= 0) {
-            System.out.println("Portfolio " + name + " has increased " + getValue().subtract(getStartEquity()) + " EUR (" + gain.divide(getStartEquity(), RoundingMode.HALF_UP) + "%) in value!");
-        } else {
-            System.out.println("Portfolio " + name + " has decreased " + getValue().subtract(getStartEquity()) + " EUR (" + gain.divide(getStartEquity(), RoundingMode.HALF_UP) + "%) in value!");
-        }
     }
 
     private void historicalOverview() {
@@ -219,10 +213,11 @@ public class Portfolio {
         System.out.printf(format, "Equity currently available in portfolio: ", getEquity());
         System.out.printf(format, "Combined value of all assets: ", getValue());
         BigDecimal gain = getValue().subtract(getStartEquity());
+        BigDecimal gainPercent = gain.divide(getStartEquity(), 4, RoundingMode.HALF_UP).multiply(new BigDecimal(Double.toString(100)));
         if (Double.parseDouble(gain.toString()) >= 0) {
-            System.out.println("Portfolio " + name + " would have decreased " + getValue().subtract(getStartEquity()) + " EUR (" + gain.divide(getStartEquity(), RoundingMode.HALF_UP) + "%) in value had it been started with current positions at the given date.");
+            System.out.println("Portfolio " + name + " would have decreased " + getValue().subtract(getStartEquity()) + " EUR (" + gainPercent + "%) in value had it been started with current positions at the given date.");
         } else {
-            System.out.println("Portfolio " + name + " would have increased " + getValue().subtract(getStartEquity()) + " EUR (" + gain.divide(getStartEquity(), RoundingMode.HALF_UP) + "%) in value had it been started with current positions at the given date.");
+            System.out.println("Portfolio " + name + " would have increased " + getValue().subtract(getStartEquity()) + " EUR (" + gainPercent + "%) in value had it been started with current positions at the given date.");
         }
     }
 

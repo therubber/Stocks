@@ -46,14 +46,6 @@ public class User {
     }
 
     /**
-     * Getter method for order history
-     * @return List with order history
-     */
-    public List<Order> getOrderHistory() {
-        return orderHistory;
-    }
-
-    /**
      * Adding portfolio for testing
      * @param portfolio Portfolio to add
      */
