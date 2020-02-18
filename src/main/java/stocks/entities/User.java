@@ -72,7 +72,7 @@ public class User {
                     System.out.println("Insufficient account equity for depot creation! please try again");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Input invalid. Please enter a double in the format - 0,00 -  ");
+                System.out.println("Input invalid. Please enter a double in the format - 0.00 -  ");
             }
         } else {
             System.out.println("A portfolio with this name already exists, please try again.");
@@ -130,6 +130,7 @@ public class User {
             for (Order order : orderHistory) {
                 System.out.printf("%-8s %10s %5d %15s %10.2f %15s%n", order.getId(), order.getType(), order.getCount(), order.getSecurity().getName(), order.getExecutionPrice(), order.getExecutionDate());
             }
+            System.out.println();
         } else {
             System.out.println("No orders yet! Please add a position to your portfolio.");
         }

@@ -43,6 +43,16 @@ public class Portfolio {
         this.startequity = equity;
     }
 
+    // Copy constructor to for historical view of portfolio
+    private Portfolio(Portfolio portfolio) {
+        this.name = portfolio.name;
+        this.owner = portfolio.owner;
+        this.equity = portfolio.equity;
+        this.startequity = portfolio.startequity;
+        this.positions = portfolio.positions;
+        this.ownedSecurities = portfolio.ownedSecurities;
+    }
+
     public String getName() {
         return name;
     }
@@ -130,27 +140,14 @@ public class Portfolio {
     }
 
     /**
-     * Displays a list of all securities with data contained in the portfolio
-     */
-    public void listOwnedSecurities() {
-        System.out.println();
-        System.out.printf("%-18s %-16s %-10s %-10s %-15s%n", "Name", "ISIN", "WKN", "Price", "Date");
-        System.out.println();
-        for (Security security : ownedSecurities) {
-            System.out.printf("%-18s %-16s %-10s %-10.2f %-15s%n", security.getName(), security.getIsin(), security.getWkn(), security.getSpotPrice().getPrice(), security.getSpotDate());
-        }
-        System.out.println();
-    }
-
-    /**
      * Displays data of all existing positions in the portfolio to the console
      */
     public void positions() {
         System.out.println();
-        System.out.printf("%-9s %10s   %-18s %-10s %-10s%n", "ID", "Count", "Name", "Value", "Execution");
+        System.out.printf("%-12s %-10s %-18s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Price", "Value", "Execution");
         System.out.println();
         for (Position position : positions) {
-            System.out.printf("%-9s %10d   %-18s %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurityName(), position.getValue(), position.getExecutionDate());
+            System.out.printf("%-12s %-10d %-18s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurityName(), position.getPrice(),  position.getValue(), position.getExecutionDate());
         }
         System.out.println();
     }
@@ -198,20 +195,19 @@ public class Portfolio {
      *  - combined value of all assets
      */
     public void overview() {
-        listOwnedSecurities();
         positions();
         String format = "%-45s %10.2f EUR%n";
         System.out.printf(format, "Combined value of positions: ",  getPositionValue());
         System.out.printf(format, "Equity currently available in portfolio: ", getEquity());
-        System.out.printf(format, "Combined value of all assets: ", getValue());
+        System.out.printf(format, "Combined value of all assets: ", getValue() + System.lineSeparator());
     }
 
     private void historicalOverview() {
         positions();
         String format = "%-45s %10.2f EUR%n";
-        System.out.printf(format, "Combined value of positions: ",  getPositionValue());
-        System.out.printf(format, "Equity currently available in portfolio: ", getEquity());
-        System.out.printf(format, "Combined value of all assets: ", getValue());
+        System.out.printf(format, "Combined value of positions today: ",  getPositionValue());
+        System.out.printf(format, "Equity currently available in portfolio at start: ", getEquity());
+        System.out.printf(format, "Combined value of all assets at start: ", getValue());
         BigDecimal gain = getValue().subtract(getStartEquity());
         BigDecimal gainPercent = gain.divide(getStartEquity(), 4, RoundingMode.HALF_UP).multiply(new BigDecimal(Double.toString(100)));
         if (Double.parseDouble(gain.toString()) >= 0) {
@@ -259,7 +255,9 @@ public class Portfolio {
             security.priceFrom(date);
         }
         historicalOverview();
-        update();
+        for (Security security : ownedSecurities) {
+            security.correctPrice();
+        }
     }
 
     /**

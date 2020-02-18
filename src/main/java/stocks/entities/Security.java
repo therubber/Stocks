@@ -83,6 +83,13 @@ public class Security {
     }
 
     /**
+     * Used to correct last price after viewing historical data
+     */
+    public void correctPrice() {
+        prices.remove(prices.size() - 1);
+    }
+
+    /**
      * Gets SpotDate of the security, used to check whether the prices are up to date.
      * @return SpotDate of the most recent SpotPrice
      */
@@ -118,8 +125,8 @@ public class Security {
      */
     public void update() {
         try {
-            File file = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("SecurityData/" + name + ".csv")).getFile());
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            InputStream inputStream = Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("SecurityData/" + name + ".csv"));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] data = line.split(";");

@@ -80,8 +80,8 @@ public class Securities {
      */
     public static void initiate() {
         try {
-            File file = new File(Objects.requireNonNull(Securities.class.getClassLoader().getResource("SecurityData/Securities.csv")).getFile());
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            InputStream inputStream = Objects.requireNonNull(Securities.class.getResourceAsStream("/SecurityData/Securities.csv"));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] fund = line.split(";");
