@@ -204,7 +204,7 @@ public class Navigation {
             int index = Input.intValue();
             if (index == 0) {
                 System.out.println("Going back to main menu...");
-            } else if (index < Securities.size()) {
+            } else if (index <= Securities.size()) {
                 Security selectedSecurity = Securities.get(index - 1);
                 selectedSecurity.priceHistory();
             } else {
