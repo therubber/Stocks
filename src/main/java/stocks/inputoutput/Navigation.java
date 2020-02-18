@@ -155,10 +155,15 @@ public class Navigation {
 
     private void login(String username) {
         if (Users.contains(new User(username))) {
-            selectedUser = Users.get(username);
-            selectedUser.updatePortfolios();
-            System.out.println("User " + username + " is now logged in!");
-            Help.clear();
+            System.out.println("Password: ");
+            if (Users.get(username).checkPassword(Input.stringValue())) {
+                selectedUser = Users.get(username);
+                selectedUser.updatePortfolios();
+                System.out.println("User " + username + " is now logged in!");
+                Help.clear();
+            } else {
+                System.out.println("Password invalid. Please try again.");
+            }
         } else {
             System.out.println("User does not exist! Please register a new User");
         }
@@ -168,7 +173,8 @@ public class Navigation {
         System.out.println("Enter a username to create a new user: ");
         String username = Input.stringValue();
         if (!Users.contains(username)) {
-            Users.add(new User(username));
+            System.out.println("Please enter a password: ");
+            Users.add(new User(username, Input.stringValue()));
             System.out.println("New user " + username + " has been created!");
             login(username);
         } else {

@@ -11,6 +11,7 @@ public class User {
     private BigDecimal equity;
     private List<Portfolio> portfolios = new LinkedList<>();
     public List<Order> orderHistory = new LinkedList<>();
+    private String password;
 
     /**
      * Regular constructor to be used
@@ -19,6 +20,12 @@ public class User {
     public User(String username) {
         this.equity = new BigDecimal(Integer.toString(10000)).setScale(2, RoundingMode.HALF_UP);
         this.username = username;
+    }
+
+    public User(String username, String password) {
+        this.equity = new BigDecimal(Integer.toString(10000)).setScale(2, RoundingMode.HALF_UP);
+        this.username = username;
+        this.password = Base64.getEncoder().encodeToString(password.getBytes());
     }
 
     /**
@@ -182,6 +189,16 @@ public class User {
      */
     public void addOrderToHistory(Order order) {
         orderHistory.add(order);
+    }
+
+    /**
+     * Checks if input password and saved passwords match
+     * @param input String password input
+     * @return boolean validity of password
+     */
+    public boolean checkPassword(String input) {
+        String inputEncoded = Base64.getEncoder().encodeToString(input.getBytes());
+        return inputEncoded.equals(password);
     }
 
     @Override

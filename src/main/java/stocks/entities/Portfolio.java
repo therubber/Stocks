@@ -80,7 +80,6 @@ public class Portfolio {
         Position position = new Position(order);
         if (!positions.isEmpty()) {
             if (!positions.contains(position)) {
-                positions.add(position);
                 Users.get(owner).addOrderToHistory(order);
                 executeOrder(order);
             } else {
@@ -199,7 +198,8 @@ public class Portfolio {
         String format = "%-45s %10.2f EUR%n";
         System.out.printf(format, "Combined value of positions: ",  getPositionValue());
         System.out.printf(format, "Equity currently available in portfolio: ", getEquity());
-        System.out.printf(format, "Combined value of all assets: ", getValue() + System.lineSeparator());
+        System.out.printf(format, "Combined value of all assets: ", getValue());
+        System.out.println();
     }
 
     private void historicalOverview() {
@@ -222,27 +222,27 @@ public class Portfolio {
      */
     public void update() {
         loadOwnedSecurities();
-        for (Position position : positions) {
-            Security positionSecurity = position.getSecurity();
-            if (Securities.contains(positionSecurity)) {
-                Security instanceSecurity = Securities.get(Securities.indexOf(positionSecurity));
-                SpotPrice positionSpotPrice = positionSecurity.getSpotPrice();
-                SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
-                if (!positionSpotPrice.equals(instanceSpotPrice)) {
-                    positionSecurity.setSpotPrice(instanceSpotPrice);
+            for (Position position : positions) {
+                Security positionSecurity = position.getSecurity();
+                if (Securities.contains(positionSecurity)) {
+                    Security instanceSecurity = Securities.get(Securities.indexOf(positionSecurity));
+                    SpotPrice positionSpotPrice = positionSecurity.getSpotPrice();
+                    SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
+                    if (!positionSpotPrice.equals(instanceSpotPrice)) {
+                        positionSecurity.setSpotPrice(instanceSpotPrice);
+                    }
                 }
             }
-        }
-        for (Security security : ownedSecurities) {
-            if (Securities.contains(security)) {
-                Security instanceSecurity = Securities.get(Securities.indexOf(security));
-                SpotPrice positionSpotPrice = security.getSpotPrice();
-                SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
-                if (!positionSpotPrice.equals(instanceSpotPrice)) {
-                    security.setSpotPrice(instanceSpotPrice);
+            for (Security security : ownedSecurities) {
+                if (Securities.contains(security)) {
+                    Security instanceSecurity = Securities.get(Securities.indexOf(security));
+                    SpotPrice positionSpotPrice = security.getSpotPrice();
+                    SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
+                    if (!positionSpotPrice.equals(instanceSpotPrice)) {
+                        security.setSpotPrice(instanceSpotPrice);
+                    }
                 }
             }
-        }
     }
 
     /**

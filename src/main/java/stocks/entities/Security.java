@@ -104,18 +104,10 @@ public class Security {
     }
 
     /**
-     * Checks whether a price is allocated to the security
-     * @return Boolean if price is allocated
-     */
-    public boolean emptyPrices() {
-        return prices.isEmpty();
-    }
-
-    /**
      * Displays price history
      */
     public void priceHistory() {
-        if (!emptyPrices()) {
+        if (prices.isEmpty()) {
             System.out.printf("%-15s %-10s%n", "Date", "Price");
             for (SpotPrice spotPrice : prices) {
                 System.out.printf("%-15s %-10.2f%n", spotPrice.getDate(), spotPrice.getPrice());
