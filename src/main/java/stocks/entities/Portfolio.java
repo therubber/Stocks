@@ -144,10 +144,10 @@ public class Portfolio {
      */
     public void positions() {
         System.out.println();
-        System.out.printf("%-12s %-10s %-18s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Price", "Value", "Execution");
+        System.out.printf("%-12s %-10s %-18s %-16s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Type", "Price", "Value", "Execution");
         System.out.println();
         for (Position position : positions) {
-            System.out.printf("%-12s %-10d %-18s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurityName(), position.getPrice(),  position.getValue(), position.getExecutionDate());
+            System.out.printf("%-12s %-10d %-18s %-16s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurityName(), position.getSecurityType(), position.getPrice(),  position.getValue(), position.getExecutionDate());
         }
         System.out.println();
     }
@@ -297,7 +297,7 @@ public class Portfolio {
             int transactionCount = Input.intValue();
             return new Position(transactionCount, security);
         } catch (IndexOutOfBoundsException e) {
-            return new Position(666, new Security("ERROR", "ERROR", "ERROR"));
+            return new Position(666, new Security("ERROR", "ERROR", "ERROR", "ERROR"));
         }
     }
 

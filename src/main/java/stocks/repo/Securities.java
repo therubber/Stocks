@@ -42,10 +42,10 @@ public class Securities {
 
     public static void list() {
         System.out.println();
-        System.out.printf("%-18s %-16s %-10s %-10s %-15s%n", "Name", "ISIN", "WKN", "Price", "Date");
+        System.out.printf("%-18s %-16s %-10s %-12s %-10s %-15s%n", "Name", "ISIN", "WKN", "Type", "Price", "Date");
         System.out.println();
         for (Security security : securityList) {
-            System.out.printf("%-18s %-16s %-10s %-10.2f %-15s%n", security.getName(), security.getIsin(), security.getWkn(), security.getSpotPrice().getPrice(), security.getSpotDate());
+            System.out.printf("%-18s %-16s %-10s %-12s %-10.2f %-15s%n", security.getName(), security.getIsin(), security.getWkn(), security.getType(), security.getSpotPrice().getPrice(), security.getSpotDate());
         }
         System.out.println();
     }
@@ -53,18 +53,16 @@ public class Securities {
 
     /**
      * Displays an indexed list of all securities available. Index begins at 1 for simplicity of use
-     * @return Int count of securities available
      */
-    public static int listIndexed() {
+    public static void listIndexed() {
         System.out.println();
-        System.out.printf("%5s %-18s %-16s %-10s %-10s %-15s%n", "Index", "Name", "ISIN", "WKN", "Price", "Date");
+        System.out.printf("%5s %-18s %-16s %-10s %-16s %-10s %-15s%n", "Index", "Name", "ISIN", "WKN", "Type", "Price", "Date");
         int index = 1;
         for (Security security : securityList) {
-            System.out.printf("%-5d %-18s %-16s %-10s %-10.2f %-15s%n", index, security.getName(), security.getIsin(), security.getWkn(), security.getSpotPrice().getPrice(), security.getSpotDate());
+            System.out.printf("%-5d %-18s %-16s %-10s %-16s %-10.2f %-15s%n", index, security.getName(), security.getIsin(), security.getWkn(), security.getType(), security.getSpotPrice().getPrice(), security.getSpotDate());
             index++;
         }
         System.out.println();
-        return index;
     }
 
     /**
@@ -88,8 +86,9 @@ public class Securities {
                 String name = fund[0];
                 String isin = fund[1];
                 String wkn = fund[2];
-                if (!securityList.contains(new Security(name, isin, wkn))) {
-                    securityList.add(new Security(name, isin, wkn));
+                String type = fund[3];
+                if (!securityList.contains(new Security(name, isin, wkn, type))) {
+                    securityList.add(new Security(name, isin, wkn, type));
                 }
             }
         } catch (IOException e) {

@@ -59,6 +59,10 @@ public class Position {
         return security;
     }
 
+    public String getSecurityType() {
+        return security.getType();
+    }
+
     /**
      * Getter method to receive value of the position
      * @return Value of the position

@@ -12,6 +12,7 @@ public class Security {
     private String name;
     private String isin;
     private String wkn;
+    private String type;
     private List<SpotPrice> prices = new LinkedList<>();
 
     /**
@@ -28,10 +29,11 @@ public class Security {
      * @param isin ISIN of the security
      * @param wkn WKN of the security
      */
-    public Security(String name, String isin, String wkn) {
+    public Security(String name, String isin, String wkn, String type) {
         this.name = name;
         this.isin = isin;
         this.wkn = wkn;
+        this.type = type;
     }
 
     /**
@@ -56,6 +58,10 @@ public class Security {
      */
     public String getWkn() {
         return wkn;
+    }
+
+    public String getType() {
+        return type;
     }
 
     /**

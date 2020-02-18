@@ -46,10 +46,10 @@ class NavigationTest {
     @Nested
     class SecuritiesTest {
 
-        private Security UniRAK = new Security("UniRAK", "DE0008491044", "849104");
-        private Security UniAsia = new Security("UniAsia", "LU0037079034", "971267");
-        private Security UniEuroAnleihen = new Security("UniEuroAnleihen", "LU0966118209", "A1W4QB");
-        private Security GenoAs = new Security("GenoAs1", "DE0009757682", "975768");
+        private Security UniRAK = new Security("UniRAK", "DE0008491044", "849104", "Fund");
+        private Security UniAsia = new Security("UniAsia", "LU0037079034", "971267", "Fund");
+        private Security UniEuroAnleihen = new Security("UniEuroAnleihen", "LU0966118209", "A1W4QB", "Fund");
+        private Security GenoAs = new Security("GenoAs1", "DE0009757682", "975768", "Fund");
 
         @Test
         void testInitiate() {
