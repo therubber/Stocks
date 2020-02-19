@@ -81,6 +81,7 @@ class PortfolioTest {
 
     @Test
     void loadOwnedSecurities() {
+        // test
         portfolio.loadOwnedSecurities();
         assertTrue(portfolio.contains("UniRAK"));
     }
