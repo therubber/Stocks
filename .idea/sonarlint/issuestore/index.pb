@@ -12,8 +12,6 @@ W
 ,src/main/java/stocks/entities/Portfolio.java,4\9\492e80629262cac5de1e0f25f60e41c7ff4e25a6
 X
 (src/main/java/stocks/entities/Order.java,a\e\aee3550f56b48941a62acc81bba953fc49dc3659
-@
-Saves/users.json,2\7\2710c47117cfcec89b7bf78e168a539e0d14e160
 `
 0src/main/java/stocks/inputoutput/Navigation.java,b\c\bccb645346c2915ecdfe04649588ebbb81c3f130
 d
@@ -70,3 +68,5 @@ a
 1src/test/resources/SecurityData/UniImmoEuropa.csv,7\b\7bfc7bc9232b06c967c40f661a14fad070021c7c
 Z
 *src/test/resources/SecurityData/UniRAK.csv,d\e\de71e1c53f9354be8aa522bebd49c51d1b775e0d
+]
+-src/main/resources/SecurityData/Lufthansa.csv,3\b\3bcbbc2a72e16483b5286b95fa306c65d61c9554

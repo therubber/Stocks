@@ -3,6 +3,7 @@ package stocks.entities;
 import stocks.inputoutput.Input;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.*;
 
 public class User {
@@ -67,7 +68,7 @@ public class User {
         System.out.println("User equity: " + equity + "EUR");
         System.out.println("Enter a Name for the portfolio you want to create: ");
         String name = Input.stringValue();
-        if (!portfolios.contains(new Portfolio(name, username))) {
+        if (!portfolios.contains(new Portfolio(name, username, LocalDate.now()))) {
             System.out.println("Enter the amount of equity to transfer to the portfolio account: ");
             try {
                 BigDecimal depotEquity = BigDecimal.valueOf(Input.doubleValue());
@@ -93,7 +94,7 @@ public class User {
      * @return Portfolio requested
      */
     public Portfolio getPortfolio(String name) {
-        return portfolios.get(portfolios.indexOf(new Portfolio(name, username)));
+        return portfolios.get(portfolios.indexOf(new Portfolio(name, username, LocalDate.now())));
     }
 
     /**
@@ -102,15 +103,15 @@ public class User {
      * @return Boolean whether the portfolio is contained in the users portfolio list
      */
     public boolean hasPortfolio(String name) {
-        return portfolios.contains(new Portfolio(name, username));
+        return portfolios.contains(new Portfolio(name, username, LocalDate.now()));
     }
 
     /**
-     * Checks whether the user has any portfolios
-     * @return boolean whether the user has any portfolios
+     * Checks whether the user has two portfolios (for comparison)
+     * @return boolean whether the user has two or more portfolios
      */
     public boolean hasPortfolios() {
-        return !portfolios.isEmpty();
+        return portfolios.size() >= 2;
     }
 
     /**
@@ -118,7 +119,7 @@ public class User {
      */
     public void listPortfolios() {
         System.out.printf("%-15s %-10s%n", "Name", "Value");
-        if (hasPortfolios()) {
+        if (!portfolios.isEmpty()) {
             for (Portfolio portfolio : portfolios) {
                 System.out.printf("%-15s %-10.2f%n", portfolio.toString(), portfolio.getValue());
             }
@@ -149,10 +150,10 @@ public class User {
     public void compare() {
         listPortfolios();
         System.out.println("Enter the name of the first Portfolio: ");
-        Portfolio portfolio1 = new Portfolio(Input.stringValue(), username);
+        Portfolio portfolio1 = new Portfolio(Input.stringValue(), username, LocalDate.now());
         if (portfolios.contains(portfolio1)) {
             System.out.println("Enter the name of the second Portfolio: ");
-            Portfolio portfolio2 = new Portfolio(Input.stringValue(), username);
+            Portfolio portfolio2 = new Portfolio(Input.stringValue(), username, LocalDate.now());
             if (portfolios.contains(portfolio2)) {
                 comparePortfolios(portfolio1, portfolio2);
             } else {

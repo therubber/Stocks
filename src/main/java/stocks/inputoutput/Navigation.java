@@ -18,7 +18,6 @@ public class Navigation {
         Navigation instance = new Navigation();
         Securities.load();
         Users.load();
-        Help.noUser();
         instance.navigation();
     }
 
@@ -26,9 +25,16 @@ public class Navigation {
         boolean exit = false;
         while (!exit) {
             if (selectedUser == null) {
+                Help.noUser();
                 exit = noUserNavigation();
             } else {
-                exit = userNavigation();
+                if (selectedPortfolio == null) {
+                    Help.loggedIn();
+                    exit = userNavigation();
+                } else {
+                    Help.portfolio();
+                    exit = portfolioNavigation();
+                }
             }
         }
     }
@@ -43,6 +49,7 @@ public class Navigation {
                     return false;
                 case "add":
                     addUser();
+                    save();
                     return false;
                 case "lf":
                     Securities.list();
@@ -51,7 +58,6 @@ public class Navigation {
                     priceHistory();
                     return false;
                 case "help":
-                    Help.noUser();
                     return false;
                 case "clear":
                     Help.clear();
@@ -60,6 +66,7 @@ public class Navigation {
                     save();
                     return true;
                 default:
+                    System.out.println("Invalid command, please try again.");
                     return false;
             }
         }
@@ -67,6 +74,9 @@ public class Navigation {
     }
 
     private boolean userNavigation() {
+        if (selectedPortfolio != null) {
+            return portfolioNavigation();
+        } else {
             switch (Input.stringValue()) {
                 case "selected":
                     selected();
@@ -87,39 +97,10 @@ public class Navigation {
                 case "ph":
                     priceHistory();
                     return false;
-                case "buy":
-                    if (portfolioSelected()) {
-                        selectedPortfolio.buy();
-                    }
-                    return false;
-                case "sell":
-                    if (portfolioSelected()) {
-                        selectedPortfolio.sell();
-                    }
-                    return false;
-                case "ov":
-                    if (portfolioSelected()) {
-                        selectedPortfolio.overview();
-                    }
-                    return false;
                 case "oh":
                     selectedUser.printOrderHistory();
                     return false;
-                case "compare":
-                    selectedUser.compare();
-                    return false;
-                case "hist":
-                    if (portfolioSelected()) {
-                        try {
-                            System.out.println("Enter a date. Format: YYYY-MM-DD");
-                            selectedPortfolio.valueFrom(Input.stringValue());
-                        } catch (DateTimeParseException e) {
-                            System.out.println("Input date is invalid. Please try again.");
-                        }
-                    }
-                    return false;
                 case "help":
-                    Help.loggedIn();
                     return false;
                 case "clear":
                     Help.clear();
@@ -128,6 +109,7 @@ public class Navigation {
                     System.out.println("User " + selectedUser.getUsername() + " successfully logged out!");
                     selectedUser = null;
                     selectedPortfolio = null;
+                    save();
                     Help.noUser();
                     return false;
                 case "exit":
@@ -135,17 +117,59 @@ public class Navigation {
                     return true;
                 default:
                     System.out.println("Invalid command, please try again.");
-                    Help.loggedIn();
                     return false;
             }
+        }
     }
 
-    private boolean portfolioSelected() {
-        if (selectedPortfolio == null) {
-            System.out.println("No portfolio selected, Please select one using the -select- command.");
-            return false;
-        } else {
-            return true;
+    private boolean portfolioNavigation() {
+        switch(Input.stringValue()) {
+            case "selected":
+                selected();
+                return false;
+            case "select":
+                selectPortfolio();
+                return false;
+            case "buy":
+                selectedPortfolio.buy();
+                save();
+                return false;
+            case "sell":
+                selectedPortfolio.sell();
+                save();
+                return false;
+            case "ov":
+                selectedPortfolio.overview(selectedPortfolio);
+                return false;
+            case "compare":
+                if (selectedUser.hasPortfolios()) {
+                    selectedUser.compare();
+                } else {
+                    System.out.println("Comparison is unavailable for users who own less than 2 portfolios.");
+                }
+                return false;
+            case "hist":
+                try {
+                    System.out.println("Enter a date. Format: YYYY-MM-DD");
+                    selectedPortfolio.historical(Input.stringValue());
+                } catch (DateTimeParseException e) {
+                    System.out.println("Input date is invalid. Please try again.");
+                }
+                return false;
+            case "help":
+                return false;
+            case "clear":
+                Help.clear();
+                return false;
+            case "logout":
+                selectedPortfolio = null;
+                selectedUser = null;
+                return false;
+            case "exit":
+                return true;
+            default:
+                System.out.println("Invalid command, please try again.");
+                return false;
         }
     }
 
@@ -157,7 +181,7 @@ public class Navigation {
         if (Users.contains(new User(username))) {
             System.out.println("Password: ");
             if (Users.get(username).checkPassword(Input.stringValue())) {
-                selectedUser = Users.get(username);
+                selectUser(Users.get(username));
                 selectedUser.updatePortfolios();
                 System.out.println("User " + username + " is now logged in!");
                 Help.clear();
@@ -192,7 +216,16 @@ public class Navigation {
         }
     }
 
+    /**
+     * Selects a user
+     * @param user User to be made selectedUser
+     */
+    public void selectUser(User user) {
+        this.selectedUser = user;
+    }
+
     private void selectPortfolio() {
+        selectedUser.listPortfolios();
         System.out.println("Please enter the name of the portfolio you want to select.");
         String depotName = Input.stringValue();
         if (selectedUser.hasPortfolio(depotName)) {

@@ -34,10 +34,21 @@ public class Help {
         System.out.printf(FORMAT, "lp:", "List all portfolios");
         System.out.printf(FORMAT, "lf:", "List all securities");
         System.out.printf(FORMAT, "ph:", "Select a security and show its price history");
+        System.out.printf(FORMAT, "oh:", "Displays order history");
+        System.out.printf(FORMAT, "help:", "Shows this dialog");
+        System.out.printf(FORMAT, "clear:", "Clears the console");
+        System.out.printf(FORMAT, "logout:", "Logs current user out and displays the login menu");
+        System.out.printf(FORMAT, "exit:", "Exit Stocks");
+        System.out.println();
+    }
+
+    static void portfolio() {
+        System.out.println();
+        System.out.printf(FORMAT, "selected:", "Overview of user & portfolio currently selected");
+        System.out.printf(FORMAT, "select:", "Select an existing portfolio");
         System.out.printf(FORMAT, "buy:", "Add a new position to the selected portfolio");
         System.out.printf(FORMAT, "sell:", "Reduce an existing position in the selected portfolio");
         System.out.printf(FORMAT, "ov:", "Overview of all positions in selected portfolio");
-        System.out.printf(FORMAT, "oh:", "Displays order history");
         System.out.printf(FORMAT, "compare:", "Compares two portfolios");
         System.out.printf(FORMAT, "hist:", "Shows overview with data from input date");
         System.out.printf(FORMAT, "help:", "Shows this dialog");

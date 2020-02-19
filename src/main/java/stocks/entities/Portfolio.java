@@ -19,15 +19,18 @@ public class Portfolio {
     private BigDecimal startequity;
     private List<Position> positions = new LinkedList<>();
     public transient List<Security> ownedSecurities = new LinkedList<>();
+    public List<Portfolio> history = new LinkedList<>();
+    public LocalDate state;
 
     /**
      * Constructor for setting up a portfolio without equity
      * @param name Name
      * @param owner Owner
      */
-    public Portfolio(String name, String owner) {
+    public Portfolio(String name, String owner, LocalDate state) {
         this.name = name;
         this.owner = owner;
+        this.state = state;
     }
 
     /**
@@ -41,6 +44,7 @@ public class Portfolio {
         this.equity = equity;
         this.owner = owner;
         this.startequity = equity;
+        this.state = LocalDate.now();
     }
 
     // Copy constructor to for historical view of portfolio
@@ -51,6 +55,8 @@ public class Portfolio {
         this.startequity = portfolio.startequity;
         this.positions = portfolio.positions;
         this.ownedSecurities = portfolio.ownedSecurities;
+        this.history = portfolio.history;
+        this.state = portfolio.state;
     }
 
     public String getName() {
@@ -71,6 +77,10 @@ public class Portfolio {
      */
     public BigDecimal getStartEquity() {
         return startequity;
+    }
+
+    public String getState() {
+        return state.toString();
     }
 
     /**
@@ -141,11 +151,11 @@ public class Portfolio {
     /**
      * Displays data of all existing positions in the portfolio to the console
      */
-    public void positions() {
+    public void positions(Portfolio portfolio) {
         System.out.println();
         System.out.printf("%-12s %-10s %-18s %-16s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Type", "Price", "Value", "Execution");
         System.out.println();
-        for (Position position : positions) {
+        for (Position position : portfolio.positions) {
             System.out.printf("%-12s %-10d %-18s %-16s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurityName(), position.getSecurityType(), position.getPrice(),  position.getValue(), position.getExecutionDate());
         }
         System.out.println();
@@ -193,71 +203,89 @@ public class Portfolio {
      *  - equity available in portfolio
      *  - combined value of all assets
      */
-    public void overview() {
-        positions();
+    public void overview(Portfolio portfolio) {
+        portfolio.positions(portfolio);
         String format = "%-45s %10.2f EUR%n";
-        System.out.printf(format, "Combined value of positions: ",  getPositionValue());
-        System.out.printf(format, "Equity currently available in portfolio: ", getEquity());
-        System.out.printf(format, "Combined value of all assets: ", getValue());
+        System.out.printf(format, "Combined value of positions: ",  portfolio.getPositionValue());
+        System.out.printf(format, "Equity currently available in portfolio: ", portfolio.getEquity());
+        System.out.printf(format, "Combined value of all assets: ", portfolio.getValue());
         System.out.println();
     }
 
-    private void historicalOverview() {
-        positions();
-        String format = "%-45s %10.2f EUR%n";
-        System.out.printf(format, "Combined value of positions today: ",  getPositionValue());
-        System.out.printf(format, "Equity currently available in portfolio at start: ", getEquity());
-        System.out.printf(format, "Combined value of all assets at start: ", getValue());
-        BigDecimal gain = getValue().subtract(getStartEquity());
-        BigDecimal gainPercent = gain.divide(getStartEquity(), 4, RoundingMode.HALF_UP).multiply(new BigDecimal(Double.toString(100)));
-        if (Double.parseDouble(gain.toString()) >= 0) {
-            System.out.println("Portfolio " + name + " would have decreased " + getValue().subtract(getStartEquity()) + " EUR (" + gainPercent + "%) in value had it been started with current positions at the given date.");
+    /**
+     * Updates all positions to the most recent prices available and adds current state of Portfolio to history List
+     */
+    public void update() {
+        this.state = LocalDate.now();
+        if (!history.contains(new Portfolio(this))) {
+            history.add(new Portfolio(this));
+            updatePrices();
         } else {
-            System.out.println("Portfolio " + name + " would have increased " + getValue().subtract(getStartEquity()) + " EUR (" + gainPercent + "%) in value had it been started with current positions at the given date.");
+            updatePrices();
         }
     }
 
-    /**
-     * Updates all positions to the most recent prices available
-     */
-    public void update() {
+    private void updatePrices() {
         loadOwnedSecurities();
-            for (Position position : positions) {
-                Security positionSecurity = position.getSecurity();
-                if (Securities.contains(positionSecurity)) {
-                    Security instanceSecurity = Securities.get(Securities.indexOf(positionSecurity));
-                    SpotPrice positionSpotPrice = positionSecurity.getSpotPrice();
-                    SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
-                    if (!positionSpotPrice.equals(instanceSpotPrice)) {
-                        positionSecurity.setSpotPrice(instanceSpotPrice);
-                    }
+        for (Position position : positions) {
+            Security positionSecurity = position.getSecurity();
+            if (Securities.contains(positionSecurity)) {
+                Security instanceSecurity = Securities.get(Securities.indexOf(positionSecurity));
+                SpotPrice positionSpotPrice = positionSecurity.getSpotPrice();
+                SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
+                if (!positionSpotPrice.equals(instanceSpotPrice)) {
+                    positionSecurity.setSpotPrice(instanceSpotPrice);
                 }
             }
-            for (Security security : ownedSecurities) {
-                if (Securities.contains(security)) {
-                    Security instanceSecurity = Securities.get(Securities.indexOf(security));
-                    SpotPrice positionSpotPrice = security.getSpotPrice();
-                    SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
-                    if (!positionSpotPrice.equals(instanceSpotPrice)) {
-                        security.setSpotPrice(instanceSpotPrice);
-                    }
+        }
+        for (Security security : ownedSecurities) {
+            if (Securities.contains(security)) {
+                Security instanceSecurity = Securities.get(Securities.indexOf(security));
+                SpotPrice positionSpotPrice = security.getSpotPrice();
+                SpotPrice instanceSpotPrice = instanceSecurity.getSpotPrice();
+                if (!positionSpotPrice.equals(instanceSpotPrice)) {
+                    security.setSpotPrice(instanceSpotPrice);
                 }
             }
+        }
     }
 
     /**
      * Sets prices in the portfolio to those of a certain date
      * @param date Date to which the prices should be set
      */
-    public void valueFrom(String date) {
+    public void historical(String date) {
         loadOwnedSecurities();
-        for (Security security : ownedSecurities) {
-            security.priceFrom(date);
+        Portfolio portfolio = getHistoricalPortfolio(date);
+        if (portfolio.name.equals("ERROR")) {
+            if (portfolio.history.isEmpty()) {
+                System.out.println("Error: Portfolio did not exist at that date.");
+            } else {
+                System.out.println("Error: Portfolio did not exist at " + portfolio.history.get(0).getState() + ".");
+            }
+        } else {
+            overview(portfolio);
+            for (Security security : portfolio.ownedSecurities) {
+                security.correctPrice();
+            }
         }
-        historicalOverview();
-        for (Security security : ownedSecurities) {
-            security.correctPrice();
+    }
+
+    /**
+     * Gets a historical State of the portfolio.
+     * @param date Date of which the portfolio should be retrieved
+     * @return Portfolio at state of the date
+     */
+    public Portfolio getHistoricalPortfolio(String date) {
+        int portfolioIndex = history.indexOf(new Portfolio(getName(), owner, LocalDate.parse(date)));
+        if (portfolioIndex != -1) {
+            Portfolio portfolio = history.get(portfolioIndex);
+            for (Security security : portfolio.ownedSecurities) {
+                security.priceFrom(date);
+            }
+            return portfolio;
         }
+        return new Portfolio("ERROR", "ERROR", LocalDate.parse("1970-01-01"));
     }
 
     /**
@@ -337,7 +365,8 @@ public class Portfolio {
         if (o == null || getClass() != o.getClass()) return false;
         Portfolio portfolio = (Portfolio) o;
         return Objects.equals(name, portfolio.name) &&
-                Objects.equals(owner, portfolio.owner);
+                Objects.equals(owner, portfolio.owner) &&
+                Objects.equals(state, portfolio.state);
     }
 
     @Override
