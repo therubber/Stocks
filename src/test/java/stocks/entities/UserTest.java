@@ -18,7 +18,7 @@ class UserTest {
     @BeforeEach
     void setUp() {
         Securities.load();
-        user = new User("user");
+        user = new User("user", "password");
         order = new Order(5, LocalDate.now(), "BUY", Securities.get("UniRAK"));
         portfolio = new Portfolio("test", "user", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP));
         user.addPortfolio(portfolio);

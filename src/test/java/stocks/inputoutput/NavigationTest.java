@@ -30,8 +30,8 @@ class NavigationTest {
 
         @Test
         void testAdd() {
-            Users.add(new User("user"));
-            assertTrue(Users.contains(new User("user")));
+            Users.add(new User("user", "password"));
+            assertTrue(Users.contains(new User("user", "password")));
         }
 
         @Test
@@ -90,7 +90,7 @@ class NavigationTest {
 
     @Test
     void testPortfolio() {
-        Users.add(new User("testUser"));
+        Users.add(new User("testUser", "password"));
         Portfolio portfolio = new Portfolio("test", "testUser", new BigDecimal(5000));
         portfolio.orderInput(new Order(5, LocalDate.now(), "BUY", Securities.get("UniRAK")));
         assertEquals(new Position(5, Securities.get("UniRAK")), portfolio.getPosition(0));

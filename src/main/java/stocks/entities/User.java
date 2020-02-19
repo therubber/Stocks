@@ -23,6 +23,11 @@ public class User {
         this.username = username;
     }
 
+    /**
+     * Regular constructor to be used
+     * @param username String username to create user with
+     * @param password Password to set for user
+     */
     public User(String username, String password) {
         this.equity = new BigDecimal(Integer.toString(10000)).setScale(2, RoundingMode.HALF_UP);
         this.username = username;

@@ -23,7 +23,7 @@ class PortfolioTest {
 
     @BeforeEach
     void setUp() {
-        Users.add(new User("testUser"));
+        Users.add(new User("testUser", "password"));
         portfolio = new Portfolio("test", "testUser", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP));
         securityDow = new Security("UniRAK");
         order = new Order(1, LocalDate.now(), "BUY", securityDow);
@@ -47,7 +47,7 @@ class PortfolioTest {
     }
 
     @Test
-    void addPosition() throws URISyntaxException, IOException {
+    void addPosition() {
         portfolio.orderInput(order);
         assertEquals(new BigDecimal(Double.toString(275.86)).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
         assertEquals(1, portfolio.getPositionCount());
@@ -76,7 +76,7 @@ class PortfolioTest {
 
     @Test
     void getPositionValue() {
-        assertEquals(new BigDecimal(137.93).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
+        assertEquals(new BigDecimal(Double.toString(137.93)).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
     }
 
     @Test
