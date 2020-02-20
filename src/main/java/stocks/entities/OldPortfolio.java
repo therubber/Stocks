@@ -14,7 +14,7 @@ public class OldPortfolio {
     public OldPortfolio(Portfolio portfolio) {
         this.equity = portfolio.getEquity();
         this.state = portfolio.state;
-        for (Object position : portfolio) {
+        for (Position position : portfolio) {
             this.positions.add((Position) position);
         }
     }
