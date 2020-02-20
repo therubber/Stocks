@@ -26,7 +26,7 @@ class SecurityTest {
 
     @Test
     void getSpotPrice() {
-        assertEquals(new SpotPrice(137.93, LocalDate.parse("2020-02-13")), security.getSpotPrice());
+        assertEquals(new SpotPrice(138.33, LocalDate.parse("2020-02-19")), security.getSpotPrice());
     }
 
     @Test
@@ -37,6 +37,6 @@ class SecurityTest {
 
     @Test
     void getSpotDate() {
-        assertEquals(LocalDate.parse("2020-02-13"), security.getSpotDate());
+        assertEquals(LocalDate.parse("2020-02-19"), security.getSpotDate());
     }
 }

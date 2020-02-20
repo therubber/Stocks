@@ -44,7 +44,7 @@ class PositionTest {
 
     @Test
     void getSpotPrice() {
-        SpotPrice spotPrice = new SpotPrice(137.93, LocalDate.parse("2020-02-13"));
+        SpotPrice spotPrice = new SpotPrice(138.33, LocalDate.parse("2020-02-19"));
         assertEquals(spotPrice, position.getSpotPrice());
     }
 

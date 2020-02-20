@@ -2,6 +2,7 @@ package stocks.entities;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import stocks.repo.Securities;
 import stocks.repo.Users;
 
 import java.io.IOException;
@@ -23,11 +24,11 @@ class PortfolioTest {
 
     @BeforeEach
     void setUp() {
+        Securities.load();
+        securityDow = Securities.get("UniRAK");
         Users.add(new User("testUser", "password"));
         portfolio = new Portfolio("test", "testUser", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP));
-        securityDow = new Security("UniRAK");
         order = new Order(1, LocalDate.now(), "BUY", securityDow);
-        securityDow.update();
         portfolio.orderInput(order);
     }
 
@@ -38,7 +39,7 @@ class PortfolioTest {
 
     @Test
     void getEquity() {
-        assertEquals(new BigDecimal(Double.toString(4862.07)).setScale(2, RoundingMode.HALF_UP), portfolio.getEquity());
+        assertEquals(new BigDecimal(Double.toString(4861.67)).setScale(2, RoundingMode.HALF_UP), portfolio.getEquity());
     }
 
     @Test
@@ -49,7 +50,7 @@ class PortfolioTest {
     @Test
     void addPosition() {
         portfolio.orderInput(order);
-        assertEquals(new BigDecimal(Double.toString(275.86)).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
+        assertEquals(new BigDecimal(Double.toString(276.66)).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
         assertEquals(1, portfolio.getPositionCount());
     }
 
@@ -76,13 +77,20 @@ class PortfolioTest {
 
     @Test
     void getPositionValue() {
-        assertEquals(new BigDecimal(Double.toString(137.93)).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
+        assertEquals(new BigDecimal(Double.toString(138.33)).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
     }
 
     @Test
     void loadOwnedSecurities() {
-        // test
         portfolio.loadOwnedSecurities();
         assertTrue(portfolio.contains("UniRAK"));
+    }
+
+    @Test
+    void orderInput() {
+        Position position = portfolio.getPosition(0);
+        assertEquals(1, position.getCount());
+        portfolio.orderInput(new Order(1, LocalDate.now(), "SELL", securityDow));
+        assertEquals(0, portfolio.getPositionCount());
     }
 }

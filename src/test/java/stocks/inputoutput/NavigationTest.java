@@ -81,10 +81,10 @@ class NavigationTest {
         @Test
         void testUpdatePrices() {
             Securities.updatePrices();
-            assertEquals(new BigDecimal(Double.toString(137.93)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniRAK).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(Double.toString(80.76)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniAsia).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(Double.toString(57.45)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniEuroAnleihen).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(Double.toString(90.55)).setScale(2, RoundingMode.HALF_UP), Securities.get(GenoAs).getSpotPrice().getPrice());
+            assertEquals(new BigDecimal(Double.toString(138.33)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniRAK).getSpotPrice().getPrice());
+            assertEquals(new BigDecimal(Double.toString(80.59)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniAsia).getSpotPrice().getPrice());
+            assertEquals(new BigDecimal(Double.toString(57.64)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniEuroAnleihen).getSpotPrice().getPrice());
+            assertEquals(new BigDecimal(Double.toString(91.68)).setScale(2, RoundingMode.HALF_UP), Securities.get(GenoAs).getSpotPrice().getPrice());
         }
     }
 

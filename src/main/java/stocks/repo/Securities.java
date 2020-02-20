@@ -24,10 +24,6 @@ public class Securities {
         return securityList.get(index);
     }
 
-    public static List<Security> getAll() {
-        return securityList;
-    }
-
     public static boolean contains(Security security) {
         return securityList.contains(security);
     }

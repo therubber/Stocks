@@ -18,7 +18,7 @@ public class Portfolio {
     public String owner;
     private BigDecimal startequity;
     private List<Position> positions = new LinkedList<>();
-    public transient List<Security> ownedSecurities = new LinkedList<>();
+    public List<Security> ownedSecurities = new LinkedList<>();
     public List<Portfolio> history = new LinkedList<>();
     public LocalDate state;
 
@@ -99,7 +99,15 @@ public class Portfolio {
                     equity = equity.subtract(order.getValue());
                 } else {
                     orderPosition.setCount(orderPosition.getCount() - order.getCount());
+                    if (orderPosition.isZero()) {
+                        Position positionToRemove = new Position(order.getSecurity());
+                        positions.remove(positionToRemove);
+                        ownedSecurities.remove(positionToRemove.getSecurity());
+                    }
                     equity = equity.add(order.getValue());
+                }
+                if (!ownedSecurities.contains(position.getSecurity())) {
+                    ownedSecurities.add(position.getSecurity());
                 }
                 System.out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
             }
@@ -113,6 +121,9 @@ public class Portfolio {
         if (order.getType().equals("BUY")) {
             positions.add(new Position(order));
             equity = equity.subtract(order.getValue());
+            if (!ownedSecurities.contains(order.getSecurity())) {
+                ownedSecurities.add(order.getSecurity());
+            }
         } else {
             if (order.getCount() < getPosition(positions.indexOf(new Position(order.getSecurity()))).getCount()) {
                 equity = equity.add(order.getValue());
@@ -182,7 +193,6 @@ public class Portfolio {
     }
 
     void loadOwnedSecurities() {
-        ownedSecurities = new LinkedList<>();
         for (Position position : positions) {
             ownedSecurities.add(position.getSecurity());
         }
@@ -276,7 +286,7 @@ public class Portfolio {
      * @param date Date of which the portfolio should be retrieved
      * @return Portfolio at state of the date
      */
-    public Portfolio getHistoricalPortfolio(String date) {
+    private Portfolio getHistoricalPortfolio(String date) {
         int portfolioIndex = history.indexOf(new Portfolio(getName(), owner, LocalDate.parse(date)));
         if (portfolioIndex != -1) {
             Portfolio portfolio = history.get(portfolioIndex);
@@ -300,9 +310,6 @@ public class Portfolio {
                 if (Help.confirmOrder(position, true)) {
                     Order order = new Order(position.getCount(), LocalDate.now(), "BUY", position.getSecurity());
                     orderInput(order);
-                    if (!ownedSecurities.contains(position.getSecurity())) {
-                        ownedSecurities.add(position.getSecurity());
-                    }
                 } else {
                     System.out.println("Buy order cancelled, back to menu.");
                 }
@@ -353,6 +360,24 @@ public class Portfolio {
             System.out.println("Invalid index. Please try again.");
         }
     }
+
+    /**
+     * Shows what gains have been made in  a certain timeframe
+     */
+    public void histGains() {
+        System.out.println("Please enter a date for the beginning of the timeframe:");
+        String start = Input.stringValue();
+        Portfolio compare = getHistoricalPortfolio(start);
+        BigDecimal gain = getValue().subtract(compare.getValue());
+        BigDecimal gainPercent = gain.divide(compare.getStartEquity(),5, RoundingMode.HALF_UP).multiply(new BigDecimal(Integer.toString(100)));
+        if (gain.doubleValue() > 0) {
+            System.out.println("Portfolio has increased " + gain.toString() + " EUR or " + gainPercent + "% in value");
+        } else {
+            System.out.println("Portfolio has decreased " + gain.multiply(new BigDecimal(Integer.toString(-1))).toString() + " EUR or " + gainPercent + "% in value");
+        }
+    }
+
+
 
     @Override
     public String toString() {

@@ -28,7 +28,7 @@ class OrderTest {
 
     @Test
     void getExecutionPrice() {
-        assertEquals(new BigDecimal(Double.toString(137.93)).setScale(2, RoundingMode.HALF_UP), order.getExecutionPrice());
+        assertEquals(new BigDecimal(Double.toString(138.33)).setScale(2, RoundingMode.HALF_UP), order.getExecutionPrice());
     }
 
     @Test
