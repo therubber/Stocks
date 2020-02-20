@@ -7,12 +7,9 @@ import stocks.repo.UserRepo;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.InputMismatchException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-public class Portfolio {
+public class Portfolio implements Iterable<Position> {
 
     private String name;
     private BigDecimal equity;
@@ -47,17 +44,6 @@ public class Portfolio {
         this.state = LocalDate.now();
     }
 
-    // Copy constructor to for historical view of portfolio
-    private Portfolio(Portfolio portfolio) {
-        this.name = portfolio.name;
-        this.owner = portfolio.owner;
-        this.equity = portfolio.equity;
-        this.startequity = portfolio.startequity;
-        this.positions = portfolio.positions;
-        this.ownedSecurities = portfolio.ownedSecurities;
-        this.state = portfolio.state;
-    }
-
     public String getName() {
         return name;
     }
@@ -76,10 +62,6 @@ public class Portfolio {
      */
     public BigDecimal getStartEquity() {
         return startequity;
-    }
-
-    public String getState() {
-        return state.toString();
     }
 
     /**
@@ -163,11 +145,11 @@ public class Portfolio {
     /**
      * Displays data of all existing positions in the portfolio to the console
      */
-    public void positions(Portfolio portfolio) {
+    public void positions() {
         System.out.println();
         System.out.printf("%-12s %-10s %-18s %-16s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Type", "Price", "Value", "Execution");
         System.out.println();
-        for (Position position : portfolio.positions) {
+        for (Position position : positions) {
             System.out.printf("%-12s %-10d %-18s %-16s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurityName(), position.getSecurityType(), position.getPrice(),  position.getValue(), position.getExecutionDate());
         }
         System.out.println();
@@ -217,7 +199,7 @@ public class Portfolio {
      *  - combined value of all assets
      */
     public void overview(Portfolio portfolio) {
-        portfolio.positions(portfolio);
+        portfolio.positions();
         String format = "%-45s %10.2f EUR%n";
         System.out.printf(format, "Combined value of positions: ",  portfolio.getPositionValue());
         System.out.printf(format, "Equity currently available in portfolio: ", portfolio.getEquity());
@@ -316,6 +298,10 @@ public class Portfolio {
         } else {
             System.out.println("Invalid index. Please try again.");
         }
+    }
+
+    public Iterator<Position> iterator() {
+        return positions.iterator();
     }
 
     @Override
