@@ -1,6 +1,7 @@
 package stocks.entities;
 
 import stocks.inputoutput.Input;
+import stocks.repo.SecurityRepo;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -183,9 +184,9 @@ public class User {
     /**
      * Updates all portfolios owned by the user to the most recent prices
      */
-    public void updatePortfolios() {
+    public void updatePortfolios(SecurityRepo securityRepo) {
         for (Portfolio portfolio : portfolios) {
-            portfolio.update(portfolio.ownedSecurities);
+            portfolio.update(securityRepo);
         }
     }
 

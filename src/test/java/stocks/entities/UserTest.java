@@ -3,6 +3,8 @@ package stocks.entities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import stocks.repo.SecurityRepo;
+import stocks.repo.UserRepo;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -14,16 +16,18 @@ class UserTest {
     User user;
     Order order;
     Portfolio portfolio;
+    UserRepo users;
 
     @BeforeEach
     void setUp() {
+        users.load();
         SecurityRepo securityRepo = new SecurityRepo();
         securityRepo.load();
         user = new User("user", "password");
         order = new Order(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK"));
         portfolio = new Portfolio("test", "user", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP));
         user.addPortfolio(portfolio);
-        portfolio.orderInput(order);
+        portfolio.orderInput(order, users);
     }
     @Test
     void getUsername() {

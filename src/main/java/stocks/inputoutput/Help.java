@@ -51,7 +51,7 @@ public class Help {
         System.out.printf(FORMAT, "ov:", "Overview of all positions in selected portfolio");
         System.out.printf(FORMAT, "oh:", "Displays order history");
         System.out.printf(FORMAT, "compare:", "Compares two portfolios");
-        System.out.printf(FORMAT, "hist:", "Shows overview with data from input date");
+        // System.out.printf(FORMAT, "hist:", "Shows overview with data from input date");
         System.out.printf(FORMAT, "help:", "Shows this dialog");
         System.out.printf(FORMAT, "clear:", "Clears the console");
         System.out.printf(FORMAT, "logout:", "Logs current user out and displays the login menu");

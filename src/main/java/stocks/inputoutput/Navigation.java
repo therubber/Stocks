@@ -5,20 +5,19 @@ import stocks.entities.User;
 import stocks.entities.Security;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
-
-import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 
 public class Navigation {
 
     private transient User selectedUser;
     private transient Portfolio selectedPortfolio;
-    private static transient SecurityRepo available = new SecurityRepo();
+    private static transient SecurityRepo availableSecurities = new SecurityRepo();
+    private static UserRepo users = new UserRepo();
 
     public static void main(String[] args) {
         Navigation instance = new Navigation();
-        available.load();
-        UserRepo.load();
+        availableSecurities.load();
+        users.load();
         instance.navigation();
     }
 
@@ -50,10 +49,9 @@ public class Navigation {
                     return false;
                 case "add":
                     addUser();
-                    save();
                     return false;
                 case "lf":
-                    available.list();
+                    availableSecurities.list();
                     return false;
                 case "ph":
                     priceHistory();
@@ -64,7 +62,7 @@ public class Navigation {
                     Help.clear();
                     return false;
                 case "exit":
-                    save();
+                    users.save();
                     return true;
                 default:
                     System.out.println("Invalid command, please try again.");
@@ -87,13 +85,13 @@ public class Navigation {
                     return false;
                 case "add":
                     selectedUser.addPortfolio();
-                    save();
+                    users.save();
                     return false;
                 case "lp":
                     selectedUser.listPortfolios();
                     return false;
                 case "lf":
-                    available.list();
+                    availableSecurities.list();
                     return false;
                 case "ph":
                     priceHistory();
@@ -110,11 +108,11 @@ public class Navigation {
                     System.out.println("User " + selectedUser.getUsername() + " successfully logged out!");
                     selectedUser = null;
                     selectedPortfolio = null;
-                    save();
+                    users.save();
                     Help.noUser();
                     return false;
                 case "exit":
-                    save();
+                    users.save();
                     return true;
                 default:
                     System.out.println("Invalid command, please try again.");
@@ -132,15 +130,24 @@ public class Navigation {
                 selectPortfolio();
                 return false;
             case "buy":
-                selectedPortfolio.buy(available);
-                save();
+                selectedPortfolio.buy(availableSecurities, users);
+                users.save();
                 return false;
             case "sell":
-                selectedPortfolio.sell();
-                save();
+                selectedPortfolio.sell(users);
+                users.save();
                 return false;
             case "ov":
                 selectedPortfolio.overview(selectedPortfolio);
+                return false;
+            case "lp":
+                selectedUser.listPortfolios();
+                return false;
+            case "lf":
+                availableSecurities.list();
+                return false;
+            case "ph":
+                priceHistory();
                 return false;
             case "oh":
                 selectedUser.printOrderHistory();
@@ -150,14 +157,6 @@ public class Navigation {
                     selectedUser.compare();
                 } else {
                     System.out.println("Comparison is unavailable for users who own less than 2 portfolios.");
-                }
-                return false;
-            case "hist":
-                try {
-                    System.out.println("Enter a date. Format: YYYY-MM-DD");
-                    selectedPortfolio.historical(Input.stringValue());
-                } catch (DateTimeParseException e) {
-                    System.out.println("Input date is invalid. Please try again.");
                 }
                 return false;
             case "help":
@@ -170,6 +169,7 @@ public class Navigation {
                 selectedUser = null;
                 return false;
             case "exit":
+                users.save();
                 return true;
             default:
                 System.out.println("Invalid command, please try again.");
@@ -177,16 +177,12 @@ public class Navigation {
         }
     }
 
-    private void save() {
-        UserRepo.save();
-    }
-
     private void login(String username) {
-        if (UserRepo.contains(new User(username))) {
+        if (users.contains(new User(username))) {
             System.out.println("Password: ");
-            if (UserRepo.get(username).checkPassword(Input.stringValue())) {
-                selectUser(UserRepo.get(username));
-                selectedUser.updatePortfolios();
+            if (users.get(username).checkPassword(Input.stringValue())) {
+                selectUser(users.get(username));
+                selectedUser.updatePortfolios(availableSecurities);
                 System.out.println("User " + username + " is now logged in!");
                 Help.clear();
             } else {
@@ -200,15 +196,15 @@ public class Navigation {
     private void addUser() {
         System.out.println("Enter a username to create a new user: ");
         String username = Input.stringValue();
-        if (!UserRepo.contains(username)) {
+        if (!users.contains(username)) {
             System.out.println("Please enter a password: ");
-            UserRepo.add(new User(username, Input.stringValue()));
+            users.add(new User(username, Input.stringValue()));
             System.out.println("New user " + username + " has been created!");
             login(username);
         } else {
             System.out.println("User with that username already exists, please login.");
         }
-        UserRepo.save();
+        users.save();
     }
 
     private void selected() {
@@ -241,14 +237,14 @@ public class Navigation {
     }
 
     private void priceHistory() {
-        available.listIndexed();
+        availableSecurities.listIndexed();
         System.out.println("Enter the index of the Security whose price history you want to display or 0 to exit:");
         try {
             int index = Input.intValue();
             if (index == 0) {
                 System.out.println("Going back to main menu...");
-            } else if (index <= available.size()) {
-                Security selectedSecurity = available.get(index - 1);
+            } else if (index <= availableSecurities.size()) {
+                Security selectedSecurity = availableSecurities.get(index - 1);
                 selectedSecurity.priceHistory();
             } else {
                 System.out.println("Index invalid. Please try again.");

@@ -9,41 +9,42 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserRepoTest {
 
     static User user = new User("test");
+    static UserRepo users = new UserRepo();
 
     @BeforeAll
     static void setUp() {
-        UserRepo.add(user);
+        users.add(user);
     }
 
     @Test
     void get() {
-        assertEquals(user, UserRepo.get("test"));
+        assertEquals(user, users.get("test"));
     }
 
     @Test
     void getAll() {
-        assertTrue(UserRepo.contains(new User("test")));
+        assertTrue(users.contains(new User("test")));
     }
 
     @Test
     void contains() {
-        assertTrue(UserRepo.contains(new User("test")));
+        assertTrue(users.contains(new User("test")));
     }
 
     @Test
     void testContains() {
-        assertFalse(UserRepo.contains("asdfasdf"));
-        assertTrue(UserRepo.contains(user));
+        assertFalse(users.contains("asdfasdf"));
+        assertTrue(users.contains(user));
     }
 
     @Test
     void indexOf() {
-        UserRepo.add(new User("user"));
-        assertEquals(1, UserRepo.indexOf(new User("user")));
+        users.add(new User("user"));
+        assertEquals(1, users.indexOf(new User("user")));
     }
 
     @Test
     void isEmpty() {
-        assertFalse(UserRepo.isEmpty());
+        assertFalse(users.isEmpty());
     }
 }

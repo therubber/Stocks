@@ -17,15 +17,17 @@ class PortfolioTest {
     Security securityDow;
     Order order;
     SecurityRepo securityRepo;
+    UserRepo users;
 
     @BeforeEach
     void setUp() {
         securityRepo.load();
+        users.load();
         securityDow = securityRepo.get("UniRAK");
-        UserRepo.add(new User("testUser", "password"));
+        users.add(new User("testUser", "password"));
         portfolio = new Portfolio("test", "testUser", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP));
         order = new Order(1, LocalDate.now(), "BUY", securityDow);
-        portfolio.orderInput(order);
+        portfolio.orderInput(order, users);
     }
 
     @Test
@@ -45,7 +47,7 @@ class PortfolioTest {
 
     @Test
     void addPosition() {
-        portfolio.orderInput(order);
+        portfolio.orderInput(order, users);
         assertEquals(new BigDecimal(Double.toString(276.66)).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
         assertEquals(1, portfolio.getPositionCount());
     }
@@ -86,7 +88,7 @@ class PortfolioTest {
     void orderInput() {
         Position position = portfolio.getPosition(0);
         assertEquals(1, position.getCount());
-        portfolio.orderInput(new Order(1, LocalDate.now(), "SELL", securityDow));
+        portfolio.orderInput(new Order(1, LocalDate.now(), "SELL", securityDow), users);
         assertEquals(0, portfolio.getPositionCount());
     }
 }

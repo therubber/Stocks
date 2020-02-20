@@ -19,8 +19,7 @@ public class Portfolio {
     public String owner;
     private BigDecimal startequity;
     private List<Position> positions = new LinkedList<>();
-    public SecurityRepo ownedSecurities = new SecurityRepo();
-    public List<Portfolio> history = new LinkedList<>();
+    public transient SecurityRepo ownedSecurities = new SecurityRepo();
     public LocalDate state;
 
     /**
@@ -56,7 +55,6 @@ public class Portfolio {
         this.startequity = portfolio.startequity;
         this.positions = portfolio.positions;
         this.ownedSecurities = portfolio.ownedSecurities;
-        this.history = portfolio.history;
         this.state = portfolio.state;
     }
 
@@ -87,11 +85,11 @@ public class Portfolio {
     /**
      * Adds a position to the portfolio or increases one if it already exists
      */
-    public void orderInput(Order order) {
+    public void orderInput(Order order, UserRepo users) {
         Position position = new Position(order);
         if (!positions.isEmpty()) {
             if (!positions.contains(position)) {
-                UserRepo.get(owner).addOrderToHistory(order);
+                users.get(owner).addOrderToHistory(order);
                 executeOrder(order);
             } else {
                 Position orderPosition = positions.get(positions.indexOf(position));
@@ -106,7 +104,7 @@ public class Portfolio {
                         ownedSecurities.remove(positionToRemove.getSecurity());
                     }
                     equity = equity.add(order.getValue());
-                    UserRepo.get(owner).addOrderToHistory(order);
+                    users.get(owner).addOrderToHistory(order);
                 }
                 if (!ownedSecurities.contains(position.getSecurity())) {
                     ownedSecurities.add(position.getSecurity());
@@ -114,7 +112,7 @@ public class Portfolio {
                 System.out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
             }
         } else {
-            UserRepo.get(owner).addOrderToHistory(order);
+            users.get(owner).addOrderToHistory(order);
             executeOrder(order);
         }
     }
@@ -126,14 +124,15 @@ public class Portfolio {
             if (!ownedSecurities.contains(order.getSecurity())) {
                 ownedSecurities.add(order.getSecurity());
             }
+            System.out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
         } else {
             if (order.getCount() < getPosition(positions.indexOf(new Position(order.getSecurity()))).getCount()) {
                 equity = equity.add(order.getValue());
+                System.out.println("Sell order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
             } else {
                 System.out.println("Cannot sell more than you own. Please try again.");
             }
         }
-        System.out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
     }
 
     /**
@@ -195,7 +194,7 @@ public class Portfolio {
     }
 
     void loadOwnedSecurities() {
-        ownedSecurities.clear();
+        ownedSecurities = new SecurityRepo();
         for (Position position : positions) {
             position.getSecurity().update();
             ownedSecurities.add(position.getSecurity());
@@ -231,9 +230,6 @@ public class Portfolio {
      */
     public void update(SecurityRepo securityRepo) {
         this.state = LocalDate.now();
-        if (!history.contains(new Portfolio(this))) {
-            history.add(new Portfolio(this));
-        }
         updatePrices(securityRepo);
     }
 
@@ -241,7 +237,7 @@ public class Portfolio {
         loadOwnedSecurities();
         for (Position position : positions) {
             Security positionSecurity = position.getSecurity();
-            if (securityRepo.contains(positionSecurity)) {
+            if (ownedSecurities.contains(positionSecurity)) {
                 Security instanceSecurity = securityRepo.get(securityRepo.indexOf(positionSecurity));
                 instanceSecurity.update();
                 SpotPrice positionSpotPrice = positionSecurity.getSpotPrice();
@@ -254,44 +250,9 @@ public class Portfolio {
     }
 
     /**
-     * Sets prices in the portfolio to those of a certain date
-     * @param date Date to which the prices should be set
-     */
-    public void historical(String date) {
-        loadOwnedSecurities();
-        Portfolio portfolio = getHistoricalPortfolio(date);
-        if (portfolio.name.equals("ERROR")) {
-            if (portfolio.history.isEmpty()) {
-                System.out.println("Error: Portfolio did not exist at that date.");
-            } else {
-                System.out.println("Error: Portfolio did not exist at " + portfolio.history.get(0).getState() + ".");
-            }
-        } else {
-            overview(portfolio);
-        }
-    }
-
-    /**
-     * Gets a historical State of the portfolio.
-     * @param date Date of which the portfolio should be retrieved
-     * @return Portfolio at state of the date
-     */
-    private Portfolio getHistoricalPortfolio(String date) {
-        int portfolioIndex = history.indexOf(new Portfolio(getName(), owner, LocalDate.parse(date)));
-        if (portfolioIndex != -1) {
-            Portfolio portfolio = history.get(portfolioIndex);
-            for (Security security : portfolio.ownedSecurities) {
-                security.priceFrom(date);
-            }
-            return portfolio;
-        }
-        return new Portfolio("ERROR", "ERROR", LocalDate.parse("1970-01-01"));
-    }
-
-    /**
      * Used to buy securities and add the position to the portfolio
      */
-    public void buy(SecurityRepo securityRepo) {
+    public void buy(SecurityRepo securityRepo, UserRepo users) {
         if (securityRepo.evaluateSpotPrices()) {
             Position position = selectionBuy(securityRepo);
             if (position.getValue().doubleValue() <= equity.doubleValue() && !position.getIsin().equals("ERROR")) {
@@ -299,14 +260,13 @@ public class Portfolio {
                 System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", getEquity(), equityAfterExecution);
                 if (Help.confirmOrder(position, true)) {
                     Order order = new Order(position.getCount(), LocalDate.now(), "BUY", position.getSecurity());
-                    orderInput(order);
+                    orderInput(order, users);
                 } else {
                     System.out.println("Buy order cancelled, back to menu.");
                 }
             } else {
                 System.out.println("Insufficient balance! Please try ordering fewer shares.");
             }
-            UserRepo.save();
         } else {
             System.out.println("Spot prices were not updated properly. Please try again later.");
         }
@@ -332,7 +292,7 @@ public class Portfolio {
     /**
      * Used to reduce a position in the selected portfolio
      */
-    public void sell() {
+    public void sell(UserRepo users) {
         ownedSecurities.listIndexed();
         System.out.println("Please select the security you want to sell by entering its index.");
         int index = Input.intValue();
@@ -340,11 +300,15 @@ public class Portfolio {
             Security selectedSecurity = ownedSecurities.get(index - 1);
             if (ownedSecurities.contains(selectedSecurity)) {
                 System.out.println("Enter the amount of shares you want to reduce the position by: ");
-                int sellCount = Input.intValue();
-                Order order = new Order(sellCount, LocalDate.now(), "SELL", selectedSecurity);
-                Position position = new Position(order);
-                if (Help.confirmOrder(position, false)) {
-                    orderInput(order);
+                try {
+                    int sellCount = Input.intValue();
+                    Order order = new Order(sellCount, LocalDate.now(), "SELL", selectedSecurity);
+                    Position position = new Position(order);
+                    if (Help.confirmOrder(position, false)) {
+                        orderInput(order, users);
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Please enter a valid integer value. Try again.");
                 }
             } else {
                 System.out.println("Portfolio does not contain the selected Security.");
@@ -353,24 +317,6 @@ public class Portfolio {
             System.out.println("Invalid index. Please try again.");
         }
     }
-
-    /**
-     * Shows what gains have been made in  a certain timeframe
-     */
-    public void histGains() {
-        System.out.println("Please enter a date for the beginning of the timeframe:");
-        String start = Input.stringValue();
-        Portfolio compare = getHistoricalPortfolio(start);
-        BigDecimal gain = getValue().subtract(compare.getValue());
-        BigDecimal gainPercent = gain.divide(compare.getStartEquity(),5, RoundingMode.HALF_UP).multiply(new BigDecimal(Integer.toString(100)));
-        if (gain.doubleValue() > 0) {
-            System.out.println("Portfolio has increased " + gain.toString() + " EUR or " + gainPercent + "% in value");
-        } else {
-            System.out.println("Portfolio has decreased " + gain.multiply(new BigDecimal(Integer.toString(-1))).toString() + " EUR or " + gainPercent + "% in value");
-        }
-    }
-
-
 
     @Override
     public String toString() {

@@ -20,28 +20,29 @@ import static org.junit.jupiter.api.Assertions.*;
 class NavigationTest {
 
     SecurityRepo securityRepo;
+    UserRepo users;
 
     @BeforeEach
     void setUp() {
         securityRepo.load();
-        UserRepo.load();
+        users.load();
     }
 
     @Nested
-    class UserRepoTest {
+    class usersTest {
 
         @Test
         void testAdd() {
-            UserRepo.add(new User("user", "password"));
-            assertTrue(UserRepo.contains(new User("user", "password")));
+            users.add(new User("user", "password"));
+            assertTrue(users.contains(new User("user", "password")));
         }
 
         @Test
         @DisplayName("Save / Load")
         void testSaveLoad() {
-            UserRepo.save();
-            UserRepo.load();
-            assertTrue(UserRepo.contains("user"));
+            users.save();
+            users.load();
+            assertTrue(users.contains("user"));
         }
     }
 
@@ -92,9 +93,9 @@ class NavigationTest {
 
     @Test
     void testPortfolio() {
-        UserRepo.add(new User("testUser", "password"));
+        users.add(new User("testUser", "password"));
         Portfolio portfolio = new Portfolio("test", "testUser", new BigDecimal(5000));
-        portfolio.orderInput(new Order(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK")));
+        portfolio.orderInput(new Order(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK")), users);
         assertEquals(new Position(5, securityRepo.get("UniRAK")), portfolio.getPosition(0));
     }
 }

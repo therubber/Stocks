@@ -9,16 +9,14 @@ import java.util.List;
 
 public class UserRepo {
 
-    private UserRepo() {}
-
-    static List<User> userList = new LinkedList<>();
+    private List<User> userList = new LinkedList<>();
 
     /**
      * Getter method to get a User out of the list
      * @param name String name of the user
      * @return User user
      */
-    public static User get(String name) {
+    public User get(String name) {
         return userList.get(userList.indexOf(new User(name)));
     }
 
@@ -26,7 +24,7 @@ public class UserRepo {
      * Adds a user
      * @param user User to be added
      */
-    public static void add(User user) {
+    public void add(User user) {
         userList.add(user);
     }
 
@@ -35,11 +33,11 @@ public class UserRepo {
      * @param user User to check containment
      * @return Boolean whether the user is contained in the list
      */
-    public static boolean contains(User user) {
+    public boolean contains(User user) {
         return userList.contains(user);
     }
 
-    public static boolean contains(String name) {
+    public boolean contains(String name) {
         return userList.contains(new User(name));
     }
 
@@ -48,7 +46,7 @@ public class UserRepo {
      * @param user User to check index
      * @return Int index of user in the list, -1 if not contained
      */
-    public static int indexOf(User user) {
+    public int indexOf(User user) {
         return userList.indexOf(user);
     }
 
@@ -56,19 +54,18 @@ public class UserRepo {
      * Checks whether the user base contains any users
      * @return Boolean whether the list of users is empty
      */
-    public static boolean isEmpty() {
+    public boolean isEmpty() {
         return userList.isEmpty();
     }
 
     /**
      * Saves the list of all users to /Saves/users.json file
      */
-    public static void save() {
-        Gson gson = new Gson();
+    public void save() {
         try {
             FileOutputStream fileOutputStream= new FileOutputStream("Saves/users.json");
-            String save = gson.toJson(userList);
-            fileOutputStream.write(save.getBytes());
+            String json = new Gson().toJson(userList);
+            fileOutputStream.write(json.getBytes());
             fileOutputStream.close();
         }  catch (IOException ioe) {
             ioe.printStackTrace();
@@ -78,7 +75,7 @@ public class UserRepo {
     /**
      * Loads all users into Users class from /Saves/users.json
      */
-    public static void load() {
+    public void load() {
         try {
             FileInputStream fileInputStream = new FileInputStream("Saves/users.json");
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
@@ -112,6 +109,8 @@ public class UserRepo {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NullPointerException e) {
+            System.out.println("Savefile Corrupted! Creating new Save...");
         }
     }
 }
