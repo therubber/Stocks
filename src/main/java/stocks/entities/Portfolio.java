@@ -3,7 +3,7 @@ package stocks.entities;
 import stocks.inputoutput.Help;
 import stocks.inputoutput.Input;
 import stocks.repo.SecurityRepo;
-import stocks.repo.Users;
+import stocks.repo.UserRepo;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -91,7 +91,7 @@ public class Portfolio {
         Position position = new Position(order);
         if (!positions.isEmpty()) {
             if (!positions.contains(position)) {
-                Users.get(owner).addOrderToHistory(order);
+                UserRepo.get(owner).addOrderToHistory(order);
                 executeOrder(order);
             } else {
                 Position orderPosition = positions.get(positions.indexOf(position));
@@ -106,7 +106,7 @@ public class Portfolio {
                         ownedSecurities.remove(positionToRemove.getSecurity());
                     }
                     equity = equity.add(order.getValue());
-                    Users.get(owner).addOrderToHistory(order);
+                    UserRepo.get(owner).addOrderToHistory(order);
                 }
                 if (!ownedSecurities.contains(position.getSecurity())) {
                     ownedSecurities.add(position.getSecurity());
@@ -114,7 +114,7 @@ public class Portfolio {
                 System.out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
             }
         } else {
-            Users.get(owner).addOrderToHistory(order);
+            UserRepo.get(owner).addOrderToHistory(order);
             executeOrder(order);
         }
     }
@@ -306,7 +306,7 @@ public class Portfolio {
             } else {
                 System.out.println("Insufficient balance! Please try ordering fewer shares.");
             }
-            Users.save();
+            UserRepo.save();
         } else {
             System.out.println("Spot prices were not updated properly. Please try again later.");
         }

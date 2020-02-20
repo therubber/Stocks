@@ -3,7 +3,7 @@ package stocks.entities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import stocks.repo.SecurityRepo;
-import stocks.repo.Users;
+import stocks.repo.UserRepo;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,7 +22,7 @@ class PortfolioTest {
     void setUp() {
         securityRepo.load();
         securityDow = securityRepo.get("UniRAK");
-        Users.add(new User("testUser", "password"));
+        UserRepo.add(new User("testUser", "password"));
         portfolio = new Portfolio("test", "testUser", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP));
         order = new Order(1, LocalDate.now(), "BUY", securityDow);
         portfolio.orderInput(order);

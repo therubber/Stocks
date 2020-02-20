@@ -4,7 +4,7 @@ import stocks.entities.Portfolio;
 import stocks.entities.User;
 import stocks.entities.Security;
 import stocks.repo.SecurityRepo;
-import stocks.repo.Users;
+import stocks.repo.UserRepo;
 
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
@@ -18,7 +18,7 @@ public class Navigation {
     public static void main(String[] args) {
         Navigation instance = new Navigation();
         available.load();
-        Users.load();
+        UserRepo.load();
         instance.navigation();
     }
 
@@ -178,14 +178,14 @@ public class Navigation {
     }
 
     private void save() {
-        Users.save();
+        UserRepo.save();
     }
 
     private void login(String username) {
-        if (Users.contains(new User(username))) {
+        if (UserRepo.contains(new User(username))) {
             System.out.println("Password: ");
-            if (Users.get(username).checkPassword(Input.stringValue())) {
-                selectUser(Users.get(username));
+            if (UserRepo.get(username).checkPassword(Input.stringValue())) {
+                selectUser(UserRepo.get(username));
                 selectedUser.updatePortfolios();
                 System.out.println("User " + username + " is now logged in!");
                 Help.clear();
@@ -200,15 +200,15 @@ public class Navigation {
     private void addUser() {
         System.out.println("Enter a username to create a new user: ");
         String username = Input.stringValue();
-        if (!Users.contains(username)) {
+        if (!UserRepo.contains(username)) {
             System.out.println("Please enter a password: ");
-            Users.add(new User(username, Input.stringValue()));
+            UserRepo.add(new User(username, Input.stringValue()));
             System.out.println("New user " + username + " has been created!");
             login(username);
         } else {
             System.out.println("User with that username already exists, please login.");
         }
-        Users.save();
+        UserRepo.save();
     }
 
     private void selected() {

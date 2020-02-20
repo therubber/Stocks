@@ -7,9 +7,9 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Users {
+public class UserRepo {
 
-    private Users() {}
+    private UserRepo() {}
 
     static List<User> userList = new LinkedList<>();
 

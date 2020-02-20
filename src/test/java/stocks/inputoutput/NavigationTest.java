@@ -10,7 +10,7 @@ import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
 import stocks.repo.SecurityRepo;
-import stocks.repo.Users;
+import stocks.repo.UserRepo;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -24,24 +24,24 @@ class NavigationTest {
     @BeforeEach
     void setUp() {
         securityRepo.load();
-        Users.load();
+        UserRepo.load();
     }
 
     @Nested
-    class UsersTest {
+    class UserRepoTest {
 
         @Test
         void testAdd() {
-            Users.add(new User("user", "password"));
-            assertTrue(Users.contains(new User("user", "password")));
+            UserRepo.add(new User("user", "password"));
+            assertTrue(UserRepo.contains(new User("user", "password")));
         }
 
         @Test
         @DisplayName("Save / Load")
         void testSaveLoad() {
-            Users.save();
-            Users.load();
-            assertTrue(Users.contains("user"));
+            UserRepo.save();
+            UserRepo.load();
+            assertTrue(UserRepo.contains("user"));
         }
     }
 
@@ -92,7 +92,7 @@ class NavigationTest {
 
     @Test
     void testPortfolio() {
-        Users.add(new User("testUser", "password"));
+        UserRepo.add(new User("testUser", "password"));
         Portfolio portfolio = new Portfolio("test", "testUser", new BigDecimal(5000));
         portfolio.orderInput(new Order(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK")));
         assertEquals(new Position(5, securityRepo.get("UniRAK")), portfolio.getPosition(0));
