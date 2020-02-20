@@ -14,7 +14,7 @@ public class Portfolio implements Iterable<Position> {
     private String name;
     private BigDecimal equity;
     public String owner;
-    private BigDecimal startequity;
+    private BigDecimal startEquity;
     private List<Position> positions = new LinkedList<>();
     public transient SecurityRepo ownedSecurities = new SecurityRepo();
     public LocalDate state;
@@ -40,7 +40,7 @@ public class Portfolio implements Iterable<Position> {
         this.name = name;
         this.equity = equity;
         this.owner = owner;
-        this.startequity = equity;
+        this.startEquity = equity;
         this.state = LocalDate.now();
     }
 
@@ -61,7 +61,7 @@ public class Portfolio implements Iterable<Position> {
      * @return startequity
      */
     public BigDecimal getStartEquity() {
-        return startequity;
+        return startEquity;
     }
 
     /**
