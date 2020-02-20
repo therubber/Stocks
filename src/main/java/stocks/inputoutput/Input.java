@@ -1,6 +1,5 @@
 package stocks.inputoutput;
 
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Input {
@@ -23,13 +22,7 @@ public class Input {
      * @return Int input if valid
      */
     public static int intValue() {
-        int input = 0;
-        try {
-            input = scanner.nextInt();
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please try again.");
-        }
-        return input;
+        return scanner.nextInt();
     }
 
     /**

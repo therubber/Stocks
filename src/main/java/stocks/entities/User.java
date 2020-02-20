@@ -185,7 +185,7 @@ public class User {
      */
     public void updatePortfolios() {
         for (Portfolio portfolio : portfolios) {
-            portfolio.update();
+            portfolio.update(portfolio.ownedSecurities);
         }
     }
 

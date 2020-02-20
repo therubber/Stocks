@@ -2,7 +2,7 @@ package stocks.entities;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import stocks.repo.Securities;
+import stocks.repo.SecurityRepo;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -13,11 +13,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class PositionTest {
 
     private Position position;
+    private SecurityRepo securityRepo;
 
     @BeforeEach
     void setUp() {
-        Securities.load();
-        position = new Position(5, Securities.get("UniRAK"));
+        securityRepo.load();
+        position = new Position(5, securityRepo.get("UniRAK"));
     }
 
     @Test
@@ -33,12 +34,12 @@ class PositionTest {
 
     @Test
     void getSecurity() {
-        assertEquals(Securities.get("UniRAK"), position.getSecurity());
+        assertEquals(securityRepo.get("UniRAK"), position.getSecurity());
     }
 
     @Test
     void getValue() {
-        BigDecimal value = Securities.get("UniRAK").getSpotPrice().getPrice().multiply(new BigDecimal(Integer.toString(5))).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal value = securityRepo.get("UniRAK").getSpotPrice().getPrice().multiply(new BigDecimal(Integer.toString(5))).setScale(2, RoundingMode.HALF_UP);
         assertEquals(value, position.getValue());
     }
 

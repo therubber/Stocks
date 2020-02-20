@@ -9,7 +9,7 @@ import stocks.entities.Order;
 import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.entities.User;
-import stocks.repo.Securities;
+import stocks.repo.SecurityRepo;
 import stocks.repo.Users;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -19,9 +19,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NavigationTest {
 
+    SecurityRepo securityRepo;
+
     @BeforeEach
     void setUp() {
-        Securities.load();
+        securityRepo.load();
         Users.load();
     }
 
@@ -44,7 +46,7 @@ class NavigationTest {
     }
 
     @Nested
-    class SecuritiesTest {
+    class SecurityRepoTest {
 
         private Security UniRAK = new Security("UniRAK", "DE0008491044", "849104", "Fund");
         private Security UniAsia = new Security("UniAsia", "LU0037079034", "971267", "Fund");
@@ -53,38 +55,38 @@ class NavigationTest {
 
         @Test
         void testInitiate() {
-            Securities.initiate();
-            assertTrue(Securities.contains(UniRAK));
-            assertTrue(Securities.contains(UniAsia));
-            assertTrue(Securities.contains(UniEuroAnleihen));
-            assertTrue(Securities.contains(GenoAs));
+            securityRepo.initiate();
+            assertTrue(securityRepo.contains(UniRAK));
+            assertTrue(securityRepo.contains(UniAsia));
+            assertTrue(securityRepo.contains(UniEuroAnleihen));
+            assertTrue(securityRepo.contains(GenoAs));
         }
 
         @Test
         void testIndexOf() {
-            assertEquals(0, Securities.indexOf(UniRAK));
-            assertEquals(1, Securities.indexOf(UniEuroAnleihen));
-            assertEquals(2, Securities.indexOf(UniAsia));
-            assertEquals(3, Securities.indexOf(GenoAs));
+            assertEquals(0, securityRepo.indexOf(UniRAK));
+            assertEquals(1, securityRepo.indexOf(UniEuroAnleihen));
+            assertEquals(2, securityRepo.indexOf(UniAsia));
+            assertEquals(3, securityRepo.indexOf(GenoAs));
         }
 
         @Test
         void testGetName() {
-            assertEquals(UniRAK, Securities.get("UniRAK"));
+            assertEquals(UniRAK, securityRepo.get("UniRAK"));
         }
 
         @Test
         void testGetIndex() {
-            assertEquals(UniRAK, Securities.get(0));
+            assertEquals(UniRAK, securityRepo.get(0));
         }
 
         @Test
         void testUpdatePrices() {
-            Securities.updatePrices();
-            assertEquals(new BigDecimal(Double.toString(138.33)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniRAK).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(Double.toString(80.59)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniAsia).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(Double.toString(57.64)).setScale(2, RoundingMode.HALF_UP), Securities.get(UniEuroAnleihen).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(Double.toString(91.68)).setScale(2, RoundingMode.HALF_UP), Securities.get(GenoAs).getSpotPrice().getPrice());
+            securityRepo.updatePrices();
+            assertEquals(new BigDecimal(Double.toString(138.33)).setScale(2, RoundingMode.HALF_UP), securityRepo.get(UniRAK).getSpotPrice().getPrice());
+            assertEquals(new BigDecimal(Double.toString(80.59)).setScale(2, RoundingMode.HALF_UP), securityRepo.get(UniAsia).getSpotPrice().getPrice());
+            assertEquals(new BigDecimal(Double.toString(57.64)).setScale(2, RoundingMode.HALF_UP), securityRepo.get(UniEuroAnleihen).getSpotPrice().getPrice());
+            assertEquals(new BigDecimal(Double.toString(91.68)).setScale(2, RoundingMode.HALF_UP), securityRepo.get(GenoAs).getSpotPrice().getPrice());
         }
     }
 
@@ -92,7 +94,7 @@ class NavigationTest {
     void testPortfolio() {
         Users.add(new User("testUser", "password"));
         Portfolio portfolio = new Portfolio("test", "testUser", new BigDecimal(5000));
-        portfolio.orderInput(new Order(5, LocalDate.now(), "BUY", Securities.get("UniRAK")));
-        assertEquals(new Position(5, Securities.get("UniRAK")), portfolio.getPosition(0));
+        portfolio.orderInput(new Order(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK")));
+        assertEquals(new Position(5, securityRepo.get("UniRAK")), portfolio.getPosition(0));
     }
 }

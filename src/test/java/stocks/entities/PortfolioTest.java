@@ -2,17 +2,12 @@ package stocks.entities;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import stocks.repo.Securities;
+import stocks.repo.SecurityRepo;
 import stocks.repo.Users;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,11 +16,12 @@ class PortfolioTest {
     Portfolio portfolio;
     Security securityDow;
     Order order;
+    SecurityRepo securityRepo;
 
     @BeforeEach
     void setUp() {
-        Securities.load();
-        securityDow = Securities.get("UniRAK");
+        securityRepo.load();
+        securityDow = securityRepo.get("UniRAK");
         Users.add(new User("testUser", "password"));
         portfolio = new Portfolio("test", "testUser", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP));
         order = new Order(1, LocalDate.now(), "BUY", securityDow);

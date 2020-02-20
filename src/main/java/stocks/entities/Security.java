@@ -13,7 +13,7 @@ public class Security {
     private String isin;
     private String wkn;
     private String type;
-    private List<SpotPrice> prices = new LinkedList<>();
+    private transient List<SpotPrice> prices = new LinkedList<>();
 
     /**
      * Constructor with name -> Needed to select a security in buy orders
@@ -89,13 +89,6 @@ public class Security {
     }
 
     /**
-     * Used to correct last price after viewing historical data
-     */
-    public void correctPrice() {
-        prices.remove(prices.size() - 1);
-    }
-
-    /**
      * Gets SpotDate of the security, used to check whether the prices are up to date.
      * @return SpotDate of the most recent SpotPrice
      */
@@ -123,6 +116,7 @@ public class Security {
      */
     public void update() {
         try {
+            prices = new LinkedList<>();
             InputStream inputStream = Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("SecurityData/" + name + ".csv"));
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
@@ -144,9 +138,11 @@ public class Security {
      */
     public void priceFrom(String date) {
         SpotPrice histPrice = new SpotPrice(0.0, LocalDate.parse("1970-01-01"));
-        for (SpotPrice price : prices) {
-            if (price.getDate().equals(LocalDate.parse(date))) {
-                histPrice = price;
+        if  (!prices.isEmpty()) {
+            for (SpotPrice price : prices) {
+                if (price.getDate().equals(LocalDate.parse(date))) {
+                    histPrice = price;
+                }
             }
         }
         if (histPrice.getDate().equals(LocalDate.parse("1970-01-01"))) {

@@ -2,41 +2,48 @@ package stocks.repo;
 
 import stocks.entities.Security;
 import java.io.*;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-public class Securities {
+public class SecurityRepo implements Iterable<Security>{
 
-    private Securities() {}
+    private List<Security> securityList = new LinkedList<>();
 
-    private static List<Security> securityList = new LinkedList<>();
+    public void add(Security security) {
+        securityList.add(security);
+    }
 
-    public static Security get(Security securityDow) {
+    public void remove(Security security) {
+        securityList.remove(security);
+    }
+
+    public Security get(Security securityDow) {
         return securityList.get(indexOf(securityDow));
     }
 
-    public static Security get(String name) {
+    public Security get(String name) {
         return securityList.get(indexOf(new Security(name)));
     }
 
-    public static Security get(int index) {
+    public Security get(int index) {
         return securityList.get(index);
     }
 
-    public static boolean contains(Security security) {
+    public boolean contains(Security security) {
         return securityList.contains(security);
     }
 
-    public static int indexOf(Security securityDow) {
+    public int indexOf(Security securityDow) {
         return securityList.indexOf(securityDow);
     }
 
-    public static boolean isEmpty() {
+    public boolean isEmpty() {
         return securityList.isEmpty();
     }
 
-    public static void list() {
+    public void list() {
         System.out.println();
         System.out.printf("%-18s %-16s %-10s %-12s %-10s %-15s%n", "Name", "ISIN", "WKN", "Type", "Price", "Date");
         System.out.println();
@@ -50,7 +57,7 @@ public class Securities {
     /**
      * Displays an indexed list of all securities available. Index begins at 1 for simplicity of use
      */
-    public static void listIndexed() {
+    public void listIndexed() {
         System.out.println();
         System.out.printf("%5s %-18s %-16s %-10s %-16s %-10s %-15s%n", "Index", "Name", "ISIN", "WKN", "Type", "Price", "Date");
         int index = 1;
@@ -64,7 +71,7 @@ public class Securities {
     /**
      * Method to load Securities and their prices
      */
-    public static void load() {
+    public void load() {
         initiate();
         updatePrices();
     }
@@ -72,9 +79,9 @@ public class Securities {
     /**
      * Sets up names of available security and fetches data using updateSecurities()
      */
-    public static void initiate() {
+    public void initiate() {
         try {
-            InputStream inputStream = Objects.requireNonNull(Securities.class.getResourceAsStream("/SecurityData/Securities.csv"));
+            InputStream inputStream = Objects.requireNonNull(SecurityRepo.class.getResourceAsStream("/SecurityData/Securities.csv"));
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
@@ -95,7 +102,7 @@ public class Securities {
     /**
      * Updates prices to most recent using data from SecurityData file and fills price history with all other found historical prices
      */
-    public static void updatePrices() {
+    public void updatePrices() {
         for (Security security : securityList) {
             security.update();
         }
@@ -105,7 +112,7 @@ public class Securities {
      * Checks if the spot prices in /SpotData/ are valid
      * @return Boolean whether the price data in SpotData is valid
      */
-    public static boolean evaluateSpotPrices() {
+    public boolean evaluateSpotPrices() {
         boolean validPrices = false;
         if (!isEmpty()) {
             updatePrices();
@@ -118,8 +125,19 @@ public class Securities {
      * Gets the amount of security objects contained in securityList
      * @return Int amount of security objects contained
      */
-    public static int size() {
+    public int size() {
         return securityList.size();
+    }
+
+    /**
+     * Clears the Repository
+     */
+    public void clear() {
+        securityList.clear();
+    }
+
+    public Iterator<Security> iterator() {
+        return securityList.iterator();
     }
 }
 

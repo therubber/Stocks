@@ -6,48 +6,49 @@ import stocks.entities.Security;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SecuritiesTest {
+class SecurityRepoTest {
 
     Security unirak = new Security("UniRAK");
+    SecurityRepo securityRepo;
 
     @BeforeEach
     void setUp() {
-        Securities.load();
+        securityRepo.load();
     }
 
     @Test
     void get() {
-        assertEquals(unirak, Securities.get(unirak));
+        assertEquals(unirak, securityRepo.get(unirak));
     }
 
     @Test
     void testGet() {
-        assertEquals(unirak, Securities.get("UniRAK"));
+        assertEquals(unirak, securityRepo.get("UniRAK"));
     }
 
     @Test
     void testGet1() {
-        assertEquals(unirak, Securities.get(0));
+        assertEquals(unirak, securityRepo.get(0));
     }
 
     @Test
     void contains() {
-        assertTrue(Securities.contains(unirak));
-        assertFalse(Securities.contains(new Security("Union")));
+        assertTrue(securityRepo.contains(unirak));
+        assertFalse(securityRepo.contains(new Security("Union")));
     }
 
     @Test
     void indexOf() {
-        assertEquals(0, Securities.indexOf(unirak));
+        assertEquals(0, securityRepo.indexOf(unirak));
     }
 
     @Test
     void isEmpty() {
-        assertFalse(Securities.isEmpty());
+        assertFalse(securityRepo.isEmpty());
     }
 
     @Test
     void initiate() {
-        assertFalse(Securities.isEmpty());
+        assertFalse(securityRepo.isEmpty());
     }
 }

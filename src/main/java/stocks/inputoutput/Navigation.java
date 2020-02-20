@@ -3,7 +3,7 @@ package stocks.inputoutput;
 import stocks.entities.Portfolio;
 import stocks.entities.User;
 import stocks.entities.Security;
-import stocks.repo.Securities;
+import stocks.repo.SecurityRepo;
 import stocks.repo.Users;
 
 import java.time.format.DateTimeParseException;
@@ -13,10 +13,11 @@ public class Navigation {
 
     private transient User selectedUser;
     private transient Portfolio selectedPortfolio;
+    private static transient SecurityRepo available = new SecurityRepo();
 
     public static void main(String[] args) {
         Navigation instance = new Navigation();
-        Securities.load();
+        available.load();
         Users.load();
         instance.navigation();
     }
@@ -52,7 +53,7 @@ public class Navigation {
                     save();
                     return false;
                 case "lf":
-                    Securities.list();
+                    available.list();
                     return false;
                 case "ph":
                     priceHistory();
@@ -92,7 +93,7 @@ public class Navigation {
                     selectedUser.listPortfolios();
                     return false;
                 case "lf":
-                    Securities.list();
+                    available.list();
                     return false;
                 case "ph":
                     priceHistory();
@@ -131,7 +132,7 @@ public class Navigation {
                 selectPortfolio();
                 return false;
             case "buy":
-                selectedPortfolio.buy();
+                selectedPortfolio.buy(available);
                 save();
                 return false;
             case "sell":
@@ -140,6 +141,9 @@ public class Navigation {
                 return false;
             case "ov":
                 selectedPortfolio.overview(selectedPortfolio);
+                return false;
+            case "oh":
+                selectedUser.printOrderHistory();
                 return false;
             case "compare":
                 if (selectedUser.hasPortfolios()) {
@@ -237,14 +241,14 @@ public class Navigation {
     }
 
     private void priceHistory() {
-        Securities.listIndexed();
+        available.listIndexed();
         System.out.println("Enter the index of the Security whose price history you want to display or 0 to exit:");
         try {
             int index = Input.intValue();
             if (index == 0) {
                 System.out.println("Going back to main menu...");
-            } else if (index <= Securities.size()) {
-                Security selectedSecurity = Securities.get(index - 1);
+            } else if (index <= available.size()) {
+                Security selectedSecurity = available.get(index - 1);
                 selectedSecurity.priceHistory();
             } else {
                 System.out.println("Index invalid. Please try again.");
