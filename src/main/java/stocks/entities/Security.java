@@ -135,14 +135,6 @@ public class Security {
         }
     }
 
-    /**
-     * Gets SpotDate of the security, used to check whether the prices are up to date.
-     * @return SpotDate of the most recent SpotPrice
-     */
-    public LocalDate getState() {
-        return getSpotPrice().getDate();
-    }
-
     @Override
     public String toString() {
         return name + "   " + isin + "   " + wkn + "   " + getSpotPrice() + " EUR" + System.lineSeparator();

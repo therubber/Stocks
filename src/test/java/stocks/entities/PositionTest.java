@@ -19,6 +19,7 @@ class PositionTest {
 
     @BeforeEach
     void setUp() {
+        securityRepo = new SecurityRepo();
         securityRepo.load();
         position = new Position(5, securityRepo.get("UniRAK"));
     }
@@ -41,7 +42,7 @@ class PositionTest {
 
     @Test
     void getValue() {
-        BigDecimal value = securityRepo.get("UniRAK").getSpotPrice().getPrice().multiply(factory.bigDecimalFromInteger(5));
+        BigDecimal value = securityRepo.get("UniRAK").getSpotPrice().getPrice().multiply(factory.createBigDecimal(5));
         assertEquals(value, position.getValue());
     }
 

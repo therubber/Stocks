@@ -23,12 +23,13 @@ class UserTest {
 
     @BeforeEach
     void setUp() {
+        users = new UserRepo();
         users.load();
         SecurityRepo securityRepo = new SecurityRepo();
         securityRepo.load();
-        user = new User("user", "password");
+        user = factory.createUser("user", "password");
         order = factory.createOrder(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK"));
-        portfolio = new Portfolio("test", "user", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP), new Input());
+        portfolio = factory.createPortfolio("test", "user", factory.createBigDecimal(5000), new Input());
         user.addPortfolio(portfolio);
         portfolio.orderInput(order, users);
     }
@@ -39,12 +40,12 @@ class UserTest {
 
     @Test
     void getEquity() {
-        assertEquals(factory.bigDecimalFromInteger(10000), user.getEquity());
+        assertEquals(factory.createBigDecimal(10000), user.getEquity());
     }
 
     @Test
     void setEquity() {
-        BigDecimal newEquity = factory.bigDecimalFromInteger(5000).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal newEquity = factory.createBigDecimal(5000);
         user.setEquity(newEquity);
         assertEquals(newEquity, user.getEquity());
     }

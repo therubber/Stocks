@@ -1,14 +1,14 @@
 package stocks.utility;
 
 import stocks.entities.*;
-
+import stocks.inputoutput.Input;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 
 /**
- * Calls all Constructors important for Mocking
+ * Calls all Constructors important for Mocking and returns the created Object
  */
 
 public class Factory {
@@ -29,11 +29,11 @@ public class Factory {
         return new SpotPrice(value, date);
     }
 
-    public BigDecimal bigDecimalFromInteger(int value) {
+    public BigDecimal createBigDecimal(int value) {
         return BigDecimalCreator.fromInteger(value);
     }
 
-    public BigDecimal bigDecimalFromDouble(double value) {
+    public BigDecimal createBigDecimal(double value) {
         return BigDecimalCreator.fromDouble(value);
     }
 
@@ -59,6 +59,14 @@ public class Factory {
 
     public User createUser(String username, String password) {
         return new User(username, password);
+    }
+
+    public Portfolio createPortfolio(String name, String owner, LocalDate state, Input input) {
+        return new Portfolio(name, owner, state, input);
+    }
+
+    public Portfolio createPortfolio(String name, String owner, BigDecimal equity, Input input) {
+        return new Portfolio(name, owner, equity, input);
     }
 
     public static class BigDecimalCreator {

@@ -21,7 +21,9 @@ class NavigationTest {
 
     @BeforeEach
     void setUp() {
+        securityRepo = new SecurityRepo();
         securityRepo.load();
+        users = new UserRepo();
         users.load();
     }
 
@@ -81,17 +83,17 @@ class NavigationTest {
         @Test
         void testUpdatePrices() {
             securityRepo.updatePrices();
-            assertEquals(factory.bigDecimalFromDouble(138.33), securityRepo.get(UniRAK).getSpotPrice().getPrice());
-            assertEquals(factory.bigDecimalFromDouble(80.59), securityRepo.get(UniAsia).getSpotPrice().getPrice());
-            assertEquals(factory.bigDecimalFromDouble(57.64), securityRepo.get(UniEuroAnleihen).getSpotPrice().getPrice());
-            assertEquals(factory.bigDecimalFromDouble(91.68), securityRepo.get(GenoAs).getSpotPrice().getPrice());
+            assertEquals(factory.createBigDecimal(138.33), securityRepo.get(UniRAK).getSpotPrice().getPrice());
+            assertEquals(factory.createBigDecimal(80.59), securityRepo.get(UniAsia).getSpotPrice().getPrice());
+            assertEquals(factory.createBigDecimal(57.64), securityRepo.get(UniEuroAnleihen).getSpotPrice().getPrice());
+            assertEquals(factory.createBigDecimal(91.68), securityRepo.get(GenoAs).getSpotPrice().getPrice());
         }
     }
 
     @Test
     void testPortfolio() {
         users.add(new User("testUser", "password"));
-        Portfolio portfolio = new Portfolio("test", "testUser", factory.bigDecimalFromInteger(5000), new Input());
+        Portfolio portfolio = new Portfolio("test", "testUser", factory.createBigDecimal(5000), new Input());
         portfolio.orderInput(factory.createOrder(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK")), users);
         assertEquals(factory.createPosition(5, securityRepo.get("UniRAK")), portfolio.getPosition(0));
     }

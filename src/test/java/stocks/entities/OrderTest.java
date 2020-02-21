@@ -28,7 +28,7 @@ class OrderTest {
 
     @Test
     void getExecutionPrice() {
-        assertEquals(factory.bigDecimalFromDouble(138.33), order.getExecutionPrice());
+        assertEquals(factory.createBigDecimal(138.33), order.getExecutionPrice());
     }
 
     @Test

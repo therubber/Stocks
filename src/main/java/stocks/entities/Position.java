@@ -122,7 +122,7 @@ public class Position {
     public BigDecimal changeCount(int count) {
         this.count += count;
         this.executionDate = LocalDate.now();
-        return security.getSpotPrice().getPrice().multiply(factory.bigDecimalFromInteger(count));
+        return security.getSpotPrice().getPrice().multiply(factory.createBigDecimal(count));
     }
 
     /**

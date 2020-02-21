@@ -95,6 +95,6 @@ public class Order {
      * @return BigDecimal value of the order
      */
     public BigDecimal getValue() {
-        return security.getPrice().multiply(factory.bigDecimalFromInteger(count));
+        return security.getPrice().multiply(factory.createBigDecimal(count));
     }
 }

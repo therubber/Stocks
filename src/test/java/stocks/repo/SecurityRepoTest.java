@@ -13,6 +13,7 @@ class SecurityRepoTest {
 
     @BeforeEach
     void setUp() {
+        securityRepo = new SecurityRepo();
         securityRepo.load();
     }
 

@@ -1,5 +1,6 @@
 package stocks.entities;
 
+import stocks.inputoutput.Output;
 import stocks.utility.Factory;
 import stocks.inputoutput.Input;
 import stocks.inputoutput.Help;
@@ -20,13 +21,13 @@ public class Portfolio implements Iterable<Position> {
     transient SecurityRepo ownedSecurities = new SecurityRepo();
     LocalDate state;
     private final Input input;
+    private final Output out = new Output();
     private final Factory factory = new Factory();
 
     /**
      * Constructor for setting up a portfolio without equity
      * @param name  Name
      * @param owner Owner
-     * @param input Input
      */
     public Portfolio(String name, String owner, LocalDate state, Input input) {
         this.name = name;
@@ -40,7 +41,6 @@ public class Portfolio implements Iterable<Position> {
      * @param name   Name of the portfolio
      * @param owner  Owner of the portfolio
      * @param equity Amount of equity allocated to the portfolio
-     * @param input Input
      */
     public Portfolio(String name, String owner, BigDecimal equity, Input input) {
         this.name = name;
@@ -61,7 +61,7 @@ public class Portfolio implements Iterable<Position> {
      * @return Returns equity available in the portfolio
      */
     public BigDecimal getEquity() {
-        return equity.setScale(2, RoundingMode.HALF_UP);
+        return equity;
     }
 
     /**
@@ -103,13 +103,13 @@ public class Portfolio implements Iterable<Position> {
      * Displays data of all existing positions in the portfolio to the console
      */
     public void positions() {
-        System.out.println();
+        out.println();
         System.out.printf("%-12s %-10s %-18s %-16s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Type", "Price", "Value", "Execution");
-        System.out.println();
+        out.println();
         for (Position position : positions) {
             System.out.printf("%-12s %-10d %-18s %-16s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurityName(), position.getSecurityType(), position.getPrice(), position.getValue(), position.getExecutionDate());
         }
-        System.out.println();
+        out.println();
     }
 
     /**
@@ -117,7 +117,7 @@ public class Portfolio implements Iterable<Position> {
      * @return double value of open positions combined
      */
     public BigDecimal getPositionValue() {
-        BigDecimal value = factory.bigDecimalFromInteger(0);
+        BigDecimal value = factory.createBigDecimal(0);
         for (Position position : positions) {
             value = value.add(position.getValue());
         }
@@ -136,17 +136,7 @@ public class Portfolio implements Iterable<Position> {
         System.out.printf(format, "Combined value of positions: ", portfolio.getPositionValue());
         System.out.printf(format, "Equity currently available in portfolio: ", portfolio.getEquity());
         System.out.printf(format, "Combined value of all assets: ", portfolio.getValue());
-        System.out.println();
-    }
-
-    /**
-     * Checks whether the portfolio contains a position with the String name of the security
-     *
-     * @param name Name of the security to check for
-     * @return Boolean whether a position with the security name exists
-     */
-    public boolean contains(String name) {
-        return ownedSecurities.contains(factory.createSecurity(name));
+        out.println();
     }
 
     /**
@@ -172,7 +162,7 @@ public class Portfolio implements Iterable<Position> {
                 if (!ownedSecurities.contains(position.getSecurity())) {
                     ownedSecurities.add(position.getSecurity());
                 }
-                System.out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
+                out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
             }
         } else {
             users.get(owner).addOrderToHistory(order);
@@ -187,13 +177,13 @@ public class Portfolio implements Iterable<Position> {
             if (!ownedSecurities.contains(order.getSecurity())) {
                 ownedSecurities.add(order.getSecurity());
             }
-            System.out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
+            out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
         } else {
             if (order.getCount() < getPosition(positions.indexOf(factory.createPosition(order.getSecurity()))).getCount()) {
                 equity = equity.add(order.getValue());
-                System.out.println("Sell order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
+                out.println("Sell order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
             } else {
-                System.out.println("Cannot sell more than you own. Please try again.");
+                out.println("Cannot sell more than you own. Please try again.");
             }
         }
     }
@@ -243,33 +233,33 @@ public class Portfolio implements Iterable<Position> {
         if (securityRepo.evaluateSpotPrices()) {
             Position position = selectionBuy(securityRepo);
             if (position.getValue().doubleValue() <= equity.doubleValue() && !position.getIsin().equals("ERROR")) {
-                BigDecimal equityAfterExecution = getEquity().subtract(position.getPrice().multiply(factory.bigDecimalFromInteger(position.getCount())));
+                BigDecimal equityAfterExecution = getEquity().subtract(position.getPrice().multiply(factory.createBigDecimal(position.getCount())));
                 System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", getEquity(), equityAfterExecution);
                 if (Help.confirmOrder(position, true)) {
                     Order order = factory.createOrder(position.getCount(), LocalDate.now(), "BUY", position.getSecurity());
                     orderInput(order, users);
                 } else {
-                    System.out.println("Buy order cancelled, back to menu.");
+                    out.println("Buy order cancelled, back to menu.");
                 }
             } else {
-                System.out.println("Insufficient balance! Please try ordering fewer shares.");
+                out.println("Insufficient balance! Please try ordering fewer shares.");
             }
         } else {
-            System.out.println("Spot prices were not updated properly. Please try again later.");
+            out.println("Spot prices were not updated properly. Please try again later.");
         }
     }
 
     public Position selectionBuy(SecurityRepo securityRepo) {
         try {
             securityRepo.listIndexed();
-            System.out.println("Depot equity: " + equity + " EUR");
-            System.out.println("Enter the index of the Security that you want to buy: ");
+            out.println("Depot equity: " + equity + " EUR");
+            out.println("Enter the index of the Security that you want to buy: ");
             Security security = securityRepo.get(input.intValue() - 1);
-            System.out.println("Enter the count of shares you want to buy: ");
+            out.println("Enter the count of shares you want to buy: ");
             int transactionCount = input.intValue();
             return factory.createPosition(transactionCount, security);
         } catch (InputMismatchException im) {
-            System.out.println("Please enter an Int value. Try again.");
+            out.println("Please enter an Int value. Try again.");
         }
         return factory.createPosition(666, factory.createSecurity("ERROR", "ERROR", "ERROR", "ERROR"));
     }
@@ -279,12 +269,12 @@ public class Portfolio implements Iterable<Position> {
      */
     public void sell(UserRepo users) {
         ownedSecurities.listIndexed();
-        System.out.println("Please select the security you want to sell by entering its index.");
+        out.println("Please select the security you want to sell by entering its index.");
         int index = input.intValue();
         if (index > 0 && index <= ownedSecurities.size()) {
             Security selectedSecurity = ownedSecurities.get(index - 1);
             if (ownedSecurities.contains(selectedSecurity)) {
-                System.out.println("Enter the amount of shares you want to reduce the position by: ");
+                out.println("Enter the amount of shares you want to reduce the position by: ");
                 try {
                     int sellCount = input.intValue();
                     Order order = factory.createOrder(sellCount, LocalDate.now(), "SELL", selectedSecurity);
@@ -293,13 +283,13 @@ public class Portfolio implements Iterable<Position> {
                         orderInput(order, users);
                     }
                 } catch (InputMismatchException e) {
-                    System.out.println("Please enter a valid integer value. Try again.");
+                    out.println("Please enter a valid integer value. Try again.");
                 }
             } else {
-                System.out.println("Portfolio does not contain the selected Security.");
+                out.println("Portfolio does not contain the selected Security.");
             }
         } else {
-            System.out.println("Invalid index. Please try again.");
+            out.println("Invalid index. Please try again.");
         }
     }
 
