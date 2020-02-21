@@ -13,6 +13,7 @@ public class Navigation {
     private transient Portfolio selectedPortfolio;
     private static transient SecurityRepo availableSecurities = new SecurityRepo();
     private static UserRepo users = new UserRepo();
+    private final Input input = new Input();
 
     public static void main(String[] args) {
         Navigation instance = new Navigation();
@@ -41,11 +42,11 @@ public class Navigation {
 
     private boolean noUserNavigation() {
         if (selectedUser == null) {
-            switch (Input.stringValue()) {
+            switch (input.stringValue()) {
                 case "login":
                     System.out.print("Please enter your username: ");
-                    String username = Input.stringValue();
-                    login(username);
+                    String username = input.stringValue();
+                    login(new User(username));
                     return false;
                 case "add":
                     addUser();
@@ -76,7 +77,7 @@ public class Navigation {
         if (selectedPortfolio != null) {
             return portfolioNavigation();
         } else {
-            switch (Input.stringValue()) {
+            switch (input.stringValue()) {
                 case "selected":
                     selected();
                     return false;
@@ -122,7 +123,7 @@ public class Navigation {
     }
 
     private boolean portfolioNavigation() {
-        switch(Input.stringValue()) {
+        switch(input.stringValue()) {
             case "selected":
                 selected();
                 return false;
@@ -177,13 +178,13 @@ public class Navigation {
         }
     }
 
-    private void login(String username) {
-        if (users.contains(new User(username))) {
+    private void login(User user) {
+        if (users.contains(user)) {
             System.out.println("Password: ");
-            if (users.get(username).checkPassword(Input.stringValue())) {
-                selectUser(users.get(username));
+            if (users.get(user.getUsername()).checkPassword(input.stringValue())) {
+                selectUser(users.get(user.getUsername()));
                 selectedUser.updatePortfolios(availableSecurities);
-                System.out.println("User " + username + " is now logged in!");
+                System.out.println("User " + user.getUsername() + " is now logged in!");
                 Help.clear();
             } else {
                 System.out.println("Password invalid. Please try again.");
@@ -195,12 +196,13 @@ public class Navigation {
 
     private void addUser() {
         System.out.println("Enter a username to create a new user: ");
-        String username = Input.stringValue();
-        if (!users.contains(username)) {
+        String username = input.stringValue();
+        if (!users.contains(new User(username))) {
             System.out.println("Please enter a password: ");
-            users.add(new User(username, Input.stringValue()));
+            User user = new User(username, input.stringValue());
+            users.add(user);
             System.out.println("New user " + username + " has been created!");
-            login(username);
+            login(user);
         } else {
             System.out.println("User with that username already exists, please login.");
         }
@@ -227,7 +229,7 @@ public class Navigation {
     private void selectPortfolio() {
         selectedUser.listPortfolios();
         System.out.println("Please enter the name of the portfolio you want to select.");
-        String depotName = Input.stringValue();
+        String depotName = input.stringValue();
         if (selectedUser.hasPortfolio(depotName)) {
             selectedPortfolio = selectedUser.getPortfolio(depotName);
             System.out.println("Depot " + depotName + " has been selected!");
@@ -240,7 +242,7 @@ public class Navigation {
         availableSecurities.listIndexed();
         System.out.println("Enter the index of the Security whose price history you want to display or 0 to exit:");
         try {
-            int index = Input.intValue();
+            int index = input.intValue();
             if (index == 0) {
                 System.out.println("Going back to main menu...");
             } else if (index <= availableSecurities.size()) {

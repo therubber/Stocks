@@ -4,7 +4,7 @@ import stocks.entities.Position;
 
 public class Help {
 
-    static final String FORMAT = "%-15s %s%n";
+    private static final String FORMAT = "%-15s %s%n";
 
     // Private Constructor to hide public one
     private Help() {}
@@ -73,12 +73,13 @@ public class Help {
      * @return Boolean confirmation of the order
      */
     public static boolean confirmOrder(Position position, boolean type) {
+        Input betterInput = new Input();
         if (type) {
             System.out.println("Buying " + position.getCount() + " shares of " + position.getSecurity().getName() + " at " + position.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
         } else {
             System.out.println("Selling " + position.getCount() + " shares of " + position.getSecurity().getName() + " at " + position.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
         }
-        String input = Input.stringValue();
+        String input = betterInput.stringValue();
         return input.equals("y");
     }
 }

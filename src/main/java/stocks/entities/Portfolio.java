@@ -1,9 +1,10 @@
 package stocks.entities;
 
-import stocks.inputoutput.Help;
 import stocks.inputoutput.Input;
+import stocks.inputoutput.Help;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -12,36 +13,42 @@ import java.util.*;
 public class Portfolio implements Iterable<Position> {
 
     private String name;
-    private BigDecimal equity;
     public String owner;
+    BigDecimal equity;
     private BigDecimal startEquity;
-    private List<Position> positions = new LinkedList<>();
-    public transient SecurityRepo ownedSecurities = new SecurityRepo();
-    public LocalDate state;
+    List<Position> positions = new LinkedList<>();
+    transient SecurityRepo ownedSecurities = new SecurityRepo();
+    LocalDate state;
+
+    private final Input input;
 
     /**
      * Constructor for setting up a portfolio without equity
-     * @param name Name
+     * @param name  Name
      * @param owner Owner
+     * @param input Input
      */
-    public Portfolio(String name, String owner, LocalDate state) {
+    public Portfolio(String name, String owner, LocalDate state, Input input) {
         this.name = name;
         this.owner = owner;
         this.state = state;
+        this.input = input;
     }
 
     /**
      * Specified constructor to generate a fully usable portfolio
-     * @param name Name of the portfolio
-     * @param owner Owner of the portfolio
+     * @param name   Name of the portfolio
+     * @param owner  Owner of the portfolio
      * @param equity Amount of equity allocated to the portfolio
+     * @param input Input
      */
-    public Portfolio(String name, String owner, BigDecimal equity) {
+    public Portfolio(String name, String owner, BigDecimal equity, Input input) {
         this.name = name;
         this.equity = equity;
         this.owner = owner;
         this.startEquity = equity;
         this.state = LocalDate.now();
+        this.input = input;
     }
 
     public String getName() {
@@ -50,6 +57,7 @@ public class Portfolio implements Iterable<Position> {
 
     /**
      * Getter method to retrieve equity value of the portfolio
+     *
      * @return Returns equity available in the portfolio
      */
     public BigDecimal getEquity() {
@@ -58,10 +66,87 @@ public class Portfolio implements Iterable<Position> {
 
     /**
      * Getter for startequity
+     *
      * @return startequity
      */
     public BigDecimal getStartEquity() {
         return startEquity;
+    }
+
+    /**
+     * Calculates the current overall value of all assets in the portfolio
+     * @return Value of all positions and equity
+     */
+    public BigDecimal getValue() {
+        return getPositionValue().add(equity);
+    }
+
+    /**
+     * Gets a certain position out of the portfolio and returns it. Required to execute sell orders.
+     *
+     * @param index Index of the position to be returned
+     * @return Position from positions at given index
+     */
+    public Position getPosition(int index) {
+        return positions.get(index);
+    }
+
+    /**
+     * Getter method to retrieve the amount of positions in the portfolio. Required for indexing of positions
+     * @return int number of positions
+     */
+    public int getPositionCount() {
+        return positions.size();
+    }
+
+    /**
+     * Displays data of all existing positions in the portfolio to the console
+     */
+    public void positions() {
+        System.out.println();
+        System.out.printf("%-12s %-10s %-18s %-16s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Type", "Price", "Value", "Execution");
+        System.out.println();
+        for (Position position : positions) {
+            System.out.printf("%-12s %-10d %-18s %-16s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurityName(), position.getSecurityType(), position.getPrice(), position.getValue(), position.getExecutionDate());
+        }
+        System.out.println();
+    }
+
+    /**
+     * Method to calculate and return combined value of all positions currently in the portfolio
+     * @return double value of open positions combined
+     */
+    public BigDecimal getPositionValue() {
+        BigDecimal value = new BigDecimal(Integer.toString(0));
+        for (Position position : positions) {
+            value = value.add(position.getValue());
+        }
+        return value;
+    }
+
+    /**
+     * Outputs an overview of portfolio data containing:
+     * - combined value of positions
+     * - equity available in portfolio
+     * - combined value of all assets
+     */
+    public void overview(Portfolio portfolio) {
+        portfolio.positions();
+        String format = "%-45s %10.2f EUR%n";
+        System.out.printf(format, "Combined value of positions: ", portfolio.getPositionValue());
+        System.out.printf(format, "Equity currently available in portfolio: ", portfolio.getEquity());
+        System.out.printf(format, "Combined value of all assets: ", portfolio.getValue());
+        System.out.println();
+    }
+
+    /**
+     * Checks whether the portfolio contains a position with the String name of the security
+     *
+     * @param name Name of the security to check for
+     * @return Boolean whether a position with the security name exists
+     */
+    public boolean contains(String name) {
+        return ownedSecurities.contains(new Security(name));
     }
 
     /**
@@ -80,11 +165,7 @@ public class Portfolio implements Iterable<Position> {
                     equity = equity.subtract(order.getValue());
                 } else {
                     orderPosition.setCount(orderPosition.getCount() - order.getCount());
-                    if (orderPosition.isZero()) {
-                        Position positionToRemove = new Position(order.getSecurity());
-                        positions.remove(positionToRemove);
-                        ownedSecurities.remove(positionToRemove.getSecurity());
-                    }
+                    checkPosition(orderPosition);
                     equity = equity.add(order.getValue());
                     users.get(owner).addOrderToHistory(order);
                 }
@@ -117,62 +198,10 @@ public class Portfolio implements Iterable<Position> {
         }
     }
 
-    /**
-     * Gets a certain position out of the portfolio and returns it. Required to execute sell orders.
-     * @param index Index of the position to be returned
-     * @return Position from positions at given index
-     */
-    public Position getPosition(int index) {
-        return positions.get(index);
-    }
-
-    /**
-     * Deletes a position out of the portfolio if count reaches 0
-     * @param position Position to be deleted
-     */
-    public void deletePosition(Position position) {
-        positions.remove(position);
-    }
-
-    /**
-     * Getter method to retrieve the amount of positions in the portfolio. Required for indexing of positions
-     * @return int number of positions
-     */
-    public int getPositionCount() {
-        return positions.size();
-    }
-
-    /**
-     * Displays data of all existing positions in the portfolio to the console
-     */
-    public void positions() {
-        System.out.println();
-        System.out.printf("%-12s %-10s %-18s %-16s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Type", "Price", "Value", "Execution");
-        System.out.println();
-        for (Position position : positions) {
-            System.out.printf("%-12s %-10d %-18s %-16s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurityName(), position.getSecurityType(), position.getPrice(),  position.getValue(), position.getExecutionDate());
+    private void checkPosition(Position position) {
+        if (position.isZero()) {
+            positions.remove(position);
         }
-        System.out.println();
-    }
-
-    /**
-     * Calculates the current overall value of all assets in the portfolio
-     * @return Value of all positions and equity
-     */
-    public BigDecimal getValue() {
-        return getPositionValue().add(equity);
-    }
-
-    /**
-     * Method to calculate and return combined value of all positions currently in the portfolio
-     * @return double value of open positions combined
-     */
-    public BigDecimal getPositionValue() {
-        BigDecimal value = new BigDecimal(Integer.toString(0));
-        for (Position position : positions) {
-            value = value.add(position.getValue());
-        }
-        return value;
     }
 
     void loadOwnedSecurities() {
@@ -181,30 +210,6 @@ public class Portfolio implements Iterable<Position> {
             position.getSecurity().update();
             ownedSecurities.add(position.getSecurity());
         }
-    }
-
-    /**
-     * Checks whether the portfolio contains a position with the String name of the security
-     * @param name Name of the security to check for
-     * @return Boolean whether a position with the security name exists
-     */
-    public boolean contains(String name) {
-        return ownedSecurities.contains(new Security(name));
-    }
-
-    /**
-     *  Outputs an overview of portfolio data containing:
-     *  - combined value of positions
-     *  - equity available in portfolio
-     *  - combined value of all assets
-     */
-    public void overview(Portfolio portfolio) {
-        portfolio.positions();
-        String format = "%-45s %10.2f EUR%n";
-        System.out.printf(format, "Combined value of positions: ",  portfolio.getPositionValue());
-        System.out.printf(format, "Equity currently available in portfolio: ", portfolio.getEquity());
-        System.out.printf(format, "Combined value of all assets: ", portfolio.getValue());
-        System.out.println();
     }
 
     /**
@@ -254,17 +259,18 @@ public class Portfolio implements Iterable<Position> {
         }
     }
 
-    private Position selectionBuy(SecurityRepo securityRepo) {
+    public Position selectionBuy(SecurityRepo securityRepo) {
         try {
             securityRepo.listIndexed();
             System.out.println("Depot equity: " + equity + " EUR");
             System.out.println("Enter the index of the Security that you want to buy: ");
-            Security security = securityRepo.get(Input.intValue() - 1);
+            Security security = securityRepo.get(input.intValue() - 1);
             System.out.println("Enter the count of shares you want to buy: ");
-            int transactionCount = Input.intValue();
+            int transactionCount = input.intValue();
             return new Position(transactionCount, security);
         } catch (IndexOutOfBoundsException e) {
             System.out.println("Index out of bounds. Try again.");
+            e.printStackTrace();
         } catch (InputMismatchException im) {
             System.out.println("Please enter an Int value. Try again.");
         }
@@ -277,13 +283,13 @@ public class Portfolio implements Iterable<Position> {
     public void sell(UserRepo users) {
         ownedSecurities.listIndexed();
         System.out.println("Please select the security you want to sell by entering its index.");
-        int index = Input.intValue();
+        int index = input.intValue();
         if (index > 0 && index <= ownedSecurities.size()) {
             Security selectedSecurity = ownedSecurities.get(index - 1);
             if (ownedSecurities.contains(selectedSecurity)) {
                 System.out.println("Enter the amount of shares you want to reduce the position by: ");
                 try {
-                    int sellCount = Input.intValue();
+                    int sellCount = input.intValue();
                     Order order = new Order(sellCount, LocalDate.now(), "SELL", selectedSecurity);
                     Position position = new Position(order);
                     if (Help.confirmOrder(position, false)) {
@@ -300,6 +306,10 @@ public class Portfolio implements Iterable<Position> {
         }
     }
 
+    /**
+     * Makes class Portfolio iterable over positions list
+     * @return Iterator over positions list
+     */
     public Iterator<Position> iterator() {
         return positions.iterator();
     }
@@ -315,8 +325,7 @@ public class Portfolio implements Iterable<Position> {
         if (o == null || getClass() != o.getClass()) return false;
         Portfolio portfolio = (Portfolio) o;
         return Objects.equals(name, portfolio.name) &&
-                Objects.equals(owner, portfolio.owner) &&
-                Objects.equals(state, portfolio.state);
+                Objects.equals(owner, portfolio.owner);
     }
 
     @Override

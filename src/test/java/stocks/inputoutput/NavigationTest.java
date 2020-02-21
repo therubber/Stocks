@@ -42,7 +42,7 @@ class NavigationTest {
         void testSaveLoad() {
             users.save();
             users.load();
-            assertTrue(users.contains("user"));
+            assertTrue(users.contains(new User("user")));
         }
     }
 
@@ -94,7 +94,7 @@ class NavigationTest {
     @Test
     void testPortfolio() {
         users.add(new User("testUser", "password"));
-        Portfolio portfolio = new Portfolio("test", "testUser", new BigDecimal(5000));
+        Portfolio portfolio = new Portfolio("test", "testUser", new BigDecimal(5000), new Input());
         portfolio.orderInput(new Order(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK")), users);
         assertEquals(new Position(5, securityRepo.get("UniRAK")), portfolio.getPosition(0));
     }

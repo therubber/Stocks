@@ -14,6 +14,7 @@ public class User {
     private List<Portfolio> portfolios = new LinkedList<>();
     public List<Order> orderHistory = new LinkedList<>();
     private String password;
+    private final Input input = new Input();
 
     /**
      * Regular constructor to be used
@@ -70,16 +71,17 @@ public class User {
     /**
      * Used to add a portfolio to the user
      */
-    public String addPortfolio() {
+    public void addPortfolio() {
         System.out.println("User equity: " + equity + "EUR");
         System.out.println("Enter a Name for the portfolio you want to create: ");
-        String name = Input.stringValue();
-        if (!portfolios.contains(new Portfolio(name, username, LocalDate.now()))) {
+        String name = input.stringValue();
+        if (!portfolios.contains(new Portfolio(name, username, LocalDate.now(), new Input()))) {
             System.out.println("Enter the amount of equity to transfer to the portfolio account: ");
             try {
-                BigDecimal depotEquity = BigDecimal.valueOf(Input.doubleValue());
+                BigDecimal depotEquity = BigDecimal.valueOf(input.doubleValue());
                 if (depotEquity.doubleValue() <= equity.doubleValue()) {
-                    portfolios.add(new Portfolio(name, username, depotEquity));
+                    Portfolio toAdd = new Portfolio(name, username, depotEquity, new Input());
+                    portfolios.add(toAdd);
                     equity = equity.subtract(depotEquity);
                     System.out.println("Depot " + name + " successfully created!");
                 } else {
@@ -91,7 +93,6 @@ public class User {
         } else {
             System.out.println("A portfolio with this name already exists, please try again.");
         }
-        return name;
     }
 
     /**
@@ -100,7 +101,7 @@ public class User {
      * @return Portfolio requested
      */
     public Portfolio getPortfolio(String name) {
-        return portfolios.get(portfolios.indexOf(new Portfolio(name, username, LocalDate.now())));
+        return portfolios.get(portfolios.indexOf(new Portfolio(name, username, LocalDate.now(), new Input())));
     }
 
     /**
@@ -109,7 +110,7 @@ public class User {
      * @return Boolean whether the portfolio is contained in the users portfolio list
      */
     public boolean hasPortfolio(String name) {
-        return portfolios.contains(new Portfolio(name, username, LocalDate.now()));
+        return portfolios.contains(new Portfolio(name, username, LocalDate.now(), new Input()));
     }
 
     /**
@@ -156,10 +157,10 @@ public class User {
     public void compare() {
         listPortfolios();
         System.out.println("Enter the name of the first Portfolio: ");
-        Portfolio portfolio1 = new Portfolio(Input.stringValue(), username, LocalDate.now());
+        Portfolio portfolio1 = new Portfolio(input.stringValue(), username, LocalDate.now(), new Input());
         if (portfolios.contains(portfolio1)) {
             System.out.println("Enter the name of the second Portfolio: ");
-            Portfolio portfolio2 = new Portfolio(Input.stringValue(), username, LocalDate.now());
+            Portfolio portfolio2 = new Portfolio(input.stringValue(), username, LocalDate.now(), new Input());
             if (portfolios.contains(portfolio2)) {
                 comparePortfolios(portfolio1, portfolio2);
             } else {

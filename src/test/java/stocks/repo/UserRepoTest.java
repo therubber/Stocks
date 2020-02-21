@@ -33,7 +33,7 @@ class UserRepoTest {
 
     @Test
     void testContains() {
-        assertFalse(users.contains("asdfasdf"));
+        assertFalse(users.contains(new User("asdfasdf")));
         assertTrue(users.contains(user));
     }
 

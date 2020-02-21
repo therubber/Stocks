@@ -2,6 +2,7 @@ package stocks.entities;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import stocks.inputoutput.Input;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
 
@@ -25,7 +26,7 @@ class UserTest {
         securityRepo.load();
         user = new User("user", "password");
         order = new Order(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK"));
-        portfolio = new Portfolio("test", "user", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP));
+        portfolio = new Portfolio("test", "user", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP), new Input());
         user.addPortfolio(portfolio);
         portfolio.orderInput(order, users);
     }

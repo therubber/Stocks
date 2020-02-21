@@ -37,10 +37,6 @@ public class UserRepo {
         return userList.contains(user);
     }
 
-    public boolean contains(String name) {
-        return userList.contains(new User(name));
-    }
-
     /**
      * Gets the index of a user if he is contained in the list. Returns -1 if not.
      * @param user User to check index
@@ -77,9 +73,7 @@ public class UserRepo {
      */
     public void load() {
         try {
-            FileInputStream fileInputStream = new FileInputStream("Saves/users.json");
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("Saves/users.json")));
             StringBuilder sb = new StringBuilder();
             String input;
             while ((input = bufferedReader.readLine()) != null) {
@@ -88,8 +82,6 @@ public class UserRepo {
             String jsonInput = sb.toString();
             userList = new LinkedList<>(new Gson().fromJson(jsonInput, new TypeToken<List<User>>(){}.getType()));
             bufferedReader.close();
-            fileInputStream.close();
-            inputStreamReader.close();
         } catch (FileNotFoundException fnfe) {
             System.out.println("No Savefile found, creating new one...");
             try {

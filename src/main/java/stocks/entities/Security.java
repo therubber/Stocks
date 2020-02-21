@@ -9,10 +9,10 @@ import java.util.Objects;
 
 public class Security {
 
-    private String name;
-    private String isin;
-    private String wkn;
-    private String type;
+    String name;
+    String isin;
+    String wkn;
+    String type;
     private transient List<SpotPrice> prices = new LinkedList<>();
 
     /**
@@ -133,23 +133,11 @@ public class Security {
     }
 
     /**
-     * Gets the Spotprice of the Security from a certain date
-     * @param date Date of which a spot price should be returned
+     * Gets SpotDate of the security, used to check whether the prices are up to date.
+     * @return SpotDate of the most recent SpotPrice
      */
-    public void priceFrom(String date) {
-        SpotPrice histPrice = new SpotPrice(0.0, LocalDate.parse("1970-01-01"));
-        if  (!prices.isEmpty()) {
-            for (SpotPrice price : prices) {
-                if (price.getDate().equals(LocalDate.parse(date))) {
-                    histPrice = price;
-                }
-            }
-        }
-        if (histPrice.getDate().equals(LocalDate.parse("1970-01-01"))) {
-            System.out.println("No price data found matching input date! Please try again");
-        } else {
-            prices.add(histPrice);
-        }
+    public LocalDate getState() {
+        return getSpotPrice().getDate();
     }
 
     @Override
