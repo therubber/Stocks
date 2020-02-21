@@ -1,6 +1,6 @@
 package stocks.repo;
 
-import stocks.entities.Factory;
+import stocks.utility.Factory;
 import stocks.entities.Security;
 import java.io.*;
 import java.util.Iterator;

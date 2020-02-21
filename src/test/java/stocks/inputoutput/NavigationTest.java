@@ -5,10 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import stocks.entities.*;
+import stocks.utility.Factory;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;

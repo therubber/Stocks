@@ -1,4 +1,6 @@
-package stocks.entities;
+package stocks.utility;
+
+import stocks.entities.*;
 
 import java.io.File;
 import java.math.BigDecimal;

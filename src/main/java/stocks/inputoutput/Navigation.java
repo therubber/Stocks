@@ -1,6 +1,6 @@
 package stocks.inputoutput;
 
-import stocks.entities.Factory;
+import stocks.utility.Factory;
 import stocks.entities.Portfolio;
 import stocks.entities.User;
 import stocks.entities.Security;

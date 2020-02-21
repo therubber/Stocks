@@ -2,9 +2,8 @@ package stocks.daos;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import stocks.entities.Factory;
+import stocks.utility.Factory;
 import stocks.entities.Security;
-import stocks.entities.SpotPrice;
 
 import java.time.LocalDate;
 

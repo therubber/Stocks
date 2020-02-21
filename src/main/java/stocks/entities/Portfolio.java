@@ -1,5 +1,6 @@
 package stocks.entities;
 
+import stocks.utility.Factory;
 import stocks.inputoutput.Input;
 import stocks.inputoutput.Help;
 import stocks.repo.SecurityRepo;
@@ -267,9 +268,6 @@ public class Portfolio implements Iterable<Position> {
             System.out.println("Enter the count of shares you want to buy: ");
             int transactionCount = input.intValue();
             return factory.createPosition(transactionCount, security);
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("Index out of bounds. Try again.");
-            e.printStackTrace();
         } catch (InputMismatchException im) {
             System.out.println("Please enter an Int value. Try again.");
         }

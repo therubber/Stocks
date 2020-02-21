@@ -1,5 +1,7 @@
 package stocks.entities;
 
+import stocks.utility.Encoder;
+import stocks.utility.Factory;
 import stocks.inputoutput.Input;
 import stocks.repo.SecurityRepo;
 import java.math.BigDecimal;
@@ -34,7 +36,7 @@ public class User {
     public User(String username, String password) {
         this.equity = factory.bigDecimalFromInteger(10000);
         this.username = username;
-        this.password = Base64.getEncoder().encodeToString(password.getBytes());
+        this.password = Encoder.encode(password);
     }
 
     /**
@@ -206,7 +208,7 @@ public class User {
      * @return boolean validity of password
      */
     public boolean checkPassword(String input) {
-        String inputEncoded = Base64.getEncoder().encodeToString(input.getBytes());
+        String inputEncoded = Encoder.encode(input);
         return inputEncoded.equals(password);
     }
 

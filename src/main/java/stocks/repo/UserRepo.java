@@ -2,7 +2,7 @@ package stocks.repo;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import stocks.entities.Factory;
+import stocks.utility.Factory;
 import stocks.entities.User;
 import java.io.*;
 import java.util.LinkedList;

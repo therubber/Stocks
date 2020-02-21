@@ -1,5 +1,7 @@
 package stocks.entities;
 
+import stocks.utility.Factory;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;

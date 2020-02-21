@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
+import stocks.utility.Factory;
 import stocks.inputoutput.Input;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
@@ -110,5 +111,4 @@ class PortfolioTest {
         inOrder.verify(securityRepoMock).listIndexed();
         inOrder.verify(securityRepoMock).get(3);
     }
-
 }
