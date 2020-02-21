@@ -4,7 +4,6 @@ import stocks.inputoutput.Input;
 import stocks.inputoutput.Help;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
-import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -19,8 +18,8 @@ public class Portfolio implements Iterable<Position> {
     List<Position> positions = new LinkedList<>();
     transient SecurityRepo ownedSecurities = new SecurityRepo();
     LocalDate state;
-
     private final Input input;
+    private final Factory factory = new Factory();
 
     /**
      * Constructor for setting up a portfolio without equity
@@ -117,7 +116,7 @@ public class Portfolio implements Iterable<Position> {
      * @return double value of open positions combined
      */
     public BigDecimal getPositionValue() {
-        BigDecimal value = new BigDecimal(Integer.toString(0));
+        BigDecimal value = factory.bigDecimalFromInteger(0);
         for (Position position : positions) {
             value = value.add(position.getValue());
         }
@@ -146,14 +145,14 @@ public class Portfolio implements Iterable<Position> {
      * @return Boolean whether a position with the security name exists
      */
     public boolean contains(String name) {
-        return ownedSecurities.contains(new Security(name));
+        return ownedSecurities.contains(factory.createSecurity(name));
     }
 
     /**
      * Adds a position to the portfolio or increases one if it already exists
      */
     public void orderInput(Order order, UserRepo users) {
-        Position position = new Position(order);
+        Position position = factory.createPosition(order);
         if (!positions.isEmpty()) {
             if (!positions.contains(position)) {
                 users.get(owner).addOrderToHistory(order);
@@ -165,7 +164,7 @@ public class Portfolio implements Iterable<Position> {
                     equity = equity.subtract(order.getValue());
                 } else {
                     orderPosition.setCount(orderPosition.getCount() - order.getCount());
-                    checkPosition(orderPosition);
+                    cleanPosition(orderPosition);
                     equity = equity.add(order.getValue());
                     users.get(owner).addOrderToHistory(order);
                 }
@@ -182,14 +181,14 @@ public class Portfolio implements Iterable<Position> {
 
     private void executeOrder(Order order) {
         if (order.getType().equals("BUY")) {
-            positions.add(new Position(order));
+            positions.add(factory.createPosition(order));
             equity = equity.subtract(order.getValue());
             if (!ownedSecurities.contains(order.getSecurity())) {
                 ownedSecurities.add(order.getSecurity());
             }
             System.out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
         } else {
-            if (order.getCount() < getPosition(positions.indexOf(new Position(order.getSecurity()))).getCount()) {
+            if (order.getCount() < getPosition(positions.indexOf(factory.createPosition(order.getSecurity()))).getCount()) {
                 equity = equity.add(order.getValue());
                 System.out.println("Sell order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
             } else {
@@ -198,7 +197,7 @@ public class Portfolio implements Iterable<Position> {
         }
     }
 
-    private void checkPosition(Position position) {
+    private void cleanPosition(Position position) {
         if (position.isZero()) {
             positions.remove(position);
         }
@@ -243,10 +242,10 @@ public class Portfolio implements Iterable<Position> {
         if (securityRepo.evaluateSpotPrices()) {
             Position position = selectionBuy(securityRepo);
             if (position.getValue().doubleValue() <= equity.doubleValue() && !position.getIsin().equals("ERROR")) {
-                BigDecimal equityAfterExecution = getEquity().subtract(position.getPrice().multiply(new BigDecimal(Integer.toString(position.getCount()))));
+                BigDecimal equityAfterExecution = getEquity().subtract(position.getPrice().multiply(factory.bigDecimalFromInteger(position.getCount())));
                 System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", getEquity(), equityAfterExecution);
                 if (Help.confirmOrder(position, true)) {
-                    Order order = new Order(position.getCount(), LocalDate.now(), "BUY", position.getSecurity());
+                    Order order = factory.createOrder(position.getCount(), LocalDate.now(), "BUY", position.getSecurity());
                     orderInput(order, users);
                 } else {
                     System.out.println("Buy order cancelled, back to menu.");
@@ -267,14 +266,14 @@ public class Portfolio implements Iterable<Position> {
             Security security = securityRepo.get(input.intValue() - 1);
             System.out.println("Enter the count of shares you want to buy: ");
             int transactionCount = input.intValue();
-            return new Position(transactionCount, security);
+            return factory.createPosition(transactionCount, security);
         } catch (IndexOutOfBoundsException e) {
             System.out.println("Index out of bounds. Try again.");
             e.printStackTrace();
         } catch (InputMismatchException im) {
             System.out.println("Please enter an Int value. Try again.");
         }
-        return new Position(666, new Security("ERROR", "ERROR", "ERROR", "ERROR"));
+        return factory.createPosition(666, factory.createSecurity("ERROR", "ERROR", "ERROR", "ERROR"));
     }
 
     /**
@@ -290,8 +289,8 @@ public class Portfolio implements Iterable<Position> {
                 System.out.println("Enter the amount of shares you want to reduce the position by: ");
                 try {
                     int sellCount = input.intValue();
-                    Order order = new Order(sellCount, LocalDate.now(), "SELL", selectedSecurity);
-                    Position position = new Position(order);
+                    Order order = factory.createOrder(sellCount, LocalDate.now(), "SELL", selectedSecurity);
+                    Position position = factory.createPosition(order);
                     if (Help.confirmOrder(position, false)) {
                         orderInput(order, users);
                     }

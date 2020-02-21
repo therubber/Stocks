@@ -12,6 +12,7 @@ public class Order {
     private boolean type;
     private Security security;
     private String id;
+    private final Factory factory = new Factory();
 
     /**
      * Constructor for regular use
@@ -92,6 +93,6 @@ public class Order {
      * @return BigDecimal value of the order
      */
     public BigDecimal getValue() {
-        return security.getPrice().multiply(new BigDecimal(Integer.toString(count)));
+        return security.getPrice().multiply(factory.bigDecimalFromInteger(count));
     }
 }

@@ -15,13 +15,14 @@ public class User {
     public List<Order> orderHistory = new LinkedList<>();
     private String password;
     private final Input input = new Input();
+    private final Factory factory= new Factory();
 
     /**
      * Regular constructor to be used
      * @param username String username to create user with
      */
     public User(String username) {
-        this.equity = new BigDecimal(Integer.toString(10000)).setScale(2, RoundingMode.HALF_UP);
+        this.equity = factory.bigDecimalFromInteger(10000);
         this.username = username;
     }
 
@@ -31,7 +32,7 @@ public class User {
      * @param password Password to set for user
      */
     public User(String username, String password) {
-        this.equity = new BigDecimal(Integer.toString(10000)).setScale(2, RoundingMode.HALF_UP);
+        this.equity = factory.bigDecimalFromInteger(10000);
         this.username = username;
         this.password = Base64.getEncoder().encodeToString(password.getBytes());
     }

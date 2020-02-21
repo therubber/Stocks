@@ -4,11 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import stocks.entities.Security;
-import stocks.entities.Order;
-import stocks.entities.Portfolio;
-import stocks.entities.Position;
-import stocks.entities.User;
+import stocks.entities.*;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
 import java.math.BigDecimal;
@@ -21,6 +17,7 @@ class NavigationTest {
 
     SecurityRepo securityRepo;
     UserRepo users;
+    private final Factory factory = new Factory();
 
     @BeforeEach
     void setUp() {
@@ -49,10 +46,10 @@ class NavigationTest {
     @Nested
     class SecurityRepoTest {
 
-        private Security UniRAK = new Security("UniRAK", "DE0008491044", "849104", "Fund");
-        private Security UniAsia = new Security("UniAsia", "LU0037079034", "971267", "Fund");
-        private Security UniEuroAnleihen = new Security("UniEuroAnleihen", "LU0966118209", "A1W4QB", "Fund");
-        private Security GenoAs = new Security("GenoAs1", "DE0009757682", "975768", "Fund");
+        private Security UniRAK = factory.createSecurity("UniRAK", "DE0008491044", "849104", "Fund");
+        private Security UniAsia = factory.createSecurity("UniAsia", "LU0037079034", "971267", "Fund");
+        private Security UniEuroAnleihen = factory.createSecurity("UniEuroAnleihen", "LU0966118209", "A1W4QB", "Fund");
+        private Security GenoAs = factory.createSecurity("GenoAs1", "DE0009757682", "975768", "Fund");
 
         @Test
         void testInitiate() {
@@ -84,18 +81,18 @@ class NavigationTest {
         @Test
         void testUpdatePrices() {
             securityRepo.updatePrices();
-            assertEquals(new BigDecimal(Double.toString(138.33)).setScale(2, RoundingMode.HALF_UP), securityRepo.get(UniRAK).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(Double.toString(80.59)).setScale(2, RoundingMode.HALF_UP), securityRepo.get(UniAsia).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(Double.toString(57.64)).setScale(2, RoundingMode.HALF_UP), securityRepo.get(UniEuroAnleihen).getSpotPrice().getPrice());
-            assertEquals(new BigDecimal(Double.toString(91.68)).setScale(2, RoundingMode.HALF_UP), securityRepo.get(GenoAs).getSpotPrice().getPrice());
+            assertEquals(factory.bigDecimalFromDouble(138.33), securityRepo.get(UniRAK).getSpotPrice().getPrice());
+            assertEquals(factory.bigDecimalFromDouble(80.59), securityRepo.get(UniAsia).getSpotPrice().getPrice());
+            assertEquals(factory.bigDecimalFromDouble(57.64), securityRepo.get(UniEuroAnleihen).getSpotPrice().getPrice());
+            assertEquals(factory.bigDecimalFromDouble(91.68), securityRepo.get(GenoAs).getSpotPrice().getPrice());
         }
     }
 
     @Test
     void testPortfolio() {
         users.add(new User("testUser", "password"));
-        Portfolio portfolio = new Portfolio("test", "testUser", new BigDecimal(5000), new Input());
-        portfolio.orderInput(new Order(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK")), users);
-        assertEquals(new Position(5, securityRepo.get("UniRAK")), portfolio.getPosition(0));
+        Portfolio portfolio = new Portfolio("test", "testUser", factory.bigDecimalFromInteger(5000), new Input());
+        portfolio.orderInput(factory.createOrder(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK")), users);
+        assertEquals(factory.createPosition(5, securityRepo.get("UniRAK")), portfolio.getPosition(0));
     }
 }

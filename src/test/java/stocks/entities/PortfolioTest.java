@@ -21,6 +21,7 @@ class PortfolioTest {
     Order order;
     SecurityRepo securityRepo = new SecurityRepo();
     UserRepo users = new UserRepo();
+    private final Factory factory = new Factory();
 
     @BeforeEach
     void setUp() {
@@ -29,7 +30,7 @@ class PortfolioTest {
         securityDow = securityRepo.get("UniRAK");
         users.add(new User("testUser", "password"));
         portfolio = new Portfolio("test", "testUser", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP), new Input());
-        order = new Order(1, LocalDate.now(), "BUY", securityDow);
+        order = factory.createOrder(5, LocalDate.now(), "BUY", securityDow);
         portfolio.orderInput(order, users);
     }
 
@@ -40,22 +41,22 @@ class PortfolioTest {
 
     @Test
     void getEquity() {
-        assertEquals(new BigDecimal(Double.toString(4861.67)).setScale(2, RoundingMode.HALF_UP), portfolio.getEquity());
+        assertEquals(factory.bigDecimalFromDouble(4861.67), portfolio.getEquity());
     }
 
     @Test
     void getStartequity() {
-        assertEquals(new BigDecimal(Double.toString(5000)).setScale(2, RoundingMode.HALF_UP), portfolio.getStartEquity());
+        assertEquals(factory.bigDecimalFromInteger(5000), portfolio.getStartEquity());
     }
 
     @Test
     void getValue() {
-        assertEquals(new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP), portfolio.getValue());
+        assertEquals(factory.bigDecimalFromInteger(5000), portfolio.getValue());
     }
 
     @Test
     void getPosition() {
-        assertEquals(new Position(order), portfolio.getPosition(0));
+        assertEquals(factory.createPosition(order), portfolio.getPosition(0));
     }
 
     @Test
@@ -65,7 +66,7 @@ class PortfolioTest {
 
     @Test
     void getPositionValue() {
-        assertEquals(new BigDecimal(Double.toString(138.33)).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
+        assertEquals(factory.bigDecimalFromDouble(138.33), portfolio.getPositionValue());
     }
 
     @Test
@@ -77,11 +78,11 @@ class PortfolioTest {
     @Test
     void orderInput() {
         portfolio.orderInput(order, users);
-        assertEquals(new BigDecimal(Double.toString(276.66)).setScale(2, RoundingMode.HALF_UP), portfolio.getPositionValue());
+        assertEquals(factory.bigDecimalFromDouble(1383.30), portfolio.getPositionValue());
         assertEquals(1, portfolio.getPositionCount());
         Position position = portfolio.getPosition(0);
-        assertEquals(2, position.getCount());
-        portfolio.orderInput(new Order(1, LocalDate.now(), "SELL", securityDow), users);
+        assertEquals(10, position.getCount());
+        portfolio.orderInput(factory.createOrder(1, LocalDate.now(), "SELL", securityDow), users);
         assertEquals(1, portfolio.getPositionCount());
     }
 
@@ -105,9 +106,9 @@ class PortfolioTest {
 
         assertEquals(4, resultPosition.getCount());
         assertSame(wienerSchnitzelAg, resultPosition.getSecurity());
-
         InOrder inOrder = Mockito.inOrder(securityRepoMock, inputMock);
         inOrder.verify(securityRepoMock).listIndexed();
         inOrder.verify(securityRepoMock).get(3);
     }
+
 }

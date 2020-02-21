@@ -2,6 +2,7 @@ package stocks.repo;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import stocks.entities.Factory;
 import stocks.entities.User;
 import java.io.*;
 import java.util.LinkedList;
@@ -10,6 +11,7 @@ import java.util.List;
 public class UserRepo {
 
     private List<User> userList = new LinkedList<>();
+    private final Factory factory = new Factory();
 
     /**
      * Getter method to get a User out of the list
@@ -17,7 +19,7 @@ public class UserRepo {
      * @return User user
      */
     public User get(String name) {
-        return userList.get(userList.indexOf(new User(name)));
+        return userList.get(userList.indexOf(factory.createUser(name)));
     }
 
     /**
@@ -85,13 +87,13 @@ public class UserRepo {
         } catch (FileNotFoundException fnfe) {
             System.out.println("No Savefile found, creating new one...");
             try {
-                File saveDir = new File("Saves");
+                File saveDir = factory.createFile("Saves");
                 if (!saveDir.exists()) {
                     if (saveDir.mkdir()) {
                         System.out.println("/Saves/ Directory created!");
                     }
                 } else {
-                    File save = new File(saveDir.getPath() + "users.json");
+                    File save = factory.createFile(saveDir.getPath() + "users.json");
                     if (save.createNewFile()) {
                         System.out.println("New save created!");
                     }

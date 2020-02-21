@@ -13,7 +13,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class PositionTest {
 
     private Position position;
-    private SecurityRepo securityRepo;
+    private  SecurityRepo securityRepo;
+    private Factory factory = new Factory();
+
 
     @BeforeEach
     void setUp() {
@@ -39,13 +41,13 @@ class PositionTest {
 
     @Test
     void getValue() {
-        BigDecimal value = securityRepo.get("UniRAK").getSpotPrice().getPrice().multiply(new BigDecimal(Integer.toString(5))).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal value = securityRepo.get("UniRAK").getSpotPrice().getPrice().multiply(factory.bigDecimalFromInteger(5));
         assertEquals(value, position.getValue());
     }
 
     @Test
     void getSpotPrice() {
-        SpotPrice spotPrice = new SpotPrice(138.33, LocalDate.parse("2020-02-19"));
+        SpotPrice spotPrice = factory.createSpotPrice(138.33, LocalDate.parse("2020-02-19"));
         assertEquals(spotPrice, position.getSpotPrice());
     }
 

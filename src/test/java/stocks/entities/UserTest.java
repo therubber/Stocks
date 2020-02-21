@@ -18,6 +18,7 @@ class UserTest {
     Order order;
     Portfolio portfolio;
     UserRepo users;
+    private final Factory factory = new Factory();
 
     @BeforeEach
     void setUp() {
@@ -25,7 +26,7 @@ class UserTest {
         SecurityRepo securityRepo = new SecurityRepo();
         securityRepo.load();
         user = new User("user", "password");
-        order = new Order(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK"));
+        order = factory.createOrder(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK"));
         portfolio = new Portfolio("test", "user", new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP), new Input());
         user.addPortfolio(portfolio);
         portfolio.orderInput(order, users);
@@ -37,12 +38,12 @@ class UserTest {
 
     @Test
     void getEquity() {
-        assertEquals(new BigDecimal(10000).setScale(2, RoundingMode.HALF_UP), user.getEquity());
+        assertEquals(factory.bigDecimalFromInteger(10000), user.getEquity());
     }
 
     @Test
     void setEquity() {
-        BigDecimal newEquity = new BigDecimal(5000).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal newEquity = factory.bigDecimalFromInteger(5000).setScale(2, RoundingMode.HALF_UP);
         user.setEquity(newEquity);
         assertEquals(newEquity, user.getEquity());
     }

@@ -1,5 +1,6 @@
 package stocks.inputoutput;
 
+import stocks.entities.Factory;
 import stocks.entities.Portfolio;
 import stocks.entities.User;
 import stocks.entities.Security;
@@ -14,6 +15,7 @@ public class Navigation {
     private static transient SecurityRepo availableSecurities = new SecurityRepo();
     private static UserRepo users = new UserRepo();
     private final Input input = new Input();
+    private final Factory factory = new Factory();
 
     public static void main(String[] args) {
         Navigation instance = new Navigation();
@@ -46,7 +48,7 @@ public class Navigation {
                 case "login":
                     System.out.print("Please enter your username: ");
                     String username = input.stringValue();
-                    login(new User(username));
+                    login(factory.createUser(username));
                     return false;
                 case "add":
                     addUser();
@@ -197,9 +199,9 @@ public class Navigation {
     private void addUser() {
         System.out.println("Enter a username to create a new user: ");
         String username = input.stringValue();
-        if (!users.contains(new User(username))) {
+        if (!users.contains(factory.createUser(username))) {
             System.out.println("Please enter a password: ");
-            User user = new User(username, input.stringValue());
+            User user = factory.createUser(username, input.stringValue());
             users.add(user);
             System.out.println("New user " + username + " has been created!");
             login(user);

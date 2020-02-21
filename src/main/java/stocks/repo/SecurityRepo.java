@@ -1,5 +1,6 @@
 package stocks.repo;
 
+import stocks.entities.Factory;
 import stocks.entities.Security;
 import java.io.*;
 import java.util.Iterator;
@@ -10,6 +11,7 @@ import java.util.Objects;
 public class SecurityRepo implements Iterable<Security>{
 
     private List<Security> securityList = new LinkedList<>();
+    private final Factory factory = new Factory();
 
     public void add(Security security) {
         securityList.add(security);
@@ -24,7 +26,7 @@ public class SecurityRepo implements Iterable<Security>{
     }
 
     public Security get(String name) {
-        return securityList.get(indexOf(new Security(name)));
+        return securityList.get(indexOf(factory.createSecurity(name)));
     }
 
     public Security get(int index) {
@@ -90,8 +92,8 @@ public class SecurityRepo implements Iterable<Security>{
                 String isin = fund[1];
                 String wkn = fund[2];
                 String type = fund[3];
-                if (!securityList.contains(new Security(name, isin, wkn, type))) {
-                    securityList.add(new Security(name, isin, wkn, type));
+                if (!securityList.contains(factory.createSecurity(name, isin, wkn, type))) {
+                    securityList.add(factory.createSecurity(name, isin, wkn, type));
                 }
             }
         } catch (IOException e) {

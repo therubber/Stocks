@@ -2,6 +2,7 @@ package stocks.daos;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import stocks.entities.Factory;
 import stocks.entities.Security;
 import stocks.entities.SpotPrice;
 
@@ -12,10 +13,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class SecurityTest {
 
     Security security;
+    private final Factory factory = new Factory();
 
     @BeforeEach
     void setUp() {
-        security = new Security("UniRAK");
+        security = factory.createSecurity("UniRAK");
         security.update();
     }
 
@@ -26,13 +28,13 @@ class SecurityTest {
 
     @Test
     void getSpotPrice() {
-        assertEquals(new SpotPrice(138.33, LocalDate.parse("2020-02-19")), security.getSpotPrice());
+        assertEquals(factory.createSpotPrice(138.33, LocalDate.parse("2020-02-19")), security.getSpotPrice());
     }
 
     @Test
     void setSpotPrice() {
-        security.setSpotPrice(new SpotPrice(130.20, LocalDate.parse("2020-02-17")));
-        assertEquals(new SpotPrice(130.20, LocalDate.parse("2020-02-17")), security.getSpotPrice());
+        security.setSpotPrice(factory.createSpotPrice(130.20, LocalDate.parse("2020-02-17")));
+        assertEquals(factory.createSpotPrice(130.20, LocalDate.parse("2020-02-17")), security.getSpotPrice());
     }
 
     @Test

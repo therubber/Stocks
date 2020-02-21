@@ -11,6 +11,7 @@ public class Position {
     private String id;
     private LocalDate executionDate;
     private Security security;
+    private final Factory factory = new Factory();
 
     public Position(Order order) {
         this.count = order.getCount();
@@ -68,7 +69,7 @@ public class Position {
      * @return Value of the position
      */
     public BigDecimal getValue() {
-        return security.getSpotPrice().getPrice().multiply(new BigDecimal (Integer.toString(count)));
+        return security.getSpotPrice().getPrice().multiply(Factory.BigDecimalCreator.fromInteger(count));
     }
 
     /**
@@ -119,7 +120,7 @@ public class Position {
     public BigDecimal changeCount(int count) {
         this.count += count;
         this.executionDate = LocalDate.now();
-        return security.getSpotPrice().getPrice().multiply(new BigDecimal(count));
+        return security.getSpotPrice().getPrice().multiply(factory.bigDecimalFromInteger(count));
     }
 
     /**

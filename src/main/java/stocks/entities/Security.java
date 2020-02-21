@@ -14,6 +14,7 @@ public class Security {
     String wkn;
     String type;
     private transient List<SpotPrice> prices = new LinkedList<>();
+    private final Factory factory = new Factory();
 
     /**
      * Constructor with name -> Needed to select a security in buy orders
@@ -77,7 +78,7 @@ public class Security {
      * @return Most recent price available, Price (0, 1970-01-01) if no price is available
      */
     public SpotPrice getSpotPrice() {
-        return !prices.isEmpty() ? prices.get(prices.size() - 1) : new SpotPrice(0, LocalDate.parse("1970-01-01"));
+        return !prices.isEmpty() ? prices.get(prices.size() - 1) : factory.createSpotPrice(0, LocalDate.parse("1970-01-01"));
     }
 
     /**
@@ -122,7 +123,7 @@ public class Security {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] data = line.split(";");
-                prices.add(new SpotPrice(Double.parseDouble(data[0]), LocalDate.parse(data[1])));
+                prices.add(factory.createSpotPrice(Double.parseDouble(data[0]), LocalDate.parse(data[1])));
             }
             bufferedReader.close();
         } catch (FileNotFoundException fnfe) {

@@ -13,12 +13,13 @@ class OrderTest {
 
     private Order order;
     Security securityDow;
+    private final Factory factory = new Factory();
 
     @BeforeEach
     void setUp() {
-        securityDow = new Security("UniRAK");
+        securityDow = factory.createSecurity("UniRAK");
         securityDow.update();
-        order = new Order(5, LocalDate.now(), "BUY", securityDow);
+        order = factory.createOrder(5, LocalDate.now(), "BUY", securityDow);
     }
 
     @Test
@@ -28,7 +29,7 @@ class OrderTest {
 
     @Test
     void getExecutionPrice() {
-        assertEquals(new BigDecimal(Double.toString(138.33)).setScale(2, RoundingMode.HALF_UP), order.getExecutionPrice());
+        assertEquals(factory.bigDecimalFromDouble(138.33), order.getExecutionPrice());
     }
 
     @Test
