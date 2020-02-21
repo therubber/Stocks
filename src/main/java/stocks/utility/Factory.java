@@ -8,7 +8,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 
 /**
- * Used for calling all Constructors important for Mocking in tests
+ * Calls all Constructors important for Mocking
  */
 
 public class Factory {
