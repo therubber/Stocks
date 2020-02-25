@@ -28,9 +28,6 @@ public class Input {
 
     private static class InputFromConsole {
 
-        // Private constructor to hide public one
-        private InputFromConsole() {}
-
         private static final Scanner scanner = new Scanner(System.in);
 
         /**

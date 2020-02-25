@@ -5,7 +5,6 @@ import stocks.factories.PortfolioFactory;
 import stocks.factories.SecurityFactory;
 import stocks.inputoutput.Output;
 import stocks.inputoutput.Input;
-import stocks.inputoutput.Help;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
 import java.math.BigDecimal;
@@ -243,7 +242,7 @@ public class Portfolio implements Iterable<Position> {
             if (position.getValue().doubleValue() <= equity.doubleValue() && !position.getIsin().equals("ERROR")) {
                 BigDecimal equityAfterExecution = getEquity().subtract(position.getPrice().multiply(numberFactory.createBigDecimal(position.getCount())));
                 System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", getEquity(), equityAfterExecution);
-                if (Help.confirmOrder(position, true)) {
+                if (confirmOrder(position, true)) {
                     Order order = portfolioFactory.createOrder(position.getCount(), "BUY", position.getSecurity());
                     orderInput(order, users);
                 } else {
@@ -287,7 +286,7 @@ public class Portfolio implements Iterable<Position> {
                     int sellCount = input.intValue();
                     Order order = portfolioFactory.createOrder(sellCount, "SELL", selectedSecurity);
                     Position position = portfolioFactory.createPosition(order);
-                    if (Help.confirmOrder(position, false)) {
+                    if (confirmOrder(position, false)) {
                         orderInput(order, users);
                     }
                 } catch (InputMismatchException e) {
@@ -299,6 +298,23 @@ public class Portfolio implements Iterable<Position> {
         } else {
             out.println("Invalid index. Please try again.");
         }
+    }
+
+    /**
+     * Used to confirm buy/sell orders
+     * @param position Position to confirm
+     * @param type Boolean type of order, true if "BUY"
+     * @return Boolean confirmation of the order
+     */
+    public boolean confirmOrder(Position position, boolean type) {
+        Input betterInput = new Input();
+        if (type) {
+            System.out.println("Buying " + position.getCount() + " shares of " + position.getSecurity().getName() + " at " + position.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
+        } else {
+            System.out.println("Selling " + position.getCount() + " shares of " + position.getSecurity().getName() + " at " + position.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
+        }
+        String confirm = betterInput.stringValue();
+        return confirm.equals("y");
     }
 
     public void valueDevelopment(String state) {
