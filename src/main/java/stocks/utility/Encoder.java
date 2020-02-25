@@ -19,7 +19,7 @@ public class Encoder {
         return bytesToHex(encodedHash);
     }
 
-    public static String bytesToHex(byte[] hash) {
+    private static String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder();
         for (byte b : hash) {
             String hex = Integer.toHexString(0xff & b);

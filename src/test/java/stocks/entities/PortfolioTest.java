@@ -1,5 +1,6 @@
 package stocks.entities;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class PortfolioSnapshot {
+class PortfolioTest {
 
     Portfolio portfolio;
     Security securityDow;
@@ -51,32 +52,32 @@ class PortfolioSnapshot {
 
     @Test
     void getName() {
-        assertEquals("test", portfolio.getName());
+        Assertions.assertEquals("test", portfolio.getName());
     }
 
     @Test
     void getEquity() {
-        assertEquals(numberFactory.createBigDecimal(4308.35), portfolio.getEquity());
+        Assertions.assertEquals(numberFactory.createBigDecimal(4308.35), portfolio.getEquity());
     }
 
     @Test
     void getStartequity() {
-        assertEquals(numberFactory.createBigDecimal(5000), portfolio.getStartEquity());
+        Assertions.assertEquals(numberFactory.createBigDecimal(5000), portfolio.getStartEquity());
     }
 
     @Test
     void getValue() {
-        assertEquals(numberFactory.createBigDecimal(5000.00), portfolio.getValue());
+        Assertions.assertEquals(numberFactory.createBigDecimal(5000.00), portfolio.getValue());
     }
 
     @Test
     void getPosition() {
-        assertEquals(portfolioFactory.createPosition(order), portfolio.getPosition(0));
+        Assertions.assertEquals(portfolioFactory.createPosition(order), portfolio.getPosition(0));
     }
 
     @Test
     void getPositionCount() {
-        assertEquals(1, portfolio.getPositionCount());
+        Assertions.assertEquals(1, portfolio.getPositionCount());
     }
 
     @Test
@@ -85,18 +86,18 @@ class PortfolioSnapshot {
         Position positionMock = Mockito.mock(Position.class);
         portfolioMock.addPosition(positionMock);
         doReturn(numberFactory.createBigDecimal(5)).when(positionMock).getValue();
-        assertEquals(numberFactory.createBigDecimal(5), portfolioMock.getPositionValue());
+        Assertions.assertEquals(numberFactory.createBigDecimal(5), portfolioMock.getPositionValue());
     }
 
     @Test
     void orderInput() {
         portfolio.orderInput(order, users);
-        assertEquals(numberFactory.createBigDecimal(1383.30), portfolio.getPositionValue());
-        assertEquals(1, portfolio.getPositionCount());
+        Assertions.assertEquals(numberFactory.createBigDecimal(1383.30), portfolio.getPositionValue());
+        Assertions.assertEquals(1, portfolio.getPositionCount());
         Position position = portfolio.getPosition(0);
         assertEquals(10, position.getCount());
         portfolio.orderInput(portfolioFactory.createOrder(1, "SELL", securityDow), users);
-        assertEquals(1, portfolio.getPositionCount());
+        Assertions.assertEquals(1, portfolio.getPositionCount());
     }
 
     @Test

@@ -24,7 +24,7 @@ public class Portfolio implements Iterable<Position> {
     LocalDate state;
     List<PortfolioSnapshot> portfolioHistory = new LinkedList<>();
 
-    private final Input input;
+    private final Input input = new Input();
     private final Output out = new Output();
     private final NumberFactory numberFactory = new NumberFactory();
     private final PortfolioFactory portfolioFactory = new PortfolioFactory();
@@ -35,11 +35,10 @@ public class Portfolio implements Iterable<Position> {
      * @param name  Name
      * @param owner Owner
      */
-    public Portfolio(String name, String owner, LocalDate state, Input input) {
+    public Portfolio(String name, String owner, LocalDate state) {
         this.name = name;
         this.owner = owner;
         this.state = state;
-        this.input = input;
     }
 
     /**
@@ -48,13 +47,12 @@ public class Portfolio implements Iterable<Position> {
      * @param owner  Owner of the portfolio
      * @param equity Amount of equity allocated to the portfolio
      */
-    public Portfolio(String name, String owner, BigDecimal equity, Input input) {
+    public Portfolio(String name, String owner, BigDecimal equity) {
         this.name = name;
         this.equity = equity;
         this.owner = owner;
         this.startEquity = equity;
         this.state = LocalDate.now();
-        this.input = input;
     }
 
     public String getName() {

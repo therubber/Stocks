@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import stocks.entities.*;
 import stocks.factories.NumberFactory;
 import stocks.factories.PortfolioFactory;
@@ -12,6 +13,7 @@ import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doReturn;
 
 class NavigationTest {
 
@@ -95,8 +97,23 @@ class NavigationTest {
     @Test
     void testPortfolio() {
         users.addUser(new User("testUser", "password"));
-        Portfolio portfolioSnapshot = new Portfolio("test", "testUser", numberFactory.createBigDecimal(5000), new Input());
+        Portfolio portfolioSnapshot = new Portfolio("test", "testUser", numberFactory.createBigDecimal(5000));
         portfolioSnapshot.orderInput(portfolioFactory.createOrder(5, "BUY", securityRepo.get("UniRAK")), users);
         assertEquals(portfolioFactory.createPosition(5, securityRepo.get("UniRAK")), portfolioSnapshot.getPosition(0));
+    }
+
+    @Test
+    void selectPortfolio() {
+        Navigation navigation = new Navigation();
+        User userMock = Mockito.mock(User.class);
+        Input inputMock = Mockito.mock(Input.class);
+        Portfolio portfolio = new Portfolio("schnitzel", "jay unit", numberFactory.createBigDecimal(5));
+
+        doReturn("schnitzel").when(inputMock).stringValue();
+        doReturn(true).when(userMock).hasPortfolio("schnitzel");
+        doReturn(portfolio).when(userMock).getPortfolio("schnitzel");
+
+        navigation.selectPortfolio();
+        assertEquals(portfolio, navigation.selectedPortfolio);
     }
 }

@@ -21,11 +21,11 @@ public class PortfolioFactory {
     }
 
     public Portfolio createPortfolio(String name, String owner, LocalDate state, Input input) {
-        return new Portfolio(name, owner, state, input);
+        return new Portfolio(name, owner, state);
     }
 
     public Portfolio createPortfolio(String name, String owner, BigDecimal equity, Input input) {
-        return new Portfolio(name, owner, equity, input);
+        return new Portfolio(name, owner, equity);
     }
 
     public PortfolioSnapshot createPortfolioSnapshotEdit(String state) {

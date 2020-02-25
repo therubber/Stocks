@@ -8,14 +8,17 @@ import stocks.repo.UserRepo;
 
 public class Navigation {
 
-    private transient User selectedUser;
-    private transient Portfolio selectedPortfolio;
+    public transient User selectedUser;
+    public transient Portfolio selectedPortfolio;
     private static transient SecurityRepo availableSecurities = new SecurityRepo();
     private static UserRepo users = new UserRepo();
     private final Input input = new Input();
     private final Output out = new Output();
     private final UserFactory userFactory = new UserFactory();
 
+    /**
+     * Main method for the stocks program
+     */
     public static void main(String[] args) {
         Navigation instance = new Navigation();
         availableSecurities.load();
@@ -23,6 +26,9 @@ public class Navigation {
         instance.navigation();
     }
 
+    /**
+     * Starts the navigation
+     */
     private void navigation() {
         boolean exit = false;
         while (!exit) {
@@ -41,6 +47,10 @@ public class Navigation {
         }
     }
 
+    /**
+     * Controller for when no portfolio is selected
+     * @return boolean whether the program is to be terminated via -exit-
+     */
     private boolean noUserNavigation() {
         if (selectedUser == null) {
             switch (input.stringValue()) {
@@ -74,6 +84,10 @@ public class Navigation {
         return false;
     }
 
+    /**
+     * Controller for when a user is selected
+     * @return boolean whether the program is to be terminated via -exit-
+     */
     private boolean userSelected() {
         if (selectedPortfolio != null) {
             return portfolioSelected();
@@ -120,6 +134,10 @@ public class Navigation {
         }
     }
 
+    /**
+     * Controller for when a portfolio is selected
+     * @return boolean whether the program is to be terminated via -exit-
+     */
     private boolean portfolioSelected() {
         switch (input.stringValue()) {
             case "selected":
@@ -180,6 +198,10 @@ public class Navigation {
         }
     }
 
+    /**
+     * Used to log a user in / set the selectedUser
+     * @param user User to select as selectedUser
+     */
     private void login(User user) {
         if (users.contains(user)) {
             out.println("Password: ");
@@ -196,6 +218,9 @@ public class Navigation {
         }
     }
 
+    /**
+     * Shows which user and Portfolio are selected
+     */
     private void selected() {
         out.println("User selected:\t" + selectedUser.getUsername());
         if (selectedPortfolio != null) {
@@ -214,7 +239,10 @@ public class Navigation {
         this.selectedUser = user;
     }
 
-    private void selectPortfolio() {
+    /**
+     * Selects a portfolio in navigation from the selectedUsers list of portfolios
+     */
+    public void selectPortfolio() {
         selectedUser.listPortfolios();
         out.println("Please enter the name of the portfolio you want to select.");
         String depotName = input.stringValue();
@@ -226,6 +254,9 @@ public class Navigation {
         }
     }
 
+    /**
+     * Used to show help menus in console when the -help- command is executed
+     */
     public static class Help {
 
         private Help() {}

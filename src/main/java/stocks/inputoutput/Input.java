@@ -12,6 +12,12 @@ public class Input {
     }
 
     /**
+     * Reads a line from console to String and returns it
+     * @return String input
+     */
+    public String stringValueLine() { return InputFromConsole.stringValueLine(); }
+
+    /**
      * Checks validity of int input
      * @return Int input if valid
      */
@@ -26,9 +32,20 @@ public class Input {
         return InputFromConsole.doubleValue();
     }
 
+    /**
+     * Handles the input from console using a Scanner
+     */
     private static class InputFromConsole {
 
         private static final Scanner scanner = new Scanner(System.in);
+
+        /**
+         * Checks validity of input
+         * @return String input if valid
+         */
+        public static String stringValueLine() {
+            return scanner.nextLine();
+        }
 
         /**
          * Checks validity of input
