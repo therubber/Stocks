@@ -95,14 +95,6 @@ class NavigationTest {
     }
 
     @Test
-    void testPortfolio() {
-        users.addUser(new User("testUser", "password"));
-        Portfolio portfolioSnapshot = new Portfolio("test", "testUser", numberFactory.createBigDecimal(5000));
-        portfolioSnapshot.orderInput(portfolioFactory.createOrder(5, "BUY", securityRepo.get("UniRAK")), users);
-        assertEquals(portfolioFactory.createPosition(5, securityRepo.get("UniRAK")), portfolioSnapshot.getPosition(0));
-    }
-
-    @Test
     void selectPortfolio() {
         Navigation navigation = new Navigation();
         User userMock = Mockito.mock(User.class);

@@ -110,7 +110,7 @@ public class Position {
      * Changes the count of the position by the amount of parameter
      * @param count int count that the position is reduced/increased by
      */
-    public void changeCount(int count) {
+    void changeCount(int count) {
         this.count += count;
         this.executionDate = LocalDate.now();
     }
@@ -119,7 +119,7 @@ public class Position {
      * Checks whether the count is zero -> used for deleting empty positions
      * @return boolean whether the position has the count of zero
      */
-    public boolean isZero() {
+    boolean isZero() {
         return count == 0;
     }
 
@@ -127,7 +127,7 @@ public class Position {
      * Generates an ID for the positions, no check for duplicates but unlikely
      * @return String id to be assigned to the position
      */
-    public String generateId() {
+    private String generateId() {
         return "POS" + new DecimalFormat("000000").format((int)(Math.random() * 100000));
     }
 

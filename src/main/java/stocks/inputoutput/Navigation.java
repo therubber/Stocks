@@ -180,6 +180,11 @@ public class Navigation {
                     out.println("Comparison is unavailable for users who own less than 2 portfolios.");
                 }
                 return false;
+            case "hist":
+                selectedPortfolio.listHistory();
+                System.out.println("Enter the state of the Portfolio you want to display: ");
+                selectedPortfolio.viewHistorical(input.stringValue());
+                return false;
             case "help":
                 return false;
             case "clear":

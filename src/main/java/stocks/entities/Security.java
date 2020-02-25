@@ -119,13 +119,15 @@ public class Security {
      */
     public void update() {
         try {
+            SecurityFactory securityFactory = new SecurityFactory();
             prices = new LinkedList<>();
             InputStream inputStream = Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("SecurityData/" + name + ".csv"));
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] data = line.split(";");
-                prices.add(factory.createSpotPrice(Double.parseDouble(data[0]), LocalDate.parse(data[1])));
+                SpotPrice currentPrice = securityFactory.createSpotPrice(Double.parseDouble(data[0]), LocalDate.parse(data[1]));
+                prices.add(currentPrice);
             }
             bufferedReader.close();
         } catch (FileNotFoundException fnfe) {

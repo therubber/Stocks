@@ -15,7 +15,7 @@ import java.util.*;
 public class Portfolio implements Iterable<Position> {
 
     private String name;
-    public String owner;
+    private String owner;
     private BigDecimal equity;
     private BigDecimal startEquity;
     List<Position> positions = new LinkedList<>();
@@ -59,12 +59,16 @@ public class Portfolio implements Iterable<Position> {
         return name;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
     /**
      * Getter method to retrieve equity value of the portfolio
      *
      * @return Returns equity available in the portfolio
      */
-    public BigDecimal getEquity() {
+    BigDecimal getEquity() {
         return equity;
     }
 
@@ -73,7 +77,7 @@ public class Portfolio implements Iterable<Position> {
      *
      * @return startequity
      */
-    public BigDecimal getStartEquity() {
+    BigDecimal getStartEquity() {
         return startEquity;
     }
 
@@ -81,7 +85,7 @@ public class Portfolio implements Iterable<Position> {
      * Calculates the current overall value of all assets in the portfolio
      * @return Value of all positions and equity
      */
-    public BigDecimal getValue() {
+    BigDecimal getValue() {
         return getPositionValue().add(equity);
     }
 
@@ -91,7 +95,7 @@ public class Portfolio implements Iterable<Position> {
      * @param index Index of the position to be returned
      * @return Position from positions at given index
      */
-    public Position getPosition(int index) {
+    Position getPosition(int index) {
         return positions.get(index);
     }
 
@@ -99,18 +103,18 @@ public class Portfolio implements Iterable<Position> {
      * Getter method to retrieve the amount of positions in the portfolio. Required for indexing of positions
      * @return int number of positions
      */
-    public int getPositionCount() {
+    int getPositionCount() {
         return positions.size();
     }
 
     /**
      * Displays data of all existing positions in the portfolio to the console
      */
-    public void listPositions() {
+    void listPositions(PortfolioSnapshot portfolioSnapshot) {
         out.println();
         System.out.printf("%-12s %-10s %-18s %-16s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Type", "Price", "Value", "Execution");
         out.println();
-        for (Position position : positions) {
+        for (Position position : portfolioSnapshot.positions) {
             System.out.printf("%-12s %-10d %-18s %-16s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurity().getName(), position.getSecurityType(), position.getPrice(), position.getValue(), position.getExecutionDate());
         }
         out.println();
@@ -120,7 +124,7 @@ public class Portfolio implements Iterable<Position> {
      * Method to calculate and return combined value of all positions currently in the portfolio
      * @return double value of open positions combined
      */
-    public BigDecimal getPositionValue() {
+    BigDecimal getPositionValue() {
         BigDecimal value = numberFactory.createBigDecimal(0);
         for (Position position : positions) {
             value = value.add(position.getValue());
@@ -135,7 +139,7 @@ public class Portfolio implements Iterable<Position> {
      * - combined value of all assets
      */
     public void overview(Portfolio portfolio) {
-        portfolio.listPositions();
+        listPositions(portfolioFactory.createPortfolioSnapshot(portfolio));
         String format = "%-45s %10.2f EUR%n";
         System.out.printf(format, "Combined value of positions: ", portfolio.getPositionValue());
         System.out.printf(format, "Equity currently available in portfolio: ", portfolio.getEquity());
@@ -146,7 +150,7 @@ public class Portfolio implements Iterable<Position> {
     /**
      * Adds a position to the portfolio or increases one if it already exists
      */
-    public void orderInput(Order order, UserRepo users) {
+    void orderInput(Order order, UserRepo users) {
         Position position = portfolioFactory.createPosition(order);
         if (!positions.isEmpty()) {
             if (!positions.contains(position)) {
@@ -198,7 +202,7 @@ public class Portfolio implements Iterable<Position> {
         }
     }
 
-    void loadOwnedSecurities() {
+    private void loadOwnedSecurities() {
         ownedSecurities = new SecurityRepo();
         for (Position position : positions) {
             position.getSecurity().update();
@@ -209,7 +213,7 @@ public class Portfolio implements Iterable<Position> {
     /**
      * Updates all positions to the most recent prices available and adds current state of Portfolio to history List
      */
-    public void update(SecurityRepo securityRepo) {
+    void update(SecurityRepo securityRepo) {
         if (!state.equals(LocalDate.now())) {
             portfolioHistory.add(new PortfolioSnapshot(this));
         }
@@ -256,7 +260,7 @@ public class Portfolio implements Iterable<Position> {
         }
     }
 
-    public Position selectionBuy(SecurityRepo securityRepo) {
+    Position selectionBuy(SecurityRepo securityRepo) {
         try {
             securityRepo.listIndexed();
             out.println("Depot equity: " + equity + " EUR");
@@ -318,7 +322,7 @@ public class Portfolio implements Iterable<Position> {
     }
 
     public void valueDevelopment(String state) {
-        PortfolioSnapshot oldState = portfolioHistory.get(portfolioHistory.indexOf(portfolioFactory.createPortfolioSnapshotEdit(state)));
+        PortfolioSnapshot oldState = portfolioHistory.get(portfolioHistory.indexOf(portfolioFactory.createPortfolioSnapshot(state)));
         BigDecimal gain = this.getValue().subtract(oldState.getValue());
         System.out.println("Portfolio gained " + gain + " EUR in Value since " + oldState.state + "!");
     }
@@ -347,8 +351,20 @@ public class Portfolio implements Iterable<Position> {
         return positions.iterator();
     }
 
-    public void addPosition(Position position) {
+    void addPosition(Position position) {
         positions.add(position);
+    }
+
+    public void listHistory() {
+        System.out.println("History of " + name + ":");
+        for (PortfolioSnapshot portfolioSnapshot : portfolioHistory) {
+            System.out.println(portfolioSnapshot.state);
+        }
+    }
+
+    public void viewHistorical(String state) {
+        PortfolioSnapshot snapshot = portfolioFactory.createPortfolioSnapshot(state);
+        listPositions(snapshot);
     }
 
     @Override

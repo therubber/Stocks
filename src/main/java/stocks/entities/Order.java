@@ -91,7 +91,7 @@ public class Order {
      * Generates an ID for the order, no check for duplicates but unlikely
      * @return String order ID
      */
-    public String generateId() {
+    private String generateId() {
         return new DecimalFormat("00000000").format((int)(Math.random() * 10000000));
     }
 }

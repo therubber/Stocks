@@ -83,7 +83,7 @@ public class User {
     public void addPortfolio() {
         out.println("User equity: " + equity + "EUR");
         out.println("Enter a Name for the portfolio you want to create: ");
-        String name = input.stringValueLine();
+        String name = input.stringValue();
         if (!portfolios.contains(portfolioFactory.createPortfolio(name, username, LocalDate.now(), input))) {
             out.println("Enter the amount of equity to transfer to the portfolio account: ");
             try {

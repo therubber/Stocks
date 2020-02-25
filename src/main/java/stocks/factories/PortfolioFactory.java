@@ -28,8 +28,12 @@ public class PortfolioFactory {
         return new Portfolio(name, owner, equity);
     }
 
-    public PortfolioSnapshot createPortfolioSnapshotEdit(String state) {
+    public PortfolioSnapshot createPortfolioSnapshot(String state) {
         return new PortfolioSnapshot(state);
+    }
+
+    public PortfolioSnapshot createPortfolioSnapshot(Portfolio portfolio) {
+        return new PortfolioSnapshot(portfolio);
     }
 
     public Order createOrder(int count, String type, Security security) {
