@@ -3,13 +3,15 @@ package stocks.repo;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import stocks.entities.User;
+import stocks.factories.UserFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserRepoTest {
 
-    static User user = new User("test");
-    static UserRepo users = new UserRepo();
+    private final static UserFactory userFactory = new UserFactory();
+    private static User user = userFactory.createUser("test");
+    private static UserRepo users = new UserRepo();
 
     @BeforeAll
     static void setUp() {
@@ -23,24 +25,24 @@ class UserRepoTest {
 
     @Test
     void getAll() {
-        assertTrue(users.contains(new User("test")));
+        assertTrue(users.contains(userFactory.createUser("test")));
     }
 
     @Test
     void contains() {
-        assertTrue(users.contains(new User("test")));
+        assertTrue(users.contains(userFactory.createUser("test")));
     }
 
     @Test
     void testContains() {
-        assertFalse(users.contains(new User("asdfasdf")));
+        assertFalse(users.contains(userFactory.createUser("asdfasdf")));
         assertTrue(users.contains(user));
     }
 
     @Test
     void indexOf() {
-        users.addUser(new User("user"));
-        assertEquals(1, users.indexOf(new User("user")));
+        users.addUser(userFactory.createUser("user"));
+        assertEquals(1, users.indexOf(userFactory.createUser("user")));
     }
 
     @Test

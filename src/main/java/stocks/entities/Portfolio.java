@@ -19,10 +19,12 @@ public class Portfolio implements Iterable<Position> {
     private BigDecimal equity;
     private BigDecimal startEquity;
     List<Position> positions = new LinkedList<>();
+    List<Order> orderHistory = new LinkedList<>();
     transient SecurityRepo ownedSecurities = new SecurityRepo();
     LocalDate state;
+    List<PortfolioSnapshot> portfolioHistory = new LinkedList<>();
+
     private final Input input;
-    List<PortfolioSnapshotEdit> history = new LinkedList<>();
     private final Output out = new Output();
     private final NumberFactory numberFactory = new NumberFactory();
     private final PortfolioFactory portfolioFactory = new PortfolioFactory();
@@ -106,12 +108,12 @@ public class Portfolio implements Iterable<Position> {
     /**
      * Displays data of all existing positions in the portfolio to the console
      */
-    public void positions() {
+    public void listPositions() {
         out.println();
         System.out.printf("%-12s %-10s %-18s %-16s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Type", "Price", "Value", "Execution");
         out.println();
         for (Position position : positions) {
-            System.out.printf("%-12s %-10d %-18s %-16s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurityName(), position.getSecurityType(), position.getPrice(), position.getValue(), position.getExecutionDate());
+            System.out.printf("%-12s %-10d %-18s %-16s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurity().getName(), position.getSecurityType(), position.getPrice(), position.getValue(), position.getExecutionDate());
         }
         out.println();
     }
@@ -134,12 +136,12 @@ public class Portfolio implements Iterable<Position> {
      * - equity available in portfolio
      * - combined value of all assets
      */
-    public void overview(PortfolioSnapshot portfolioSnapshot) {
-        portfolioSnapshot.positions();
+    public void overview(Portfolio portfolio) {
+        portfolio.listPositions();
         String format = "%-45s %10.2f EUR%n";
-        System.out.printf(format, "Combined value of positions: ", portfolioSnapshot.getPositionValue(positions));
-        System.out.printf(format, "Equity currently available in portfolio: ", portfolioSnapshot.getEquity());
-        System.out.printf(format, "Combined value of all assets: ", portfolioSnapshot.getValue());
+        System.out.printf(format, "Combined value of positions: ", portfolio.getPositionValue());
+        System.out.printf(format, "Equity currently available in portfolio: ", portfolio.getEquity());
+        System.out.printf(format, "Combined value of all assets: ", portfolio.getValue());
         out.println();
     }
 
@@ -150,7 +152,7 @@ public class Portfolio implements Iterable<Position> {
         Position position = portfolioFactory.createPosition(order);
         if (!positions.isEmpty()) {
             if (!positions.contains(position)) {
-                users.get(owner).addOrderToHistory(order);
+                orderHistory.add(order);
                 executeOrder(order);
             } else {
                 Position orderPosition = positions.get(positions.indexOf(position));
@@ -161,7 +163,7 @@ public class Portfolio implements Iterable<Position> {
                     orderPosition.setCount(orderPosition.getCount() - order.getCount());
                     cleanPosition(orderPosition);
                     equity = equity.add(order.getValue());
-                    users.get(owner).addOrderToHistory(order);
+                    orderHistory.add(order);
                 }
                 if (!ownedSecurities.contains(position.getSecurity())) {
                     ownedSecurities.add(position.getSecurity());
@@ -169,7 +171,7 @@ public class Portfolio implements Iterable<Position> {
                 out.println("Buy order successfully executed! New portfolio equity: " + getEquity().setScale(2, RoundingMode.HALF_UP));
             }
         } else {
-            users.get(owner).addOrderToHistory(order);
+            orderHistory.add(order);
             executeOrder(order);
         }
     }
@@ -211,7 +213,7 @@ public class Portfolio implements Iterable<Position> {
      */
     public void update(SecurityRepo securityRepo) {
         if (!state.equals(LocalDate.now())) {
-            history.add(new PortfolioSnapshotEdit(this));
+            portfolioHistory.add(new PortfolioSnapshot(this));
         }
         this.state = LocalDate.now();
         updatePrices(securityRepo);
@@ -239,7 +241,7 @@ public class Portfolio implements Iterable<Position> {
     public void buy(SecurityRepo securityRepo, UserRepo users) {
         if (securityRepo.evaluateSpotPrices()) {
             Position position = selectionBuy(securityRepo);
-            if (position.getValue().doubleValue() <= equity.doubleValue() && !position.getIsin().equals("ERROR")) {
+            if (position.getValue().doubleValue() <= equity.doubleValue() && !position.getSecurity().getIsin().equals("ERROR")) {
                 BigDecimal equityAfterExecution = getEquity().subtract(position.getPrice().multiply(numberFactory.createBigDecimal(position.getCount())));
                 System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", getEquity(), equityAfterExecution);
                 if (confirmOrder(position, true)) {
@@ -306,7 +308,7 @@ public class Portfolio implements Iterable<Position> {
      * @param type Boolean type of order, true if "BUY"
      * @return Boolean confirmation of the order
      */
-    public boolean confirmOrder(Position position, boolean type) {
+    private boolean confirmOrder(Position position, boolean type) {
         Input betterInput = new Input();
         if (type) {
             System.out.println("Buying " + position.getCount() + " shares of " + position.getSecurity().getName() + " at " + position.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
@@ -318,9 +320,25 @@ public class Portfolio implements Iterable<Position> {
     }
 
     public void valueDevelopment(String state) {
-        PortfolioSnapshotEdit oldState = history.get(history.indexOf(portfolioFactory.createPortfolioSnapshotEdit(state)));
+        PortfolioSnapshot oldState = portfolioHistory.get(portfolioHistory.indexOf(portfolioFactory.createPortfolioSnapshotEdit(state)));
         BigDecimal gain = this.getValue().subtract(oldState.getValue());
         System.out.println("Portfolio gained " + gain + " EUR in Value since " + oldState.state + "!");
+    }
+
+    /**
+     * Prints the order history of the user
+     */
+    public void printOrderHistory() {
+        if (!orderHistory.isEmpty()) {
+            System.out.printf("%-8s %10s %5s %15s %10s %15s%n", "ID", "Type", "Count", "Name", "Price", "Date");
+            out.println();
+            for (Order order : orderHistory) {
+                System.out.printf("%-8s %10s %5d %15s %10.2f %15s%n", order.getId(), order.getType(), order.getCount(), order.getSecurity().getName(), order.getExecutionPrice(), order.getExecutionDate());
+            }
+            out.println();
+        } else {
+            out.println("No orders yet! Please add a position to your portfolio.");
+        }
     }
 
     /**
@@ -329,6 +347,10 @@ public class Portfolio implements Iterable<Position> {
      */
     public Iterator<Position> iterator() {
         return positions.iterator();
+    }
+
+    public void addPosition(Position position) {
+        positions.add(position);
     }
 
     @Override

@@ -2,17 +2,17 @@ package stocks.repo;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import stocks.entities.User;
 import stocks.factories.UserFactory;
 import stocks.inputoutput.Input;
 import stocks.inputoutput.Output;
-import stocks.entities.User;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 
 public class UserRepo {
 
-    private List<User> userList = new LinkedList<>();
+    private List<User> users = new LinkedList<>();
     private final UserFactory factory = new UserFactory();
     private final Input input = new Input();
     private final Output out = new Output();
@@ -23,7 +23,7 @@ public class UserRepo {
      * @return User user
      */
     public User get(String name) {
-        return userList.get(userList.indexOf(factory.createUser(name)));
+        return users.get(users.indexOf(factory.createUser(name)));
     }
 
     /**
@@ -31,7 +31,7 @@ public class UserRepo {
      * @param user User to be added
      */
     public void addUser(User user) {
-        userList.add(user);
+        users.add(user);
     }
 
     public void addUser() {
@@ -40,7 +40,7 @@ public class UserRepo {
         if (!contains(factory.createUser(username))) {
             out.println("Please enter a password: ");
             User user = factory.createUser(username, input.stringValue());
-            userList.add(user);
+            users.add(user);
             out.println("New user " + username + " has been created!");
         } else {
             out.println("User with that username already exists, please login.");
@@ -54,7 +54,7 @@ public class UserRepo {
      * @return Boolean whether the user is contained in the list
      */
     public boolean contains(User user) {
-        return userList.contains(user);
+        return users.contains(user);
     }
 
     /**
@@ -63,7 +63,7 @@ public class UserRepo {
      * @return Int index of user in the list, -1 if not contained
      */
     public int indexOf(User user) {
-        return userList.indexOf(user);
+        return users.indexOf(user);
     }
 
     /**
@@ -71,7 +71,7 @@ public class UserRepo {
      * @return Boolean whether the list of users is empty
      */
     public boolean isEmpty() {
-        return userList.isEmpty();
+        return users.isEmpty();
     }
 
     /**
@@ -80,7 +80,7 @@ public class UserRepo {
     public void save() {
         try {
             FileOutputStream fileOutputStream= new FileOutputStream("Saves/users.json");
-            String json = new Gson().toJson(userList);
+            String json = new Gson().toJson(users);
             fileOutputStream.write(json.getBytes());
             fileOutputStream.close();
         }  catch (IOException ioe) {
@@ -100,7 +100,7 @@ public class UserRepo {
                 sb.append(inputString);
             }
             String jsonInput = sb.toString();
-            userList = new LinkedList<>(new Gson().fromJson(jsonInput, new TypeToken<List<User>>(){}.getType()));
+            users = new LinkedList<>(new Gson().fromJson(jsonInput, new TypeToken<List<User>>(){}.getType()));
             bufferedReader.close();
         } catch (FileNotFoundException fnfe) {
             System.out.println("No Savefile found, creating new one...");

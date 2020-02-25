@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import stocks.factories.NumberFactory;
 import stocks.factories.PortfolioFactory;
-import stocks.factories.SecurityFactory;
 import stocks.factories.UserFactory;
 import stocks.inputoutput.Input;
 import stocks.repo.SecurityRepo;
@@ -12,13 +11,14 @@ import stocks.repo.UserRepo;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserTest {
 
     User user;
     Order order;
-    PortfolioSnapshot portfolioSnapshot;
+    Portfolio portfolio;
     UserRepo users;
     private final NumberFactory numberFactory = new NumberFactory();
     private final PortfolioFactory portfolioFactory = new PortfolioFactory();
@@ -35,9 +35,9 @@ class UserTest {
         securityRepo.load();
         user = userFactory.createUser("user", "password");
         order = portfolioFactory.createOrder(5, "BUY", securityRepo.get("UniRAK"));
-        portfolioSnapshot = portfolioFactory.createPortfolioSnapshot("test", "user", numberFactory.createBigDecimal(5000), new Input());
-        user.addPortfolio(portfolioSnapshot);
-        portfolioSnapshot.orderInput(order, users);
+        portfolio = portfolioFactory.createPortfolio("test", "user", numberFactory.createBigDecimal(5000), new Input());
+        user.addPortfolio(portfolio);
+        portfolio.orderInput(order, users);
     }
     @Test
     void getUsername() {
@@ -58,6 +58,6 @@ class UserTest {
 
     @Test
     void getPortfolios() {
-        assertTrue(user.hasPortfolio(portfolioSnapshot.getName()));
+        assertTrue(user.hasPortfolio(portfolio.getName()));
     }
 }

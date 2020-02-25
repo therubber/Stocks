@@ -8,7 +8,6 @@ import stocks.entities.*;
 import stocks.factories.NumberFactory;
 import stocks.factories.PortfolioFactory;
 import stocks.factories.SecurityFactory;
-import stocks.factories.UserFactory;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
 
@@ -96,7 +95,7 @@ class NavigationTest {
     @Test
     void testPortfolio() {
         users.addUser(new User("testUser", "password"));
-        PortfolioSnapshot portfolioSnapshot = new PortfolioSnapshot("test", "testUser", numberFactory.createBigDecimal(5000), new Input());
+        Portfolio portfolioSnapshot = new Portfolio("test", "testUser", numberFactory.createBigDecimal(5000), new Input());
         portfolioSnapshot.orderInput(portfolioFactory.createOrder(5, "BUY", securityRepo.get("UniRAK")), users);
         assertEquals(portfolioFactory.createPosition(5, securityRepo.get("UniRAK")), portfolioSnapshot.getPosition(0));
     }

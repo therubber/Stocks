@@ -58,7 +58,7 @@ class PositionTest {
 
     @Test
     void getSecurityName() {
-        assertEquals("UniRAK", position.getSecurityName());
+        assertEquals("UniRAK", position.getSecurity().getName());
     }
 
     @Test

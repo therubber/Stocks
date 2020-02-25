@@ -72,14 +72,6 @@ public class Order {
     }
 
     /**
-     * Generates an ID for the order, no check for duplicates but unlikely
-     * @return String order ID
-     */
-    public String generateId() {
-        return new DecimalFormat("00000000").format((int)(Math.random() * 10000000));
-    }
-
-    /**
      * Getter method for security which is object of the order
      * @return Security of order
      */
@@ -93,5 +85,13 @@ public class Order {
      */
     public BigDecimal getValue() {
         return security.getPrice().multiply(factory.createBigDecimal(count));
+    }
+
+    /**
+     * Generates an ID for the order, no check for duplicates but unlikely
+     * @return String order ID
+     */
+    public String generateId() {
+        return new DecimalFormat("00000000").format((int)(Math.random() * 10000000));
     }
 }

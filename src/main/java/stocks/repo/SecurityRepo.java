@@ -9,48 +9,48 @@ import java.util.*;
 
 public class SecurityRepo implements Iterable<Security>{
 
-    private List<Security> securityList = new LinkedList<>();
+    private List<Security> securities = new LinkedList<>();
     private final SecurityFactory factory = new SecurityFactory();
     private final Input input = new Input();
     private final Output out = new Output();
 
     public void add(Security security) {
-        securityList.add(security);
+        securities.add(security);
     }
 
     public void remove(Security security) {
-        securityList.remove(security);
+        securities.remove(security);
     }
 
     public Security get(Security securityDow) {
-        return securityList.get(indexOf(securityDow));
+        return securities.get(indexOf(securityDow));
     }
 
     public Security get(String name) {
-        return securityList.get(indexOf(factory.createSecurity(name)));
+        return securities.get(indexOf(factory.createSecurity(name)));
     }
 
     public Security get(int index) {
-        return securityList.get(index);
+        return securities.get(index);
     }
 
     public boolean contains(Security security) {
-        return securityList.contains(security);
+        return securities.contains(security);
     }
 
     public int indexOf(Security securityDow) {
-        return securityList.indexOf(securityDow);
+        return securities.indexOf(securityDow);
     }
 
     public boolean isEmpty() {
-        return securityList.isEmpty();
+        return securities.isEmpty();
     }
 
-    public void list() {
+    public void listSecurities() {
         System.out.println();
         System.out.printf("%-18s %-16s %-10s %-12s %-10s %-15s%n", "Name", "ISIN", "WKN", "Type", "Price", "Date");
         System.out.println();
-        for (Security security : securityList) {
+        for (Security security : securities) {
             System.out.printf("%-18s %-16s %-10s %-12s %-10.2f %-15s%n", security.getName(), security.getIsin(), security.getWkn(), security.getType(), security.getSpotPrice().getPrice(), security.getSpotDate());
         }
         System.out.println();
@@ -64,7 +64,7 @@ public class SecurityRepo implements Iterable<Security>{
         System.out.println();
         System.out.printf("%5s %-18s %-16s %-10s %-16s %-10s %-15s%n", "Index", "Name", "ISIN", "WKN", "Type", "Price", "Date");
         int index = 1;
-        for (Security security : securityList) {
+        for (Security security : securities) {
             System.out.printf("%-5d %-18s %-16s %-10s %-16s %-10.2f %-15s%n", index, security.getName(), security.getIsin(), security.getWkn(), security.getType(), security.getSpotPrice().getPrice(), security.getSpotDate());
             index++;
         }
@@ -93,8 +93,8 @@ public class SecurityRepo implements Iterable<Security>{
                 String isin = fund[1];
                 String wkn = fund[2];
                 String type = fund[3];
-                if (!securityList.contains(factory.createSecurity(name, isin, wkn, type))) {
-                    securityList.add(factory.createSecurity(name, isin, wkn, type));
+                if (!securities.contains(factory.createSecurity(name, isin, wkn, type))) {
+                    securities.add(factory.createSecurity(name, isin, wkn, type));
                 }
             }
         } catch (IOException e) {
@@ -106,7 +106,7 @@ public class SecurityRepo implements Iterable<Security>{
      * Updates prices to most recent using data from SecurityData file and fills price history with all other found historical prices
      */
     public void updatePrices() {
-        for (Security security : securityList) {
+        for (Security security : securities) {
             security.update();
         }
     }
@@ -148,18 +148,18 @@ public class SecurityRepo implements Iterable<Security>{
      * @return Int amount of security objects contained
      */
     public int size() {
-        return securityList.size();
+        return securities.size();
     }
 
     /**
      * Clears the Repository
      */
     public void clear() {
-        securityList.clear();
+        securities.clear();
     }
 
     public Iterator<Security> iterator() {
-        return securityList.iterator();
+        return securities.iterator();
     }
 }
 

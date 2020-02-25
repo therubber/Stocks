@@ -99,14 +99,6 @@ public class Position {
     }
 
     /**
-     * Getter method for the name of the contained security
-     * @return String name of security contained in position
-     */
-    public String getSecurityName() {
-        return security.getName();
-    }
-
-    /**
      * Getter method for the executionDate of the position
      * @return String execution date of the order
      */
@@ -117,12 +109,10 @@ public class Position {
     /**
      * Changes the count of the position by the amount of parameter
      * @param count int count that the position is reduced/increased by
-     * @return double updated value of the position
      */
-    public BigDecimal changeCount(int count) {
+    public void changeCount(int count) {
         this.count += count;
         this.executionDate = LocalDate.now();
-        return security.getSpotPrice().getPrice().multiply(factory.createBigDecimal(count));
     }
 
     /**
@@ -139,14 +129,6 @@ public class Position {
      */
     public String generateId() {
         return "POS" + new DecimalFormat("000000").format((int)(Math.random() * 100000));
-    }
-
-    /**
-     * Getter for ISIN
-     * @return String isin
-     */
-    public String getIsin() {
-        return getSecurity().getIsin();
     }
 
     @Override

@@ -20,16 +20,16 @@ public class PortfolioFactory {
         return new Position(count, security);
     }
 
-    public PortfolioSnapshot createPortfolioSnapshot(String name, String owner, LocalDate state, Input input) {
-        return new PortfolioSnapshot(name, owner, state, input);
+    public Portfolio createPortfolio(String name, String owner, LocalDate state, Input input) {
+        return new Portfolio(name, owner, state, input);
     }
 
-    public PortfolioSnapshot createPortfolioSnapshot(String name, String owner, BigDecimal equity, Input input) {
-        return new PortfolioSnapshot(name, owner, equity, input);
+    public Portfolio createPortfolio(String name, String owner, BigDecimal equity, Input input) {
+        return new Portfolio(name, owner, equity, input);
     }
 
-    public PortfolioSnapshotEdit createPortfolioSnapshotEdit(String state) {
-        return new PortfolioSnapshotEdit(state);
+    public PortfolioSnapshot createPortfolioSnapshotEdit(String state) {
+        return new PortfolioSnapshot(state);
     }
 
     public Order createOrder(int count, String type, Security security) {
