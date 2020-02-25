@@ -1,8 +1,9 @@
 package stocks.entities;
 
+import stocks.factories.NumberFactory;
+import stocks.factories.PortfolioFactory;
 import stocks.inputoutput.Output;
 import stocks.utility.Encoder;
-import stocks.utility.Factory;
 import stocks.inputoutput.Input;
 import stocks.repo.SecurityRepo;
 import java.math.BigDecimal;
@@ -14,19 +15,20 @@ public class User {
 
     private String username;
     private BigDecimal equity;
-    private List<Portfolio> portfolios = new LinkedList<>();
+    private List<PortfolioSnapshot> portfolioSnapshots = new LinkedList<>();
     public List<Order> orderHistory = new LinkedList<>();
     private String password;
     private final Input input = new Input();
     private final Output out = new Output();
-    private final Factory factory= new Factory();
+    private final NumberFactory numberFactory = new NumberFactory();
+    private final PortfolioFactory portfolioFactory = new PortfolioFactory();
 
     /**
      * Regular constructor to be used
      * @param username String username to create user with
      */
     public User(String username) {
-        this.equity = factory.createBigDecimal(10000);
+        this.equity = numberFactory.createBigDecimal(10000);
         this.username = username;
     }
 
@@ -36,7 +38,7 @@ public class User {
      * @param password Password to set for user
      */
     public User(String username, String password) {
-        this.equity = factory.createBigDecimal(10000);
+        this.equity = numberFactory.createBigDecimal(10000);
         this.username = username;
         this.password = Encoder.encode(password);
     }
@@ -67,10 +69,10 @@ public class User {
 
     /**
      * Adding portfolio for testing
-     * @param portfolio Portfolio to add
+     * @param portfolioSnapshot Portfolio to add
      */
-    public void addPortfolio(Portfolio portfolio) {
-        portfolios.add(portfolio);
+    public void addPortfolio(PortfolioSnapshot portfolioSnapshot) {
+        portfolioSnapshots.add(portfolioSnapshot);
     }
 
     /**
@@ -80,13 +82,13 @@ public class User {
         out.println("User equity: " + equity + "EUR");
         out.println("Enter a Name for the portfolio you want to create: ");
         String name = input.stringValue();
-        if (!portfolios.contains(factory.createPortfolio(name, username, LocalDate.now(), new Input()))) {
+        if (!portfolioSnapshots.contains(portfolioFactory.createPortfolioSnapshot(name, username, LocalDate.now(), input))) {
             out.println("Enter the amount of equity to transfer to the portfolio account: ");
             try {
                 BigDecimal depotEquity = BigDecimal.valueOf(input.doubleValue());
                 if (depotEquity.doubleValue() <= equity.doubleValue()) {
-                    Portfolio toAdd = factory.createPortfolio(name, username, depotEquity, new Input());
-                    portfolios.add(toAdd);
+                    PortfolioSnapshot toAdd = portfolioFactory.createPortfolioSnapshot(name, username, depotEquity, input);
+                    portfolioSnapshots.add(toAdd);
                     equity = equity.subtract(depotEquity);
                     out.println("Depot " + name + " successfully created!");
                 } else {
@@ -105,8 +107,8 @@ public class User {
      * @param name String name of the portfolio to get
      * @return Portfolio requested
      */
-    public Portfolio getPortfolio(String name) {
-        return portfolios.get(portfolios.indexOf(factory.createPortfolio(name, username, LocalDate.now(), new Input())));
+    public PortfolioSnapshot getPortfolio(String name) {
+        return portfolioSnapshots.get(portfolioSnapshots.indexOf(portfolioFactory.createPortfolioSnapshot(name, username, LocalDate.now(), input)));
     }
 
     /**
@@ -115,7 +117,7 @@ public class User {
      * @return Boolean whether the portfolio is contained in the users portfolio list
      */
     public boolean hasPortfolio(String name) {
-        return portfolios.contains(factory.createPortfolio(name, username, LocalDate.now(), new Input()));
+        return portfolioSnapshots.contains(portfolioFactory.createPortfolioSnapshot(name, username, LocalDate.now(), input));
     }
 
     /**
@@ -123,7 +125,7 @@ public class User {
      * @return boolean whether the user has two or more portfolios
      */
     public boolean hasPortfolios() {
-        return portfolios.size() >= 2;
+        return portfolioSnapshots.size() >= 2;
     }
 
     /**
@@ -131,9 +133,9 @@ public class User {
      */
     public void listPortfolios() {
         System.out.printf("%-15s %-10s%n", "Name", "Value");
-        if (!portfolios.isEmpty()) {
-            for (Portfolio portfolio : portfolios) {
-                System.out.printf("%-15s %-10.2f%n", portfolio.toString(), portfolio.getValue());
+        if (!portfolioSnapshots.isEmpty()) {
+            for (PortfolioSnapshot portfolioSnapshot : portfolioSnapshots) {
+                System.out.printf("%-15s %-10.2f%n", portfolioSnapshot.toString(), portfolioSnapshot.getValue());
             }
         } else {
             out.println("No portfolios available. Please add a new one!");
@@ -162,12 +164,12 @@ public class User {
     public void compare() {
         listPortfolios();
         out.println("Enter the name of the first Portfolio: ");
-        Portfolio portfolio1 = factory.createPortfolio(input.stringValue(), username, LocalDate.now(), new Input());
-        if (portfolios.contains(portfolio1)) {
+        PortfolioSnapshot portfolioSnapshot1 = portfolioFactory.createPortfolioSnapshot(input.stringValue(), username, LocalDate.now(), input);
+        if (portfolioSnapshots.contains(portfolioSnapshot1)) {
             out.println("Enter the name of the second Portfolio: ");
-            Portfolio portfolio2 = factory.createPortfolio(input.stringValue(), username, LocalDate.now(), new Input());
-            if (portfolios.contains(portfolio2)) {
-                comparePortfolios(portfolio1, portfolio2);
+            PortfolioSnapshot portfolioSnapshot2 = portfolioFactory.createPortfolioSnapshot(input.stringValue(), username, LocalDate.now(), input);
+            if (portfolioSnapshots.contains(portfolioSnapshot2)) {
+                comparePortfolios(portfolioSnapshot1, portfolioSnapshot2);
             } else {
                 out.println("Portfolio doesn't exist. Try again:");
             }
@@ -176,9 +178,9 @@ public class User {
         }
     }
 
-    private void comparePortfolios(Portfolio portfolio1, Portfolio portfolio2) {
-        Portfolio one = portfolios.get(portfolios.indexOf(portfolio1));
-        Portfolio two = portfolios.get(portfolios.indexOf(portfolio2));
+    private void comparePortfolios(PortfolioSnapshot portfolioSnapshot1, PortfolioSnapshot portfolioSnapshot2) {
+        PortfolioSnapshot one = portfolioSnapshots.get(portfolioSnapshots.indexOf(portfolioSnapshot1));
+        PortfolioSnapshot two = portfolioSnapshots.get(portfolioSnapshots.indexOf(portfolioSnapshot2));
         BigDecimal gainOne = one.getValue().subtract(one.getStartEquity());
         BigDecimal gainTwo = two.getValue().subtract(two.getStartEquity());
         out.println("Portfolio " + one.getName() + "has gained " + gainOne.toString() + "EUR in value ");
@@ -191,8 +193,8 @@ public class User {
      * Updates all portfolios owned by the user to the most recent prices
      */
     public void updatePortfolios(SecurityRepo securityRepo) {
-        for (Portfolio portfolio : portfolios) {
-            portfolio.update(securityRepo);
+        for (PortfolioSnapshot portfolioSnapshot : portfolioSnapshots) {
+            portfolioSnapshot.update(securityRepo);
         }
     }
 

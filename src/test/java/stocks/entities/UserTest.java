@@ -2,14 +2,15 @@ package stocks.entities;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import stocks.utility.Factory;
+import stocks.factories.NumberFactory;
+import stocks.factories.PortfolioFactory;
+import stocks.factories.SecurityFactory;
+import stocks.factories.UserFactory;
 import stocks.inputoutput.Input;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,9 +18,14 @@ class UserTest {
 
     User user;
     Order order;
-    Portfolio portfolio;
+    PortfolioSnapshot portfolioSnapshot;
     UserRepo users;
-    private final Factory factory = new Factory();
+    private final NumberFactory numberFactory = new NumberFactory();
+    private final PortfolioFactory portfolioFactory = new PortfolioFactory();
+    private final UserFactory userFactory = new UserFactory();
+
+
+
 
     @BeforeEach
     void setUp() {
@@ -27,11 +33,11 @@ class UserTest {
         users.load();
         SecurityRepo securityRepo = new SecurityRepo();
         securityRepo.load();
-        user = factory.createUser("user", "password");
-        order = factory.createOrder(5, LocalDate.now(), "BUY", securityRepo.get("UniRAK"));
-        portfolio = factory.createPortfolio("test", "user", factory.createBigDecimal(5000), new Input());
-        user.addPortfolio(portfolio);
-        portfolio.orderInput(order, users);
+        user = userFactory.createUser("user", "password");
+        order = portfolioFactory.createOrder(5, "BUY", securityRepo.get("UniRAK"));
+        portfolioSnapshot = portfolioFactory.createPortfolioSnapshot("test", "user", numberFactory.createBigDecimal(5000), new Input());
+        user.addPortfolio(portfolioSnapshot);
+        portfolioSnapshot.orderInput(order, users);
     }
     @Test
     void getUsername() {
@@ -40,18 +46,18 @@ class UserTest {
 
     @Test
     void getEquity() {
-        assertEquals(factory.createBigDecimal(10000), user.getEquity());
+        assertEquals(numberFactory.createBigDecimal(10000), user.getEquity());
     }
 
     @Test
     void setEquity() {
-        BigDecimal newEquity = factory.createBigDecimal(5000);
+        BigDecimal newEquity = numberFactory.createBigDecimal(5000);
         user.setEquity(newEquity);
         assertEquals(newEquity, user.getEquity());
     }
 
     @Test
     void getPortfolios() {
-        assertTrue(user.hasPortfolio(portfolio.getName()));
+        assertTrue(user.hasPortfolio(portfolioSnapshot.getName()));
     }
 }

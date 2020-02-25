@@ -13,17 +13,16 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 
-public class Portfolio implements Iterable<Position> {
+public class PortfolioSnapshot implements Iterable<Position> {
 
     private String name;
     public String owner;
-    private BigDecimal equity;
+    BigDecimal equity;
     private BigDecimal startEquity;
     List<Position> positions = new LinkedList<>();
     transient SecurityRepo ownedSecurities = new SecurityRepo();
     LocalDate state;
     private final Input input;
-    List<PortfolioSnapshotEdit> history = new LinkedList<>();
     private final Output out = new Output();
     private final NumberFactory numberFactory = new NumberFactory();
     private final PortfolioFactory portfolioFactory = new PortfolioFactory();
@@ -34,7 +33,7 @@ public class Portfolio implements Iterable<Position> {
      * @param name  Name
      * @param owner Owner
      */
-    public Portfolio(String name, String owner, LocalDate state, Input input) {
+    public PortfolioSnapshot(String name, String owner, LocalDate state, Input input) {
         this.name = name;
         this.owner = owner;
         this.state = state;
@@ -47,7 +46,7 @@ public class Portfolio implements Iterable<Position> {
      * @param owner  Owner of the portfolio
      * @param equity Amount of equity allocated to the portfolio
      */
-    public Portfolio(String name, String owner, BigDecimal equity, Input input) {
+    public PortfolioSnapshot(String name, String owner, BigDecimal equity, Input input) {
         this.name = name;
         this.equity = equity;
         this.owner = owner;
@@ -83,7 +82,7 @@ public class Portfolio implements Iterable<Position> {
      * @return Value of all positions and equity
      */
     public BigDecimal getValue() {
-        return getPositionValue().add(equity);
+        return getPositionValue(positions).add(equity);
     }
 
     /**
@@ -121,7 +120,7 @@ public class Portfolio implements Iterable<Position> {
      * Method to calculate and return combined value of all positions currently in the portfolio
      * @return double value of open positions combined
      */
-    public BigDecimal getPositionValue() {
+    public BigDecimal getPositionValue(List<Position> positions) {
         BigDecimal value = numberFactory.createBigDecimal(0);
         for (Position position : positions) {
             value = value.add(position.getValue());
@@ -177,7 +176,7 @@ public class Portfolio implements Iterable<Position> {
 
     private void executeOrder(Order order) {
         if (order.getType().equals("BUY")) {
-            positions.add(portfolioFactory.createPosition(order));
+            addPosition(portfolioFactory.createPosition(order));
             equity = equity.subtract(order.getValue());
             if (!ownedSecurities.contains(order.getSecurity())) {
                 ownedSecurities.add(order.getSecurity());
@@ -191,6 +190,10 @@ public class Portfolio implements Iterable<Position> {
                 out.println("Cannot sell more than you own. Please try again.");
             }
         }
+    }
+
+    public void addPosition(Position position) {
+        positions.add(position);
     }
 
     private void cleanPosition(Position position) {
@@ -211,9 +214,6 @@ public class Portfolio implements Iterable<Position> {
      * Updates all positions to the most recent prices available and adds current state of Portfolio to history List
      */
     public void update(SecurityRepo securityRepo) {
-        if (!state.equals(LocalDate.now())) {
-            history.add(new PortfolioSnapshotEdit(this));
-        }
         this.state = LocalDate.now();
         updatePrices(securityRepo);
     }
@@ -301,12 +301,6 @@ public class Portfolio implements Iterable<Position> {
         }
     }
 
-    public void valueDevelopment(String state) {
-        PortfolioSnapshotEdit oldState = history.get(history.indexOf(portfolioFactory.createPortfolioSnapshotEdit(state)));
-        BigDecimal gain = this.getValue().subtract(oldState.getValue());
-        System.out.println("Portfolio gained " + gain + " EUR in Value since " + oldState.state + "!");
-    }
-
     /**
      * Makes class Portfolio iterable over positions list
      * @return Iterator over positions list
@@ -324,9 +318,9 @@ public class Portfolio implements Iterable<Position> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Portfolio portfolio = (Portfolio) o;
-        return Objects.equals(name, portfolio.name) &&
-                Objects.equals(owner, portfolio.owner);
+        PortfolioSnapshot portfolioSnapshot = (PortfolioSnapshot) o;
+        return Objects.equals(name, portfolioSnapshot.name) &&
+                Objects.equals(owner, portfolioSnapshot.owner);
     }
 
     @Override

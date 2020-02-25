@@ -1,17 +1,18 @@
 package stocks.repo;
 
-import stocks.utility.Factory;
+import stocks.factories.SecurityFactory;
+import stocks.inputoutput.Input;
+import stocks.inputoutput.Output;
 import stocks.entities.Security;
 import java.io.*;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class SecurityRepo implements Iterable<Security>{
 
     private List<Security> securityList = new LinkedList<>();
-    private final Factory factory = new Factory();
+    private final SecurityFactory factory = new SecurityFactory();
+    private final Input input = new Input();
+    private final Output out = new Output();
 
     public void add(Security security) {
         securityList.add(security);
@@ -107,6 +108,25 @@ public class SecurityRepo implements Iterable<Security>{
     public void updatePrices() {
         for (Security security : securityList) {
             security.update();
+        }
+    }
+
+    public void priceHistory() {
+        listIndexed();
+        out.println("Enter the index of the Security whose price history you want to display or 0 to exit:");
+        try {
+            int index = input.intValue();
+            if (index == 0) {
+                out.println("Going back to main menu...");
+            } else if (index <= size()) {
+                Security selectedSecurity = get(index - 1);
+                selectedSecurity.priceHistory();
+            } else {
+                out.println("Index invalid. Please try again.");
+                priceHistory();
+            }
+        } catch (InputMismatchException e) {
+            out.println("Index invalid. Please try again.");
         }
     }
 

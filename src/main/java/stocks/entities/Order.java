@@ -1,6 +1,6 @@
 package stocks.entities;
 
-import stocks.utility.Factory;
+import stocks.factories.NumberFactory;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -9,23 +9,20 @@ import java.time.LocalDate;
 public class Order {
 
     private int count;
-    private BigDecimal executionPrice;
-    private LocalDate executionDate;
+    private SpotPrice executionPrice;
     private boolean type;
     private Security security;
     private String id;
-    private final Factory factory = new Factory();
+    private final NumberFactory factory = new NumberFactory();
 
     /**
      * Constructor for regular use
-     * @param executionDate String date at which the order was executed
      * @param type Boolean stating whether the order is Buy/Sell -> default = buy = false
      * @param security Security which is object of the order
      */
-    public Order(int count, LocalDate executionDate, String type, Security security) {
+    public Order(int count, String type, Security security) {
         this.count = count;
-        this.executionPrice = security.getSpotPrice().getPrice();
-        this.executionDate = executionDate;
+        this.executionPrice = security.getSpotPrice();
         if (type.equals("SELL")) {
             this.type = true;
         }
@@ -46,7 +43,7 @@ public class Order {
      * @return double execution price
      */
     public BigDecimal getExecutionPrice() {
-        return executionPrice;
+        return executionPrice.getPrice();
     }
 
     /**
@@ -54,7 +51,7 @@ public class Order {
      * @return String date of execution
      */
     public LocalDate getExecutionDate() {
-        return executionDate;
+        return executionPrice.getDate();
     }
 
 

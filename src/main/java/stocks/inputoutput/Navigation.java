@@ -1,22 +1,20 @@
 package stocks.inputoutput;
 
-import stocks.utility.Factory;
-import stocks.entities.Portfolio;
+import stocks.entities.PortfolioSnapshot;
 import stocks.entities.User;
-import stocks.entities.Security;
+import stocks.factories.UserFactory;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
-import java.util.InputMismatchException;
 
 public class Navigation {
 
     private transient User selectedUser;
-    private transient Portfolio selectedPortfolio;
+    private transient PortfolioSnapshot selectedPortfolioSnapshot;
     private static transient SecurityRepo availableSecurities = new SecurityRepo();
     private static UserRepo users = new UserRepo();
     private final Input input = new Input();
     private final Output out = new Output();
-    private final Factory factory = new Factory();
+    private final UserFactory userFactory = new UserFactory();
 
     public static void main(String[] args) {
         Navigation instance = new Navigation();
@@ -32,12 +30,12 @@ public class Navigation {
                 Help.noUser();
                 exit = noUserNavigation();
             } else {
-                if (selectedPortfolio == null) {
+                if (selectedPortfolioSnapshot == null) {
                     Help.loggedIn();
-                    exit = userNavigation();
+                    exit = userSelected();
                 } else {
                     Help.portfolio();
-                    exit = portfolioNavigation();
+                    exit = portfolioSelected();
                 }
             }
         }
@@ -49,16 +47,16 @@ public class Navigation {
                 case "login":
                     out.print("Please enter your username: ");
                     String username = input.stringValue();
-                    login(factory.createUser(username));
+                    login(userFactory.createUser(username));
                     return false;
                 case "add":
-                    addUser();
+                    users.addUser();
                     return false;
                 case "lf":
                     availableSecurities.list();
                     return false;
                 case "ph":
-                    priceHistory();
+                    availableSecurities.priceHistory();
                     return false;
                 case "help":
                     return false;
@@ -76,9 +74,9 @@ public class Navigation {
         return false;
     }
 
-    private boolean userNavigation() {
-        if (selectedPortfolio != null) {
-            return portfolioNavigation();
+    private boolean userSelected() {
+        if (selectedPortfolioSnapshot != null) {
+            return portfolioSelected();
         } else {
             switch (input.stringValue()) {
                 case "selected":
@@ -98,7 +96,7 @@ public class Navigation {
                     availableSecurities.list();
                     return false;
                 case "ph":
-                    priceHistory();
+                    availableSecurities.priceHistory();
                     return false;
                 case "oh":
                     selectedUser.printOrderHistory();
@@ -111,7 +109,7 @@ public class Navigation {
                 case "logout":
                     out.println("User " + selectedUser.getUsername() + " successfully logged out!");
                     selectedUser = null;
-                    selectedPortfolio = null;
+                    selectedPortfolioSnapshot = null;
                     users.save();
                     Help.noUser();
                     return false;
@@ -125,7 +123,7 @@ public class Navigation {
         }
     }
 
-    private boolean portfolioNavigation() {
+    private boolean portfolioSelected() {
         switch(input.stringValue()) {
             case "selected":
                 selected();
@@ -138,15 +136,15 @@ public class Navigation {
                 users.save();
                 return false;
             case "buy":
-                selectedPortfolio.buy(availableSecurities, users);
+                selectedPortfolioSnapshot.buy(availableSecurities, users);
                 users.save();
                 return false;
             case "sell":
-                selectedPortfolio.sell(users);
+                selectedPortfolioSnapshot.sell(users);
                 users.save();
                 return false;
             case "ov":
-                selectedPortfolio.overview(selectedPortfolio);
+                selectedPortfolioSnapshot.overview(selectedPortfolioSnapshot);
                 return false;
             case "lp":
                 selectedUser.listPortfolios();
@@ -155,7 +153,7 @@ public class Navigation {
                 availableSecurities.list();
                 return false;
             case "ph":
-                priceHistory();
+                availableSecurities.priceHistory();
                 return false;
             case "oh":
                 selectedUser.printOrderHistory();
@@ -173,7 +171,7 @@ public class Navigation {
                 Help.clear();
                 return false;
             case "logout":
-                selectedPortfolio = null;
+                selectedPortfolioSnapshot = null;
                 selectedUser = null;
                 return false;
             case "exit":
@@ -201,25 +199,10 @@ public class Navigation {
         }
     }
 
-    private void addUser() {
-        out.println("Enter a username to create a new user: ");
-        String username = input.stringValue();
-        if (!users.contains(factory.createUser(username))) {
-            out.println("Please enter a password: ");
-            User user = factory.createUser(username, input.stringValue());
-            users.add(user);
-            out.println("New user " + username + " has been created!");
-            login(user);
-        } else {
-            out.println("User with that username already exists, please login.");
-        }
-        users.save();
-    }
-
     private void selected() {
         out.println("User selected:\t" + selectedUser.getUsername());
-        if (selectedPortfolio != null) {
-            out.println("Depot selected:\t" + selectedPortfolio.getName());
+        if (selectedPortfolioSnapshot != null) {
+            out.println("Depot selected:\t" + selectedPortfolioSnapshot.getName());
         } else {
             out.println("No depot selected");
         }
@@ -238,29 +221,10 @@ public class Navigation {
         out.println("Please enter the name of the portfolio you want to select.");
         String depotName = input.stringValue();
         if (selectedUser.hasPortfolio(depotName)) {
-            selectedPortfolio = selectedUser.getPortfolio(depotName);
+            selectedPortfolioSnapshot = selectedUser.getPortfolio(depotName);
             out.println("Depot " + depotName + " has been selected!");
         } else {
             out.println("Depot " + depotName + " does not exist or isn't owned by you, please try a different depot.");
-        }
-    }
-
-    private void priceHistory() {
-        availableSecurities.listIndexed();
-        out.println("Enter the index of the Security whose price history you want to display or 0 to exit:");
-        try {
-            int index = input.intValue();
-            if (index == 0) {
-                out.println("Going back to main menu...");
-            } else if (index <= availableSecurities.size()) {
-                Security selectedSecurity = availableSecurities.get(index - 1);
-                selectedSecurity.priceHistory();
-            } else {
-                out.println("Index invalid. Please try again.");
-                priceHistory();
-            }
-        } catch (InputMismatchException e) {
-            out.println("Index invalid. Please try again.");
         }
     }
 }

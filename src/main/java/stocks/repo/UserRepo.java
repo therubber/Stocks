@@ -2,7 +2,9 @@ package stocks.repo;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import stocks.utility.Factory;
+import stocks.factories.UserFactory;
+import stocks.inputoutput.Input;
+import stocks.inputoutput.Output;
 import stocks.entities.User;
 import java.io.*;
 import java.util.LinkedList;
@@ -11,7 +13,9 @@ import java.util.List;
 public class UserRepo {
 
     private List<User> userList = new LinkedList<>();
-    private final Factory factory = new Factory();
+    private final UserFactory factory = new UserFactory();
+    private final Input input = new Input();
+    private final Output out = new Output();
 
     /**
      * Getter method to get a User out of the list
@@ -26,8 +30,22 @@ public class UserRepo {
      * Adds a user
      * @param user User to be added
      */
-    public void add(User user) {
+    public void addUser(User user) {
         userList.add(user);
+    }
+
+    public void addUser() {
+        out.println("Enter a username to create a new user: ");
+        String username = input.stringValue();
+        if (!contains(factory.createUser(username))) {
+            out.println("Please enter a password: ");
+            User user = factory.createUser(username, input.stringValue());
+            userList.add(user);
+            out.println("New user " + username + " has been created!");
+        } else {
+            out.println("User with that username already exists, please login.");
+        }
+        save();
     }
 
     /**
@@ -77,9 +95,9 @@ public class UserRepo {
         try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("Saves/users.json")));
             StringBuilder sb = new StringBuilder();
-            String input;
-            while ((input = bufferedReader.readLine()) != null) {
-                sb.append(input);
+            String inputString;
+            while ((inputString = bufferedReader.readLine()) != null) {
+                sb.append(inputString);
             }
             String jsonInput = sb.toString();
             userList = new LinkedList<>(new Gson().fromJson(jsonInput, new TypeToken<List<User>>(){}.getType()));
@@ -87,13 +105,13 @@ public class UserRepo {
         } catch (FileNotFoundException fnfe) {
             System.out.println("No Savefile found, creating new one...");
             try {
-                File saveDir = factory.createFile("Saves");
+                File saveDir = new File("Saves");
                 if (!saveDir.exists()) {
                     if (saveDir.mkdir()) {
                         System.out.println("/Saves/ Directory created!");
                     }
                 } else {
-                    File save = factory.createFile(saveDir.getPath() + "users.json");
+                    File save = new File(saveDir.getPath() + "users.json");
                     if (save.createNewFile()) {
                         System.out.println("New save created!");
                     }

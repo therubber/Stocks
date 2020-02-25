@@ -13,7 +13,7 @@ class UserRepoTest {
 
     @BeforeAll
     static void setUp() {
-        users.add(user);
+        users.addUser(user);
     }
 
     @Test
@@ -39,7 +39,7 @@ class UserRepoTest {
 
     @Test
     void indexOf() {
-        users.add(new User("user"));
+        users.addUser(new User("user"));
         assertEquals(1, users.indexOf(new User("user")));
     }
 

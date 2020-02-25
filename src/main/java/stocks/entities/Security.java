@@ -1,6 +1,6 @@
 package stocks.entities;
 
-import stocks.utility.Factory;
+import stocks.factories.SecurityFactory;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ public class Security {
     String wkn;
     String type;
     private transient List<SpotPrice> prices = new LinkedList<>();
-    private final Factory factory = new Factory();
+    private final SecurityFactory factory = new SecurityFactory();
 
     /**
      * Constructor with name -> Needed to select a security in buy orders

@@ -2,7 +2,9 @@ package stocks.entities;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import stocks.utility.Factory;
+import stocks.factories.NumberFactory;
+import stocks.factories.PortfolioFactory;
+import stocks.factories.SecurityFactory;
 
 import java.time.LocalDate;
 
@@ -12,13 +14,15 @@ class OrderTest {
 
     private Order order;
     Security securityDow;
-    private final Factory factory = new Factory();
+    private final NumberFactory numberFactory = new NumberFactory();
+    private final PortfolioFactory portfolioFactory = new PortfolioFactory();
+    private final SecurityFactory securityFactory = new SecurityFactory();
 
     @BeforeEach
     void setUp() {
-        securityDow = factory.createSecurity("UniRAK");
+        securityDow = securityFactory.createSecurity("UniRAK");
         securityDow.update();
-        order = factory.createOrder(5, LocalDate.now(), "BUY", securityDow);
+        order = portfolioFactory.createOrder(5, "BUY", securityDow);
     }
 
     @Test
@@ -28,7 +32,7 @@ class OrderTest {
 
     @Test
     void getExecutionPrice() {
-        assertEquals(factory.createBigDecimal(138.33), order.getExecutionPrice());
+        assertEquals(numberFactory.createBigDecimal(138.33), order.getExecutionPrice());
     }
 
     @Test

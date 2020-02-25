@@ -2,7 +2,10 @@ package stocks.entities;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import stocks.utility.Factory;
+import stocks.factories.NumberFactory;
+import stocks.factories.PortfolioFactory;
+import stocks.factories.SecurityFactory;
+import stocks.factories.UserFactory;
 import stocks.repo.SecurityRepo;
 
 import java.math.BigDecimal;
@@ -14,7 +17,8 @@ class PositionTest {
 
     private Position position;
     private  SecurityRepo securityRepo;
-    private Factory factory = new Factory();
+    private final NumberFactory numberFactory = new NumberFactory();
+    private final SecurityFactory securityFactory = new SecurityFactory();
 
 
     @BeforeEach
@@ -42,13 +46,13 @@ class PositionTest {
 
     @Test
     void getValue() {
-        BigDecimal value = securityRepo.get("UniRAK").getSpotPrice().getPrice().multiply(factory.createBigDecimal(5));
+        BigDecimal value = securityRepo.get("UniRAK").getSpotPrice().getPrice().multiply(numberFactory.createBigDecimal(5));
         assertEquals(value, position.getValue());
     }
 
     @Test
     void getSpotPrice() {
-        SpotPrice spotPrice = factory.createSpotPrice(138.33, LocalDate.parse("2020-02-19"));
+        SpotPrice spotPrice = securityFactory.createSpotPrice(138.33, LocalDate.parse("2020-02-19"));
         assertEquals(spotPrice, position.getSpotPrice());
     }
 

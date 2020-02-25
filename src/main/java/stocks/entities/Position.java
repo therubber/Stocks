@@ -1,6 +1,6 @@
 package stocks.entities;
 
-import stocks.utility.Factory;
+import stocks.factories.NumberFactory;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -13,7 +13,7 @@ public class Position {
     private String id;
     private LocalDate executionDate;
     private Security security;
-    private final Factory factory = new Factory();
+    private final NumberFactory factory = new NumberFactory();
 
     public Position(Order order) {
         this.count = order.getCount();
@@ -71,7 +71,7 @@ public class Position {
      * @return Value of the position
      */
     public BigDecimal getValue() {
-        return security.getSpotPrice().getPrice().multiply(Factory.BigDecimalCreator.fromInteger(count));
+        return security.getSpotPrice().getPrice().multiply(factory.createBigDecimal(count));
     }
 
     /**
