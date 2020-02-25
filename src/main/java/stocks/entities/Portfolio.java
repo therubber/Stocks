@@ -325,7 +325,7 @@ public class Portfolio implements Iterable<Position> {
     public void valueDevelopment(String state) {
         PortfolioSnapshot oldState = portfolioHistory.get(portfolioHistory.indexOf(portfolioFactory.createPortfolioSnapshot(state)));
         BigDecimal gain = this.getValue().subtract(oldState.getValue());
-        System.out.println("Portfolio gained " + gain + " EUR in Value since " + oldState.state + "!");
+        System.out.println("Portfolio gained " + gain + " EUR in Value since " + oldState.getState() + "!");
     }
 
     /**
@@ -359,7 +359,7 @@ public class Portfolio implements Iterable<Position> {
     public void listHistory() {
         System.out.println("History of " + name + ":");
         for (PortfolioSnapshot portfolioSnapshot : portfolioHistory) {
-            System.out.println(portfolioSnapshot.state);
+            System.out.println(portfolioSnapshot.getState());
         }
     }
 

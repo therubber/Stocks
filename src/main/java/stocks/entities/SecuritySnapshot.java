@@ -5,9 +5,9 @@ import java.util.Objects;
 
 public class SecuritySnapshot {
 
-    String name;
-    String isin;
-    String wkn;
+    private String name;
+    private String isin;
+    private String wkn;
     public String type;
     private SpotPrice price;
 

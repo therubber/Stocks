@@ -7,16 +7,12 @@ import java.util.*;
 
 public class PortfolioSnapshot implements Iterable<PositionSnapshot> {
 
-    private String name;
-    public String owner;
-    BigDecimal equity;
-    List<PositionSnapshot> positions = new LinkedList<>();
-    LocalDate state;
+    private BigDecimal equity;
+    private LocalDate state;
+    public List<PositionSnapshot> positions = new LinkedList<>();
     private final NumberFactory factory = new NumberFactory();
 
     public PortfolioSnapshot(Portfolio portfolio) {
-        this.name = portfolio.getName();
-        this.owner = portfolio.getOwner();
         this.state = portfolio.state;
         for (Position position : portfolio.positions) {
             this.positions.add(new PositionSnapshot(position));
@@ -38,6 +34,14 @@ public class PortfolioSnapshot implements Iterable<PositionSnapshot> {
      */
     public BigDecimal getEquity() {
         return equity;
+    }
+
+    /**
+     * Getter method for state of the snapshot
+     * @return LocalDate state of the snapshot
+     */
+    public LocalDate getState() {
+        return state;
     }
 
     /**
@@ -66,11 +70,6 @@ public class PortfolioSnapshot implements Iterable<PositionSnapshot> {
      */
     public Iterator<PositionSnapshot> iterator() {
         return positions.iterator();
-    }
-
-    @Override
-    public String toString() {
-        return name;
     }
 
     @Override

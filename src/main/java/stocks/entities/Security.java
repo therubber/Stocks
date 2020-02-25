@@ -11,10 +11,10 @@ import java.util.Objects;
 
 public class Security {
 
-    String name;
-    String isin;
-    String wkn;
-    String type;
+    private String name;
+    private String isin;
+    private String wkn;
+    private String type;
     private transient List<SpotPrice> prices = new LinkedList<>();
     private final SecurityFactory factory = new SecurityFactory();
 

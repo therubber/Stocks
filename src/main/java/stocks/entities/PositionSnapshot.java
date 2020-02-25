@@ -3,7 +3,6 @@ package stocks.entities;
 import stocks.factories.NumberFactory;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -17,7 +16,7 @@ public class PositionSnapshot {
 
     public PositionSnapshot(Position position) {
         this.count = position.getCount();
-        this.id = generateId();
+        this.id = position.getId();
         this.executionDate = position.getExecutionDate();
         this.securitySnapshot = new SecuritySnapshot(position.getSecurity());
     }
@@ -72,14 +71,6 @@ public class PositionSnapshot {
      */
     public LocalDate getExecutionDate() {
         return executionDate;
-    }
-
-    /**
-     * Generates an ID for the positions, no check for duplicates but unlikely
-     * @return String id to be assigned to the position
-     */
-    private String generateId() {
-        return "POS" + new DecimalFormat("000000").format((int)(Math.random() * 100000));
     }
 
     @Override
