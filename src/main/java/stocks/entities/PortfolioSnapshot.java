@@ -5,12 +5,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
-public class PortfolioSnapshot implements Iterable<Position> {
+public class PortfolioSnapshot implements Iterable<PositionSnapshot> {
 
     private String name;
     public String owner;
     BigDecimal equity;
-    List<Position> positions = new LinkedList<>();
+    List<PositionSnapshot> positions = new LinkedList<>();
     LocalDate state;
     private final NumberFactory factory = new NumberFactory();
 
@@ -18,7 +18,9 @@ public class PortfolioSnapshot implements Iterable<Position> {
         this.name = portfolio.getName();
         this.owner = portfolio.getOwner();
         this.state = portfolio.state;
-        positions.addAll(portfolio.positions);
+        for (Position position : portfolio.positions) {
+            this.positions.add(new PositionSnapshot(position));
+        }
         this.equity = portfolio.getEquity();
     }
 
@@ -32,7 +34,6 @@ public class PortfolioSnapshot implements Iterable<Position> {
 
     /**
      * Getter method to retrieve equity value of the portfolio
-     *
      * @return Returns equity available in the portfolio
      */
     public BigDecimal getEquity() {
@@ -53,7 +54,7 @@ public class PortfolioSnapshot implements Iterable<Position> {
      */
     public BigDecimal getPositionValue() {
         BigDecimal value = factory.createBigDecimal(0);
-        for (Position position : positions) {
+        for (PositionSnapshot position : positions) {
             value = value.add(position.getValue());
         }
         return value;
@@ -63,7 +64,7 @@ public class PortfolioSnapshot implements Iterable<Position> {
      * Makes class Portfolio iterable over positions list
      * @return Iterator over positions list
      */
-    public Iterator<Position> iterator() {
+    public Iterator<PositionSnapshot> iterator() {
         return positions.iterator();
     }
 
@@ -77,12 +78,11 @@ public class PortfolioSnapshot implements Iterable<Position> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PortfolioSnapshot portfolio = (PortfolioSnapshot) o;
-        return Objects.equals(name, portfolio.name) &&
-                Objects.equals(owner, portfolio.owner);
+        return Objects.equals(state, portfolio.state);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, owner);
+        return Objects.hash(state);
     }
 }

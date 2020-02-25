@@ -7,6 +7,7 @@ import stocks.inputoutput.Output;
 import stocks.inputoutput.Input;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -68,7 +69,7 @@ public class Portfolio implements Iterable<Position> {
      *
      * @return Returns equity available in the portfolio
      */
-    BigDecimal getEquity() {
+    public BigDecimal getEquity() {
         return equity;
     }
 
@@ -114,7 +115,7 @@ public class Portfolio implements Iterable<Position> {
         out.println();
         System.out.printf("%-12s %-10s %-18s %-16s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Type", "Price", "Value", "Execution");
         out.println();
-        for (Position position : portfolioSnapshot.positions) {
+        for (PositionSnapshot position : portfolioSnapshot.positions) {
             System.out.printf("%-12s %-10d %-18s %-16s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurity().getName(), position.getSecurityType(), position.getPrice(), position.getValue(), position.getExecutionDate());
         }
         out.println();
@@ -138,12 +139,12 @@ public class Portfolio implements Iterable<Position> {
      * - equity available in portfolio
      * - combined value of all assets
      */
-    public void overview(Portfolio portfolio) {
-        listPositions(portfolioFactory.createPortfolioSnapshot(portfolio));
+    public void overview(PortfolioSnapshot portfolioSnapshot) {
+        listPositions(portfolioSnapshot);
         String format = "%-45s %10.2f EUR%n";
-        System.out.printf(format, "Combined value of positions: ", portfolio.getPositionValue());
-        System.out.printf(format, "Equity currently available in portfolio: ", portfolio.getEquity());
-        System.out.printf(format, "Combined value of all assets: ", portfolio.getValue());
+        System.out.printf(format, "Combined value of positions: ", portfolioSnapshot.getPositionValue());
+        System.out.printf(format, "Equity currently available in portfolio: ", portfolioSnapshot.getEquity());
+        System.out.printf(format, "Combined value of all assets: ", portfolioSnapshot.getValue());
         out.println();
     }
 
@@ -363,8 +364,8 @@ public class Portfolio implements Iterable<Position> {
     }
 
     public void viewHistorical(String state) {
-        PortfolioSnapshot snapshot = portfolioFactory.createPortfolioSnapshot(state);
-        listPositions(snapshot);
+        PortfolioSnapshot snapshot = portfolioHistory.get(portfolioHistory.indexOf(portfolioFactory.createPortfolioSnapshot(state)));
+        overview(snapshot);
     }
 
     @Override

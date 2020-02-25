@@ -12,6 +12,7 @@ import stocks.factories.UserFactory;
 import stocks.inputoutput.Input;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
+
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
@@ -116,13 +117,5 @@ class PortfolioTest {
         InOrder inOrder = Mockito.inOrder(securityRepoMock, inputMock);
         inOrder.verify(securityRepoMock).listIndexed();
         inOrder.verify(securityRepoMock).get(3);
-    }
-
-    @Test
-    void overview() {
-        doReturn(numberFactory.createBigDecimal(0)).when(portfolioMock).getPositionValue();
-        doReturn(numberFactory.createBigDecimal(500)).when(portfolioMock).getEquity();
-        doReturn(numberFactory.createBigDecimal(500)).when(portfolioMock).getValue();
-        portfolio.overview(portfolioMock);
     }
 }

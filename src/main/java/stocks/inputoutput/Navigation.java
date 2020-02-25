@@ -1,6 +1,7 @@
 package stocks.inputoutput;
 
 import stocks.entities.Portfolio;
+import stocks.entities.PortfolioSnapshot;
 import stocks.entities.User;
 import stocks.factories.UserFactory;
 import stocks.repo.SecurityRepo;
@@ -159,7 +160,7 @@ public class Navigation {
                 users.save();
                 return false;
             case "ov":
-                selectedPortfolio.overview(selectedPortfolio);
+                selectedPortfolio.overview(new PortfolioSnapshot(selectedPortfolio));
                 return false;
             case "oh":
                 selectedPortfolio.printOrderHistory();
@@ -172,6 +173,11 @@ public class Navigation {
                 return false;
             case "ph":
                 availableSecurities.priceHistory();
+                return false;
+            case "vd":
+                selectedPortfolio.listHistory();
+                System.out.println("Enter the state of the Portfolio from which you want to calculate the value increase: ");
+                selectedPortfolio.valueDevelopment(input.stringValue());
                 return false;
             case "compare":
                 if (selectedUser.hasPortfolios()) {

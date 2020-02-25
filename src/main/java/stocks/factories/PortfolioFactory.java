@@ -2,6 +2,7 @@ package stocks.factories;
 
 import stocks.entities.*;
 import stocks.inputoutput.Input;
+import stocks.entities.PortfolioSnapshot;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
