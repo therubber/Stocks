@@ -7,6 +7,8 @@ import stocks.inputoutput.Output;
 import stocks.inputoutput.Input;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
+import stocks.snapshots.PortfolioSnapshot;
+import stocks.snapshots.PositionSnapshot;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -19,8 +21,8 @@ public class Portfolio implements Iterable<Position> {
     private String owner;
     private BigDecimal equity;
     private BigDecimal startEquity;
-    LocalDate state;
-    List<Position> positions = new LinkedList<>();
+    private LocalDate state;
+    public List<Position> positions = new LinkedList<>();
     List<Order> orderHistory = new LinkedList<>();
     transient SecurityRepo ownedSecurities = new SecurityRepo();
     List<PortfolioSnapshot> portfolioHistory = new LinkedList<>();
@@ -102,6 +104,14 @@ public class Portfolio implements Iterable<Position> {
      */
     int getPositionCount() {
         return positions.size();
+    }
+
+    /**
+     * Getter method for state of portfolio
+     * @return LocalDate State of the portfolio
+     */
+    public LocalDate getState() {
+        return state;
     }
 
     /**

@@ -1,5 +1,6 @@
-package stocks.entities;
+package stocks.snapshots;
 
+import stocks.entities.Position;
 import stocks.factories.NumberFactory;
 
 import java.math.BigDecimal;

@@ -3,12 +3,15 @@ package stocks.inputoutput;
 import java.util.Scanner;
 
 public class Input {
+
+    private InputFromConsole inputFromConsole = new InputFromConsole();
+
     /**
      * Checks validity of input
      * @return String input if valid
      */
     public String stringValue() {
-        return InputFromConsole.stringValue();
+        return inputFromConsole.stringValue();
     }
 
     /**
@@ -16,14 +19,14 @@ public class Input {
      * @return Int input if valid
      */
     public int intValue() {
-        return InputFromConsole.intValue();
+        return inputFromConsole.intValue();
     }
 
     /**
      * Input method for double values
      */
     public double doubleValue() {
-        return InputFromConsole.doubleValue();
+        return inputFromConsole.doubleValue();
     }
 
     /**
@@ -31,13 +34,13 @@ public class Input {
      */
     private static class InputFromConsole {
 
-        private static final Scanner scanner = new Scanner(System.in);
+        private final Scanner scanner = new Scanner(System.in);
 
         /**
          * Checks validity of input
          * @return String input if valid
          */
-        public static String stringValue() {
+        public String stringValue() {
             return scanner.next();
         }
 
@@ -45,14 +48,14 @@ public class Input {
          * Checks validity of int input
          * @return Int input if valid
          */
-        public static int intValue() {
+        public int intValue() {
             return scanner.nextInt();
         }
 
         /**
          * Input method for double values
          */
-        public static double doubleValue() {
+        public double doubleValue() {
             return scanner.nextDouble();
         }
     }

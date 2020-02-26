@@ -25,13 +25,9 @@ _
 \
 ,src/main/java/stocks/entities/SpotPrice.java,7\5\7538792fed45433b86670b3f90bed691f299ddf1
 [
-+src/test/java/stocks/daos/SecurityTest.java,c\3\c3cf0a04426e273591cf758a0e1d9496b6955d32
-[
 +src/main/java/stocks/entities/Security.java,9\d\9d00c1a9c4c7c2b366925e7dd0355dc00f4fcf54
 [
 +src/main/java/stocks/inputoutput/Input.java,7\c\7c52e0350389a4b5f35381a375ae460d367ad063
-\
-,src/test/java/stocks/daos/SpotPriceTest.java,c\6\c61e8a7639ef03e61cd7e1f70b52c65ed5208132
 [
 +src/main/resources/SecurityData/UniAsia.csv,8\3\83e5e7429e7ae8d62ce4e1502945589f49c8076d
 c
@@ -88,3 +84,7 @@ c
 3src/main/java/stocks/entities/SecuritySnapshot.java,1\d\1db87e0af60db760f909a7f1ebe0d5049b93a589
 c
 3src/main/java/stocks/entities/PositionSnapshot.java,8\7\87585e54c2112af9207dec80584e356eccce89f1
+_
+/src/test/java/stocks/entities/SecurityTest.java,7\1\714c83b4148814a4827e04a378030cef003dbea7
+`
+0src/test/java/stocks/entities/SpotPriceTest.java,b\d\bdb4d527062ab7545c87b01fe3dd2463b3af7abe

@@ -1,4 +1,7 @@
-package stocks.entities;
+package stocks.snapshots;
+
+import stocks.entities.Security;
+import stocks.entities.SpotPrice;
 
 import java.math.BigDecimal;
 import java.util.Objects;

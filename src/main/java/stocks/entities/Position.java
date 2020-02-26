@@ -9,8 +9,8 @@ import java.util.Objects;
 
 public class Position {
 
-    private int count;
     private String id;
+    private int count;
     private LocalDate executionDate;
     private Security security;
     private final NumberFactory factory = new NumberFactory();
@@ -60,10 +60,6 @@ public class Position {
      */
     public Security getSecurity() {
         return security;
-    }
-
-    public String getSecurityType() {
-        return security.getType();
     }
 
     /**

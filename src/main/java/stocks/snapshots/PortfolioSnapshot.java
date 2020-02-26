@@ -1,5 +1,7 @@
-package stocks.entities;
+package stocks.snapshots;
 
+import stocks.entities.Portfolio;
+import stocks.entities.Position;
 import stocks.factories.NumberFactory;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,7 +15,7 @@ public class PortfolioSnapshot implements Iterable<PositionSnapshot> {
     private final NumberFactory factory = new NumberFactory();
 
     public PortfolioSnapshot(Portfolio portfolio) {
-        this.state = portfolio.state;
+        this.state = portfolio.getState();
         for (Position position : portfolio.positions) {
             this.positions.add(new PositionSnapshot(position));
         }
