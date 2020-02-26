@@ -19,10 +19,10 @@ public class Portfolio implements Iterable<Position> {
     private String owner;
     private BigDecimal equity;
     private BigDecimal startEquity;
+    LocalDate state;
     List<Position> positions = new LinkedList<>();
     List<Order> orderHistory = new LinkedList<>();
     transient SecurityRepo ownedSecurities = new SecurityRepo();
-    LocalDate state;
     List<PortfolioSnapshot> portfolioHistory = new LinkedList<>();
 
     private final Input input = new Input();
@@ -58,10 +58,6 @@ public class Portfolio implements Iterable<Position> {
 
     public String getName() {
         return name;
-    }
-
-    public String getOwner() {
-        return owner;
     }
 
     /**

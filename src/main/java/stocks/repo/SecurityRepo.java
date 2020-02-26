@@ -84,8 +84,8 @@ public class SecurityRepo implements Iterable<Security>{
      */
     public void initiate() {
         try {
-            InputStream inputStream = Objects.requireNonNull(SecurityRepo.class.getResourceAsStream("/SecurityData/Securities.csv"));
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            InputStreamReader inputStreamReader = new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/SecurityData/Securities.csv")));
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] fund = line.split(";");

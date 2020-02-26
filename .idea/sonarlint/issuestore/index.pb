@@ -84,3 +84,7 @@ d
 4src/main/java/stocks/factories/PortfolioFactory.java,b\b\bbad5201138ec75eef6ff82aa012f5d9b841ad47
 `
 0src/test/java/stocks/entities/PortfolioTest.java,c\7\c77cd02051c77a4613554ef93d2e1fe752fe4e6d
+c
+3src/main/java/stocks/entities/SecuritySnapshot.java,1\d\1db87e0af60db760f909a7f1ebe0d5049b93a589
+c
+3src/main/java/stocks/entities/PositionSnapshot.java,8\7\87585e54c2112af9207dec80584e356eccce89f1

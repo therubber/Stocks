@@ -71,7 +71,7 @@ public class Security {
      * Directly gets spot price of security
      * @return BigDecimal spot price
      */
-    public BigDecimal getPrice() {
+    BigDecimal getPrice() {
         return prices.get(prices.size() - 1).getPrice();
     }
 
@@ -87,7 +87,7 @@ public class Security {
      * Sets the spot price
      * @param spotPrice SpotPrice to be assigned
      */
-    public void setSpotPrice(SpotPrice spotPrice) {
+    void setSpotPrice(SpotPrice spotPrice) {
         prices.add(spotPrice);
     }
 
@@ -121,8 +121,8 @@ public class Security {
         try {
             SecurityFactory securityFactory = new SecurityFactory();
             prices = new LinkedList<>();
-            InputStream inputStream = Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("SecurityData/" + name + ".csv"));
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            InputStreamReader inputStreamReader = new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/SecurityData/" + name + ".csv")));
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] data = line.split(";");

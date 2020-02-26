@@ -57,7 +57,7 @@ public class User {
      * Getter method for equity
      * @return double equity
      */
-    public BigDecimal getEquity() {
+    BigDecimal getEquity() {
         return equity;
     }
 
@@ -65,7 +65,7 @@ public class User {
      * Setter method for equity
      * @param equity BigDecimal to set equity to
      */
-    public void setEquity(BigDecimal equity) {
+    void setEquity(BigDecimal equity) {
         this.equity = equity;
     }
 
@@ -73,7 +73,7 @@ public class User {
      * Adding portfolio for testing
      * @param portfolio Portfolio to add
      */
-    public void addPortfolio(Portfolio portfolio) {
+    void addPortfolio(Portfolio portfolio) {
         portfolios.add(portfolio);
     }
 
@@ -164,7 +164,7 @@ public class User {
         }
     }
 
-    private void comparePortfolios(Portfolio portfolio1, Portfolio portfolio2) {
+    void comparePortfolios(Portfolio portfolio1, Portfolio portfolio2) {
         Portfolio one = portfolios.get(portfolios.indexOf(portfolio1));
         Portfolio two = portfolios.get(portfolios.indexOf(portfolio2));
         BigDecimal gainOne = one.getValue().subtract(one.getStartEquity());
