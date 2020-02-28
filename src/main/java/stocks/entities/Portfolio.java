@@ -9,7 +9,6 @@ import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
 import stocks.snapshots.PortfolioSnapshot;
 import stocks.snapshots.PositionSnapshot;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -64,7 +63,6 @@ public class Portfolio implements Iterable<Position> {
 
     /**
      * Getter method to retrieve equity value of the portfolio
-     *
      * @return Returns equity available in the portfolio
      */
     public BigDecimal getEquity() {
@@ -73,7 +71,6 @@ public class Portfolio implements Iterable<Position> {
 
     /**
      * Getter for startequity
-     *
      * @return startequity
      */
     BigDecimal getStartEquity() {
@@ -90,7 +87,6 @@ public class Portfolio implements Iterable<Position> {
 
     /**
      * Gets a certain position out of the portfolio and returns it. Required to execute sell orders.
-     *
      * @param index Index of the position to be returned
      * @return Position from positions at given index
      */
@@ -157,7 +153,7 @@ public class Portfolio implements Iterable<Position> {
     /**
      * Adds a position to the portfolio or increases one if it already exists
      */
-    void orderInput(Order order, UserRepo users) {
+    void orderInput(Order order) {
         Position position = portfolioFactory.createPosition(order);
         if (!positions.isEmpty()) {
             if (!positions.contains(position)) {
@@ -249,13 +245,11 @@ public class Portfolio implements Iterable<Position> {
      */
     public void buy(SecurityRepo securityRepo, UserRepo users) {
         if (securityRepo.evaluateSpotPrices()) {
-            Position position = selectionBuy(securityRepo);
-            if (position.getValue().doubleValue() <= equity.doubleValue() && !position.getSecurity().getIsin().equals("ERROR")) {
-                BigDecimal equityAfterExecution = getEquity().subtract(position.getPrice().multiply(numberFactory.createBigDecimal(position.getCount())));
-                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", getEquity(), equityAfterExecution);
-                if (confirmOrder(position, true)) {
-                    Order order = portfolioFactory.createOrder(position.getCount(), "BUY", position.getSecurity());
-                    orderInput(order, users);
+            Order order = selectionBuy(securityRepo);
+            if (order.getValue().doubleValue() <= equity.doubleValue() && !order.getSecurity().getIsin().equals("ERROR")) {
+                System.out.printf("Current equity: %10.2f EUR. Remaining after execution: %10.2f%n", getEquity(), getEquity().subtract(order.getValue()));
+                if (confirmOrder(order, true)) {
+                    orderInput(order);
                 } else {
                     out.println("Buy order cancelled, back to menu.");
                 }
@@ -267,7 +261,12 @@ public class Portfolio implements Iterable<Position> {
         }
     }
 
-    Position selectionBuy(SecurityRepo securityRepo) {
+    /**
+     * Used to get amount and Security that are to be bought by the user
+     * @param securityRepo SecurityRepo containing available securities
+     * @return Position containing
+     */
+    Order selectionBuy(SecurityRepo securityRepo) {
         try {
             securityRepo.listIndexed();
             out.println("Depot equity: " + equity + " EUR");
@@ -275,11 +274,11 @@ public class Portfolio implements Iterable<Position> {
             Security security = securityRepo.get(input.intValue() - 1);
             out.println("Enter the count of shares you want to buy: ");
             int transactionCount = input.intValue();
-            return portfolioFactory.createPosition(transactionCount, security);
+            return portfolioFactory.createOrder(transactionCount, "BUY", security);
         } catch (InputMismatchException im) {
             out.println("Please enter an Int value. Try again.");
         }
-        return portfolioFactory.createPosition(666, securityFactory.createSecurity("ERROR", "ERROR", "ERROR", "ERROR"));
+        return portfolioFactory.createOrder(666, "BUY", securityFactory.createSecurity("ERROR", "ERROR", "ERROR", "ERROR"));
     }
 
     /**
@@ -296,9 +295,8 @@ public class Portfolio implements Iterable<Position> {
                 try {
                     int sellCount = input.intValue();
                     Order order = portfolioFactory.createOrder(sellCount, "SELL", selectedSecurity);
-                    Position position = portfolioFactory.createPosition(order);
-                    if (confirmOrder(position, false)) {
-                        orderInput(order, users);
+                    if (confirmOrder(order, false)) {
+                        orderInput(order);
                     }
                 } catch (InputMismatchException e) {
                     out.println("Please enter a valid integer value. Try again.");
@@ -313,21 +311,24 @@ public class Portfolio implements Iterable<Position> {
 
     /**
      * Used to confirm buy/sell orders
-     * @param position Position to confirm
+     * @param order Order to confirm
      * @param type Boolean type of order, true if "BUY"
      * @return Boolean confirmation of the order
      */
-    private boolean confirmOrder(Position position, boolean type) {
-        Input betterInput = new Input();
+    private boolean confirmOrder(Order order, boolean type) {
         if (type) {
-            System.out.println("Buying " + position.getCount() + " shares of " + position.getSecurity().getName() + " at " + position.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
+            System.out.println("Buying " + order.getCount() + " shares of " + order.getSecurity().getName() + " at " + order.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
         } else {
-            System.out.println("Selling " + position.getCount() + " shares of " + position.getSecurity().getName() + " at " + position.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
+            System.out.println("Selling " + order.getCount() + " shares of " + order.getSecurity().getName() + " at " + order.getSecurity().getPrice() + " EUR Spot. Confirm (y/n)");
         }
-        String confirm = betterInput.stringValue();
+        String confirm = input.stringValue();
         return confirm.equals("y");
     }
 
+    /**
+     * Calculates and displays the value Development of the Portfolio from a given state to the current one
+     * @param state String historical state to compare to
+     */
     public void valueDevelopment(String state) {
         PortfolioSnapshot oldState = portfolioHistory.get(portfolioHistory.indexOf(portfolioFactory.createPortfolioSnapshot(state)));
         BigDecimal gain = this.getValue().subtract(oldState.getValue());
@@ -362,6 +363,9 @@ public class Portfolio implements Iterable<Position> {
         positions.add(position);
     }
 
+    /**
+     * Displays a list of historical snapshots available of the portfolio
+     */
     public void listHistory() {
         System.out.println("History of " + name + ":");
         for (PortfolioSnapshot portfolioSnapshot : portfolioHistory) {
@@ -369,6 +373,10 @@ public class Portfolio implements Iterable<Position> {
         }
     }
 
+    /**
+     * Displays overview of a historical state of the portfolio
+     * @param state String state of the portfolio to display
+     */
     public void viewHistorical(String state) {
         PortfolioSnapshot snapshot = portfolioHistory.get(portfolioHistory.indexOf(portfolioFactory.createPortfolioSnapshot(state)));
         overview(snapshot);

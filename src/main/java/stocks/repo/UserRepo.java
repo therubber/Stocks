@@ -13,9 +13,9 @@ import java.util.List;
 public class UserRepo {
 
     private List<User> users = new LinkedList<>();
-    private final UserFactory factory = new UserFactory();
     private final Input input = new Input();
-    private final Output out = new Output();
+    private final Output output = new Output();
+    private final UserFactory factory = new UserFactory(input, output);
 
     /**
      * Getter method to get a User out of the list
@@ -27,25 +27,22 @@ public class UserRepo {
     }
 
     /**
-     * Adds a user
-     * @param user User to be added
+     * Asks for input to create a new User and creates it
      */
-    public void addUser(User user) {
-        users.add(user);
-    }
-
-    public void addUser() {
-        out.println("Enter a username to create a new user: ");
+    public User addUser() {
+        output.println("Enter a username to create a new user: ");
         String username = input.stringValue();
         if (!contains(factory.createUser(username))) {
-            out.println("Please enter a password: ");
+            output.println("Please enter a password: ");
             User user = factory.createUser(username, input.stringValue());
             users.add(user);
-            out.println("New user " + username + " has been created!");
+            output.println("New user " + username + " has been created!");
+            save();
+            return user;
         } else {
-            out.println("User with that username already exists, please login.");
+            output.println("User with that username already exists, please login.");
+            return null;
         }
-        save();
     }
 
     /**
@@ -55,15 +52,6 @@ public class UserRepo {
      */
     public boolean contains(User user) {
         return users.contains(user);
-    }
-
-    /**
-     * Gets the index of a user if he is contained in the list. Returns -1 if not.
-     * @param user User to check index
-     * @return Int index of user in the list, -1 if not contained
-     */
-    public int indexOf(User user) {
-        return users.indexOf(user);
     }
 
     /**
@@ -80,7 +68,7 @@ public class UserRepo {
     public void save() {
         try {
             FileOutputStream fileOutputStream= new FileOutputStream("Saves/users.json");
-            String json = new Gson().toJson(users);
+            String json = new Gson(). toJson(users);
             fileOutputStream.write(json.getBytes());
             fileOutputStream.close();
         }  catch (IOException ioe) {
@@ -103,26 +91,26 @@ public class UserRepo {
             users = new LinkedList<>(new Gson().fromJson(jsonInput, new TypeToken<List<User>>(){}.getType()));
             bufferedReader.close();
         } catch (FileNotFoundException fnfe) {
-            System.out.println("No Savefile found, creating new one...");
+            output.println("No Savefile found, creating new one...");
             try {
                 File saveDir = new File("Saves");
                 if (!saveDir.exists()) {
                     if (saveDir.mkdir()) {
-                        System.out.println("/Saves/ Directory created!");
+                        output.println("/Saves/ Directory created!");
                     }
                 } else {
                     File save = new File(saveDir.getPath() + "users.json");
                     if (save.createNewFile()) {
-                        System.out.println("New save created!");
+                        output.println("New save created!");
                     }
                 }
             } catch (IOException ioe) {
-                System.out.println("New Save could not be created. Progress will not be saved.");
+                output.println("New Save could not be created. Progress will not be saved.");
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
-            System.out.println("Savefile Corrupted! Creating new Save...");
+            output.println("Savefile Corrupted! Creating new Save...");
         }
     }
 }

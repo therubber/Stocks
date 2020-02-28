@@ -20,8 +20,8 @@ public class User {
     private String password;
     private BigDecimal equity;
     private List<Portfolio> portfolios = new LinkedList<>();
-    private final Input input = new Input();
-    private final Output out = new Output();
+    private final Input input;
+    private final Output output;
     private final NumberFactory numberFactory = new NumberFactory();
     private final PortfolioFactory portfolioFactory = new PortfolioFactory();
 
@@ -29,9 +29,11 @@ public class User {
      * Regular constructor to be used
      * @param username String username to create user with
      */
-    public User(String username) {
+    public User(String username, Input input, Output output) {
         this.equity = numberFactory.createBigDecimal(10000);
         this.username = username;
+        this.input = input;
+        this.output = output;
     }
 
     /**
@@ -39,10 +41,12 @@ public class User {
      * @param username String username to create user with
      * @param password Password to set for user
      */
-    public User(String username, String password) {
+    public User(String username, String password, Input input, Output output) {
         this.equity = numberFactory.createBigDecimal(10000);
         this.username = username;
         this.password = Encoder.encode(password);
+        this.input = input;
+        this.output = output;
     }
 
     /**
@@ -81,26 +85,26 @@ public class User {
      * Used to add a portfolio to the user
      */
     public void addPortfolio() {
-        out.println("User equity: " + equity + "EUR");
-        out.println("Enter a Name for the portfolio you want to create: ");
+        output.println("User equity: " + equity + "EUR");
+        output.println("Enter a Name for the portfolio you want to create: ");
         String name = input.stringValue();
         if (!portfolios.contains(portfolioFactory.createPortfolio(name, username, LocalDate.now(), input))) {
-            out.println("Enter the amount of equity to transfer to the portfolio account: ");
+            output.println("Enter the amount of equity to transfer to the portfolio account: ");
             try {
                 BigDecimal depotEquity = BigDecimal.valueOf(input.doubleValue());
                 if (depotEquity.doubleValue() <= equity.doubleValue()) {
                     Portfolio toAdd = portfolioFactory.createPortfolio(name, username, depotEquity, input);
                     portfolios.add(toAdd);
                     equity = equity.subtract(depotEquity);
-                    out.println("Depot " + name + " successfully created!");
+                    output.println("Depot " + name + " successfully created!");
                 } else {
-                    out.println("Insufficient account equity for depot creation! please try again");
+                    output.println("Insufficient account equity for depot creation! please try again");
                 }
             } catch (InputMismatchException e) {
-                out.println("Input invalid. Please enter a double in the format - 0.00 -  ");
+                output.println("Input invalid. Please enter a double in the format - 0.00 -  ");
             }
         } else {
-            out.println("A portfolio with this name already exists, please try again.");
+            output.println("A portfolio with this name already exists, please try again.");
         }
     }
 
@@ -140,7 +144,7 @@ public class User {
                 System.out.printf("%-15s %-10.2f%n", portfolio.toString(), portfolio.getValue());
             }
         } else {
-            out.println("No portfolios available. Please add a new one!");
+            output.println("No portfolios available. Please add a new one!");
         }
     }
 
@@ -149,18 +153,18 @@ public class User {
      */
     public void compare() {
         listPortfolios();
-        out.println("Enter the name of the first Portfolio: ");
+        output.println("Enter the name of the first Portfolio: ");
         Portfolio portfolio1 = portfolioFactory.createPortfolio(input.stringValue(), username, LocalDate.now(), input);
         if (portfolios.contains(portfolio1)) {
-            out.println("Enter the name of the second Portfolio: ");
+            output.println("Enter the name of the second Portfolio: ");
             Portfolio portfolio2 = portfolioFactory.createPortfolio(input.stringValue(), username, LocalDate.now(), input);
             if (portfolios.contains(portfolio2)) {
                 comparePortfolios(portfolio1, portfolio2);
             } else {
-                out.println("Portfolio doesn't exist. Try again:");
+                output.println("Portfolio doesn't exist. Try again:");
             }
         } else {
-            out.println("Portfolio doesnt exist. Try again:");
+            output.println("Portfolio doesnt exist. Try again:");
         }
     }
 
@@ -169,10 +173,10 @@ public class User {
         Portfolio two = portfolios.get(portfolios.indexOf(portfolio2));
         BigDecimal gainOne = one.getValue().subtract(one.getStartEquity());
         BigDecimal gainTwo = two.getValue().subtract(two.getStartEquity());
-        out.println("Portfolio " + one.getName() + "has gained " + gainOne.toString() + "EUR in value ");
-        out.println("and is up " + gainOne.divide(one.getStartEquity(), 2, RoundingMode.HALF_UP)+ "%");
-        out.println("Portfolio " + two.getName() + "has gained " + gainTwo.toString() + "EUR in value.");
-        out.println("and is up " + gainTwo.divide(two.getStartEquity(), 2,  RoundingMode.HALF_UP) + "%");
+        output.println("Portfolio " + one.getName() + "has gained " + gainOne.toString() + "EUR in value ");
+        output.println("and is up " + gainOne.divide(one.getStartEquity(), 2, RoundingMode.HALF_UP)+ "%");
+        output.println("Portfolio " + two.getName() + "has gained " + gainTwo.toString() + "EUR in value.");
+        output.println("and is up " + gainTwo.divide(two.getStartEquity(), 2,  RoundingMode.HALF_UP) + "%");
     }
 
     /**

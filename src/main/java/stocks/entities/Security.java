@@ -16,7 +16,7 @@ public class Security {
     private String wkn;
     private String type;
     private transient List<SpotPrice> prices = new LinkedList<>();
-    private final SecurityFactory factory = new SecurityFactory();
+    private final SecurityFactory securityFactory = new SecurityFactory();
 
     /**
      * Constructor with name -> Needed to select a security in buy orders
@@ -80,7 +80,7 @@ public class Security {
      * @return Most recent price available, Price (0, 1970-01-01) if no price is available
      */
     public SpotPrice getSpotPrice() {
-        return !prices.isEmpty() ? prices.get(prices.size() - 1) : factory.createSpotPrice(0, LocalDate.parse("1970-01-01"));
+        return !prices.isEmpty() ? prices.get(prices.size() - 1) : securityFactory.createSpotPrice(0, LocalDate.parse("1970-01-01"));
     }
 
     /**
@@ -119,14 +119,14 @@ public class Security {
      */
     public void update() {
         try {
-            SecurityFactory securityFactory = new SecurityFactory();
+            SecurityFactory newFactory = new SecurityFactory();
             prices = new LinkedList<>();
             InputStreamReader inputStreamReader = new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/SecurityData/" + name + ".csv")));
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] data = line.split(";");
-                SpotPrice currentPrice = securityFactory.createSpotPrice(Double.parseDouble(data[0]), LocalDate.parse(data[1]));
+                SpotPrice currentPrice = newFactory.createSpotPrice(Double.parseDouble(data[0]), LocalDate.parse(data[1]));
                 prices.add(currentPrice);
             }
             bufferedReader.close();

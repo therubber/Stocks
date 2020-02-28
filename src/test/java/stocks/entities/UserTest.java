@@ -6,6 +6,7 @@ import stocks.factories.NumberFactory;
 import stocks.factories.PortfolioFactory;
 import stocks.factories.UserFactory;
 import stocks.inputoutput.Input;
+import stocks.inputoutput.Output;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
 
@@ -22,10 +23,7 @@ class UserTest {
     UserRepo users;
     private final NumberFactory numberFactory = new NumberFactory();
     private final PortfolioFactory portfolioFactory = new PortfolioFactory();
-    private final UserFactory userFactory = new UserFactory();
-
-
-
+    private final UserFactory userFactory = new UserFactory(new Input(), new Output());
 
     @BeforeEach
     void setUp() {
@@ -37,7 +35,7 @@ class UserTest {
         order = portfolioFactory.createOrder(5, "BUY", securityRepo.get("UniRAK"));
         portfolio = portfolioFactory.createPortfolio("test", "user", numberFactory.createBigDecimal(5000), new Input());
         user.addPortfolio(portfolio);
-        portfolio.orderInput(order, users);
+        portfolio.orderInput(order);
     }
     @Test
     void getUsername() {

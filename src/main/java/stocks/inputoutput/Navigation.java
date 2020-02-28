@@ -1,21 +1,18 @@
 package stocks.inputoutput;
 
-import stocks.entities.Portfolio;
 import stocks.snapshots.PortfolioSnapshot;
-import stocks.entities.User;
 import stocks.factories.UserFactory;
 import stocks.repo.SecurityRepo;
 import stocks.repo.UserRepo;
+import stocks.utility.NavigationContainer;
 
 public class Navigation {
 
-    public transient User selectedUser;
-    public transient Portfolio selectedPortfolio;
     private static transient SecurityRepo availableSecurities = new SecurityRepo();
     private static UserRepo users = new UserRepo();
     private final Input input = new Input();
-    private final Output out = new Output();
-    private final UserFactory userFactory = new UserFactory();
+    private final Output output = new Output();
+    private final UserFactory userFactory = new UserFactory(input, output);
 
     /**
      * Main method for the stocks program
@@ -31,18 +28,18 @@ public class Navigation {
      * Starts the navigation
      */
     private void navigation() {
-        boolean exit = false;
-        while (!exit) {
-            if (selectedUser == null) {
-                out.help.noUser();
-                exit = noUserNavigation();
+        NavigationContainer navigationContainer = new NavigationContainer();
+        while (!navigationContainer.exit) {
+            if (navigationContainer.user == null) {
+                output.help.noUser();
+                noUserNavigation(navigationContainer);
             } else {
-                if (selectedPortfolio == null) {
-                    out.help.loggedIn();
-                    exit = userSelected();
+                if (navigationContainer.portfolio == null) {
+                    output.help.loggedIn();
+                    userSelected(navigationContainer);
                 } else {
-                    out.help.portfolio();
-                    exit = portfolioSelected();
+                    output.help.portfolio();
+                    portfolioSelected(navigationContainer);
                 }
             }
         }
@@ -50,218 +47,216 @@ public class Navigation {
 
     /**
      * Controller for when no portfolio is selected
+     *
      * @return boolean whether the program is to be terminated via -exit-
      */
-    private boolean noUserNavigation() {
-        if (selectedUser == null) {
-            switch (input.stringValue()) {
-                case "login":
-                    out.print("Please enter your username: ");
-                    String username = input.stringValue();
-                    login(userFactory.createUser(username));
-                    return false;
-                case "add":
-                    users.addUser();
-                    return false;
-                case "lf":
-                    availableSecurities.listSecurities();
-                    return false;
-                case "ph":
-                    availableSecurities.priceHistory();
-                    return false;
-                case "help":
-                    return false;
-                case "clear":
-                    out.help.clear();
-                    return false;
-                case "exit":
-                    users.save();
-                    return true;
-                default:
-                    out.println("Invalid command, please try again.");
-                    return false;
-            }
+    private NavigationContainer noUserNavigation(NavigationContainer navigationContainer) {
+        switch (input.stringValue()) {
+            case "login":
+                output.print("Please enter your username: ");
+                navigationContainer.user = userFactory.createUser(input.stringValue());
+                return login(navigationContainer);
+            case "add":
+                navigationContainer.user = users.addUser();
+                return navigationContainer;
+            case "lf":
+                availableSecurities.listSecurities();
+                return navigationContainer;
+            case "ph":
+                availableSecurities.priceHistory();
+                return navigationContainer;
+            case "help":
+                return navigationContainer;
+            case "clear":
+                output.help.clear();
+                return navigationContainer;
+            case "exit":
+                users.save();
+                navigationContainer.exit = true;
+                return navigationContainer;
+            default:
+                output.println("Invalid command, please try again.");
+                return navigationContainer;
         }
-        return false;
     }
 
     /**
      * Controller for when a user is selected
+     *
      * @return boolean whether the program is to be terminated via -exit-
      */
-    private boolean userSelected() {
-        if (selectedPortfolio != null) {
-            return portfolioSelected();
+    private NavigationContainer userSelected(NavigationContainer navigationContainer) {
+        if (navigationContainer.portfolio != null) {
+            return portfolioSelected(navigationContainer);
         } else {
             switch (input.stringValue()) {
                 case "selected":
-                    selected();
-                    return false;
+                    selected(navigationContainer);
+                    return navigationContainer;
                 case "select":
-                    selectPortfolio();
-                    return false;
+                    selectPortfolio(navigationContainer);
+                    return navigationContainer;
                 case "add":
-                    selectedUser.addPortfolio();
+                    navigationContainer.user.addPortfolio();
                     users.save();
-                    return false;
+                    return navigationContainer;
                 case "lp":
-                    selectedUser.listPortfolios();
-                    return false;
+                    navigationContainer.user.listPortfolios();
+                    return navigationContainer;
                 case "lf":
                     availableSecurities.listSecurities();
-                    return false;
+                    return navigationContainer;
                 case "ph":
                     availableSecurities.priceHistory();
-                    return false;
+                    return navigationContainer;
                 case "help":
-                    return false;
+                    return navigationContainer;
                 case "clear":
-                    out.help.clear();
-                    return false;
+                    output.help.clear();
+                    return navigationContainer;
                 case "logout":
-                    out.println("User " + selectedUser.getUsername() + " successfully logged out!");
-                    selectedUser = null;
-                    selectedPortfolio = null;
+                    output.println("User " + navigationContainer.user.getUsername() + " successfully logged out!");
+                    navigationContainer.user = null;
+                    navigationContainer.portfolio = null;
                     users.save();
-                    out.help.noUser();
-                    return false;
+                    output.help.noUser();
+                    return navigationContainer;
                 case "exit":
                     users.save();
-                    return true;
+                    navigationContainer.exit = true;
+                    return navigationContainer;
                 default:
-                    out.println("Invalid command, please try again.");
-                    return false;
+                    output.println("Invalid command, please try again.");
+                    return navigationContainer;
             }
         }
     }
 
     /**
      * Controller for when a portfolio is selected
+     *
      * @return boolean whether the program is to be terminated via -exit-
      */
-    private boolean portfolioSelected() {
+    private NavigationContainer portfolioSelected(NavigationContainer navigationContainer) {
         switch (input.stringValue()) {
             case "selected":
-                selected();
-                return false;
+                selected(navigationContainer);
+                return navigationContainer;
             case "select":
-                selectPortfolio();
-                return false;
+                selectPortfolio(navigationContainer);
+                return navigationContainer;
             case "add":
-                selectedUser.addPortfolio();
+                navigationContainer.user.addPortfolio();
                 users.save();
-                return false;
+                return navigationContainer;
             case "buy":
-                selectedPortfolio.buy(availableSecurities, users);
+                navigationContainer.portfolio.buy(availableSecurities, users);
                 users.save();
-                return false;
+                return navigationContainer;
             case "sell":
-                selectedPortfolio.sell(users);
+                navigationContainer.portfolio.sell(users);
                 users.save();
-                return false;
+                return navigationContainer;
             case "ov":
-                selectedPortfolio.overview(new PortfolioSnapshot(selectedPortfolio));
-                return false;
+                navigationContainer.portfolio.overview(new PortfolioSnapshot(navigationContainer.portfolio));
+                return navigationContainer;
             case "oh":
-                selectedPortfolio.printOrderHistory();
-                return false;
+                navigationContainer.portfolio.printOrderHistory();
+                return navigationContainer;
             case "lp":
-                selectedUser.listPortfolios();
-                return false;
+                navigationContainer.user.listPortfolios();
+                return navigationContainer;
             case "lf":
                 availableSecurities.listSecurities();
-                return false;
+                return navigationContainer;
             case "ph":
                 availableSecurities.priceHistory();
-                return false;
+                return navigationContainer;
             case "vd":
-                selectedPortfolio.listHistory();
+                navigationContainer.portfolio.listHistory();
                 System.out.println("Enter the state of the Portfolio from which you want to calculate the value increase: ");
-                selectedPortfolio.valueDevelopment(input.stringValue());
-                return false;
+                navigationContainer.portfolio.valueDevelopment(input.stringValue());
+                return navigationContainer;
             case "compare":
-                if (selectedUser.hasPortfolios()) {
-                    selectedUser.compare();
+                if (navigationContainer.user.hasPortfolios()) {
+                    navigationContainer.user.compare();
                 } else {
-                    out.println("Comparison is unavailable for users who own less than 2 portfolios.");
+                    output.println("Comparison is unavailable for users who own less than 2 portfolios.");
                 }
-                return false;
+                return navigationContainer;
             case "hist":
-                selectedPortfolio.listHistory();
+                navigationContainer.portfolio.listHistory();
                 System.out.println("Enter the state of the Portfolio you want to display: ");
-                selectedPortfolio.viewHistorical(input.stringValue());
-                return false;
+                navigationContainer.portfolio.viewHistorical(input.stringValue());
+                return navigationContainer;
             case "help":
-                return false;
+                return navigationContainer;
             case "clear":
-                out.help.clear();
-                return false;
+                output.help.clear();
+                return navigationContainer;
             case "logout":
-                selectedPortfolio = null;
-                selectedUser = null;
-                return false;
+                navigationContainer.portfolio = null;
+                navigationContainer.user = null;
+                return navigationContainer;
             case "exit":
                 users.save();
-                return true;
+                navigationContainer.exit = true;
+                return navigationContainer;
             default:
-                out.println("Invalid command, please try again.");
-                return false;
+                output.println("Invalid command, please try again.");
+                return navigationContainer;
         }
     }
 
     /**
      * Used to log a user in / set the selectedUser
-     * @param user User to select as selectedUser
+     * @param navigationContainer NavigationContainer to check user
      */
-    private void login(User user) {
-        if (users.contains(user)) {
-            out.println("Password: ");
-            if (users.get(user.getUsername()).checkPassword(input.stringValue())) {
-                selectUser(users.get(user.getUsername()));
-                selectedUser.updatePortfolios(availableSecurities);
-                out.println("User " + user.getUsername() + " is now logged in!");
-                out.help.clear();
+    private NavigationContainer login(NavigationContainer navigationContainer) {
+        if (users.contains(navigationContainer.user)) {
+            output.println("Password: ");
+            if (users.get(navigationContainer.user.getUsername()).checkPassword(input.stringValue())) {
+                navigationContainer.user.updatePortfolios(availableSecurities);
+                output.println("User " + navigationContainer.user.getUsername() + " is now logged in!");
+                navigationContainer.user = users.get(navigationContainer.user.getUsername());
+                output.help.clear();
+                return navigationContainer;
             } else {
-                out.println("Password invalid. Please try again.");
+                output.println("Password invalid. Please try again.");
+                navigationContainer.user = null;
+                return navigationContainer;
             }
         } else {
-            out.println("User does not exist! Please register a new User");
+            output.println("User does not exist! Please register a new User");
+            navigationContainer.user = null;
+            return navigationContainer;
         }
     }
 
     /**
      * Shows which user and Portfolio are selected
      */
-    private void selected() {
-        out.println("User selected:\t" + selectedUser.getUsername());
-        if (selectedPortfolio != null) {
-            out.println("Depot selected:\t" + selectedPortfolio.getName());
+    private void selected(NavigationContainer navigationContainer) {
+        output.println("User selected:\t" + navigationContainer.user.getUsername());
+        if (navigationContainer.portfolio != null) {
+            output.println("Depot selected:\t" + navigationContainer.portfolio.getName());
         } else {
-            out.println("No depot selected");
+            output.println("No depot selected");
         }
-    }
-
-    /**
-     * Selects a user
-     *
-     * @param user User to be made selectedUser
-     */
-    void selectUser(User user) {
-        this.selectedUser = user;
     }
 
     /**
      * Selects a portfolio in navigation from the selectedUsers list of portfolios
      */
-    void selectPortfolio() {
-        selectedUser.listPortfolios();
-        out.println("Please enter the name of the portfolio you want to select.");
+    void selectPortfolio(NavigationContainer navigationContainer) {
+        navigationContainer.user.listPortfolios();
+        output.println("Please enter the name of the portfolio you want to select.");
         String depotName = input.stringValue();
-        if (selectedUser.hasPortfolio(depotName)) {
-            selectedPortfolio = selectedUser.getPortfolio(depotName);
-            out.println("Depot " + depotName + " has been selected!");
+        if (navigationContainer.user.hasPortfolio(depotName)) {
+            navigationContainer.portfolio = navigationContainer.user.getPortfolio(depotName);
+            output.println("Depot " + navigationContainer.portfolio.getName() + " has been selected!");
         } else {
-            out.println("Depot " + depotName + " does not exist or isn't owned by you, please try a different depot.");
+            output.println("Depot " + depotName + " does not exist or isn't owned by you, please try a different depot.");
         }
     }
 }
