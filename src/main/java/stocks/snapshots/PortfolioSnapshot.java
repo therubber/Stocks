@@ -1,5 +1,6 @@
 package stocks.snapshots;
 
+import javafx.geometry.Pos;
 import stocks.entities.Portfolio;
 import stocks.entities.Position;
 import stocks.factories.NumberFactory;
@@ -11,12 +12,12 @@ public class PortfolioSnapshot implements Iterable<PositionSnapshot> {
 
     private BigDecimal equity;
     private LocalDate state;
-    public List<PositionSnapshot> positions = new LinkedList<>();
+    private List<PositionSnapshot> positions = new LinkedList<>();
     private final NumberFactory factory = new NumberFactory();
 
     public PortfolioSnapshot(Portfolio portfolio) {
         this.state = portfolio.getState();
-        for (Position position : portfolio.positions) {
+        for (Position position : portfolio.getPositions()) {
             this.positions.add(new PositionSnapshot(position));
         }
         this.equity = portfolio.getEquity();
@@ -64,6 +65,14 @@ public class PortfolioSnapshot implements Iterable<PositionSnapshot> {
             value = value.add(position.getValue());
         }
         return value;
+    }
+
+    /**
+     * Getter method for positions
+     * @return List<PositionSnapshot>
+     */
+    public List<PositionSnapshot> getPositions() {
+        return positions;
     }
 
     /**

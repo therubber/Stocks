@@ -6,7 +6,6 @@ import stocks.factories.SecurityFactory;
 import stocks.inputoutput.Output;
 import stocks.inputoutput.Input;
 import stocks.repo.SecurityRepo;
-import stocks.repo.UserRepo;
 import stocks.snapshots.PortfolioSnapshot;
 import stocks.snapshots.PositionSnapshot;
 import java.math.BigDecimal;
@@ -21,7 +20,7 @@ public class Portfolio implements Iterable<Position> {
     private BigDecimal equity;
     private BigDecimal startEquity;
     private LocalDate state;
-    public List<Position> positions = new LinkedList<>();
+    private List<Position> positions = new LinkedList<>();
     List<Order> orderHistory = new LinkedList<>();
     transient SecurityRepo ownedSecurities = new SecurityRepo();
     List<PortfolioSnapshot> portfolioHistory = new LinkedList<>();
@@ -94,6 +93,10 @@ public class Portfolio implements Iterable<Position> {
         return positions.get(index);
     }
 
+    public List<Position> getPositions() {
+        return positions;
+    }
+
     /**
      * Getter method to retrieve the amount of positions in the portfolio. Required for indexing of positions
      * @return int number of positions
@@ -117,7 +120,7 @@ public class Portfolio implements Iterable<Position> {
         out.println();
         System.out.printf("%-12s %-10s %-18s %-16s %-10s %-10s %-10s%n", "ID", "Count", "Name", "Type", "Price", "Value", "Execution");
         out.println();
-        for (PositionSnapshot position : portfolioSnapshot.positions) {
+        for (PositionSnapshot position : portfolioSnapshot.getPositions()) {
             System.out.printf("%-12s %-10d %-18s %-16s %-10.2f %-10.2f %-10s%n", position.getId(), position.getCount(), position.getSecurity().getName(), position.getSecurityType(), position.getPrice(), position.getValue(), position.getExecutionDate());
         }
         out.println();
@@ -243,7 +246,7 @@ public class Portfolio implements Iterable<Position> {
     /**
      * Used to buy securities and add the position to the portfolio
      */
-    public void buy(SecurityRepo securityRepo, UserRepo users) {
+    public void buy(SecurityRepo securityRepo) {
         if (securityRepo.evaluateSpotPrices()) {
             Order order = selectionBuy(securityRepo);
             if (order.getValue().doubleValue() <= equity.doubleValue() && !order.getSecurity().getIsin().equals("ERROR")) {
@@ -284,7 +287,7 @@ public class Portfolio implements Iterable<Position> {
     /**
      * Used to reduce a position in the selected portfolio
      */
-    public void sell(UserRepo users) {
+    public void sell() {
         ownedSecurities.listIndexed();
         out.println("Please select the security you want to sell by entering its index.");
         int index = input.intValue();

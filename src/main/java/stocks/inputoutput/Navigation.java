@@ -150,11 +150,11 @@ public class Navigation {
                 // users.save();
                 return navigationContainer;
             case "buy":
-                navigationContainer.getPortfolio().buy(availableSecurities, users);
+                navigationContainer.getPortfolio().buy(availableSecurities);
                 // users.save();
                 return navigationContainer;
             case "sell":
-                navigationContainer.getPortfolio().sell(users);
+                navigationContainer.getPortfolio().sell();
                 // users.save();
                 return navigationContainer;
             case "ov":
