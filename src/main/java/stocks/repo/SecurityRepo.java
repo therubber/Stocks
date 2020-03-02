@@ -18,10 +18,6 @@ public class SecurityRepo implements Iterable<Security>{
         securities.add(security);
     }
 
-    public void remove(Security security) {
-        securities.remove(security);
-    }
-
     public Security get(Security securityDow) {
         return securities.get(indexOf(securityDow));
     }
@@ -55,7 +51,6 @@ public class SecurityRepo implements Iterable<Security>{
         }
         System.out.println();
     }
-
 
     /**
      * Displays an indexed list of all securities available. Index begins at 1 for simplicity of use
@@ -149,13 +144,6 @@ public class SecurityRepo implements Iterable<Security>{
      */
     public int size() {
         return securities.size();
-    }
-
-    /**
-     * Clears the Repository
-     */
-    public void clear() {
-        securities.clear();
     }
 
     public Iterator<Security> iterator() {

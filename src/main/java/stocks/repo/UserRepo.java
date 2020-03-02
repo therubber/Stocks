@@ -37,7 +37,7 @@ public class UserRepo {
             User user = factory.createUser(username, input.stringValue());
             users.add(user);
             output.println("New user " + username + " has been created!");
-            save();
+            // save();
             return user;
         } else {
             output.println("User with that username already exists, please login.");

@@ -63,6 +63,7 @@ public class Output {
             System.out.printf(FORMAT, "sell:", "Reduce an existing position in the selected portfolio");
             System.out.printf(FORMAT, "ov:", "Overview of all positions in selected portfolio");
             System.out.printf(FORMAT, "oh:", "Displays order history");
+            System.out.printf(FORMAT, "ph:", "Select a security and show its price history");
             System.out.printf(FORMAT, "compare:", "Compares two portfolios");
             System.out.printf(FORMAT, "help:", "Shows this dialog");
             System.out.printf(FORMAT, "clear:", "Clears the console");
